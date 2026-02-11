@@ -345,47 +345,6 @@
     margin-top: 16px;
     letter-spacing: 1px;
   }
-
-  /* Sound toggle */
-  .sound-toggle {
-    position: fixed;
-    bottom: 20px;
-    left: 20px;
-    z-index: 100;
-    width: 44px; height: 44px;
-    background: rgba(26,20,16,0.7);
-    border: 1px solid rgba(201,168,76,0.25);
-    border-radius: 50%;
-    color: var(--color-ivory);
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.3s;
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  .sound-toggle:hover {
-    border-color: var(--color-gold);
-    color: var(--color-gold);
-  }
-  .sound-toggle.active {
-    border-color: var(--color-gold);
-    color: var(--color-gold);
-    background: rgba(201,168,76,0.1);
-  }
-  .sound-toggle .tooltip {
-    position: absolute;
-    left: calc(100% + 10px);
-    white-space: nowrap;
-    font-family: var(--font-body);
-    font-size: 12px;
-    color: rgba(245,240,232,0.5);
-    opacity: 0;
-    transition: opacity 0.3s;
-    pointer-events: none;
-  }
-  .sound-toggle:hover .tooltip { opacity: 1; }
 </style>
 </head>
 <body>
@@ -475,25 +434,13 @@
   <div class="seed-display" id="seed-display">seed: 0</div>
 </div>
 
-<!-- Sound toggle -->
-<button class="sound-toggle" id="sound-toggle" aria-label="Klang ein/ausschalten">
-  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-    <path d="M11 5L6 9H2v6h4l5 4V5z" id="speaker-body"/>
-    <path d="M15.54 8.46a5 5 0 010 7.07" id="sound-wave1" opacity="0.4"/>
-    <path d="M19.07 4.93a10 10 0 010 14.14" id="sound-wave2" opacity="0.4"/>
-  </svg>
-  <span class="tooltip">Fuge hören</span>
-</button>
-
 <script type="module">
-import './src/lib/nav.js';
 import { mulberry32, normalizePitches } from './src/lib/math.js';
 import {
   FUGUE_SUBJECT_PITCHES, FUGUE_SUBJECT_DURATIONS,
   COUNTER_SUBJECT_PITCHES, COUNTER_SUBJECT_DURATIONS,
   subjectNorm, counterNorm
 } from './src/lib/fugenmaschine.js';
-import { midiToFreq, createCathedralReverb } from './src/lib/audio.js';
 
 // =============================================
 // FUGENMASCHINE — Generative Bach Fugue Visualizer
@@ -1096,144 +1043,7 @@ document.addEventListener('keydown', (e) => {
     const newSeed = Math.floor(Math.random() * 100000);
     window.resetWithSeed(newSeed);
   }
-  if (e.key === 'm') {
-    document.getElementById('sound-toggle').click();
-  }
 });
-
-// =============================================
-// AUDIO SYNTHESIS
-// =============================================
-(function() {
-  const toggle = document.getElementById('sound-toggle');
-  const wave1 = document.getElementById('sound-wave1');
-  const wave2 = document.getElementById('sound-wave2');
-  let audioCtx = null;
-  let isPlaying = false;
-  let masterGain = null;
-  let reverbGain = null;
-  let convolver = null;
-  let voiceNoteIndex = [0, 0, 0, 0];
-  let voiceNoteTimer = [0, 0, 0, 0];
-  let audioInterval = null;
-
-  function initAudio() {
-    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    masterGain = audioCtx.createGain();
-    masterGain.gain.value = 0;
-    masterGain.connect(audioCtx.destination);
-
-    convolver = createCathedralReverb(audioCtx, 3.0);
-    reverbGain = audioCtx.createGain();
-    reverbGain.gain.value = 0.35;
-    convolver.connect(reverbGain);
-    reverbGain.connect(masterGain);
-  }
-
-  function playNote(midi, voiceIndex, duration) {
-    if (!audioCtx || !isPlaying) return;
-    const freq = midiToFreq(midi);
-    const now = audioCtx.currentTime;
-
-    // Oscillator with gentle sine tone
-    const osc = audioCtx.createOscillator();
-    osc.type = 'sine';
-    osc.frequency.value = freq;
-
-    // Second oscillator for warmth (detuned)
-    const osc2 = audioCtx.createOscillator();
-    osc2.type = 'triangle';
-    osc2.frequency.value = freq;
-    osc2.detune.value = 3;
-
-    const noteGain = audioCtx.createGain();
-    const noteDur = Math.min(duration * 0.15, 1.5);
-    const attack = 0.02;
-    const release = noteDur * 0.6;
-
-    noteGain.gain.setValueAtTime(0, now);
-    noteGain.gain.linearRampToValueAtTime(0.08, now + attack);
-    noteGain.gain.exponentialRampToValueAtTime(0.001, now + noteDur);
-
-    osc.connect(noteGain);
-    osc2.connect(noteGain);
-    noteGain.connect(masterGain);
-    noteGain.connect(convolver);
-
-    osc.start(now);
-    osc.stop(now + noteDur + 0.1);
-    osc2.start(now);
-    osc2.stop(now + noteDur + 0.1);
-  }
-
-  // Advance voices and trigger notes, synchronized with visual beat
-  function startAudioLoop() {
-    voiceNoteIndex = [0, 0, 0, 0];
-    voiceNoteTimer = [0, 0, 0, 0];
-
-    // Check voice state at regular intervals and play notes
-    audioInterval = setInterval(() => {
-      if (!isPlaying || !voices || voices.length === 0) return;
-
-      voices.forEach((voice, vi) => {
-        if (!voice.active) return;
-
-        voiceNoteTimer[vi]++;
-        const isSubject = voice.state === 'subject';
-        const isCounter = voice.state === 'counter';
-
-        const pitches = isSubject ? FUGUE_SUBJECT_PITCHES :
-                        isCounter ? COUNTER_SUBJECT_PITCHES : null;
-        const durations = isSubject ? FUGUE_SUBJECT_DURATIONS :
-                          isCounter ? COUNTER_SUBJECT_DURATIONS : null;
-
-        if (!pitches || !durations) return;
-
-        const idx = voiceNoteIndex[vi] % pitches.length;
-        const dur = durations[idx] * (120 / params.tempo);
-
-        if (voiceNoteTimer[vi] >= dur) {
-          voiceNoteTimer[vi] = 0;
-          voiceNoteIndex[vi]++;
-          const nextIdx = voiceNoteIndex[vi] % pitches.length;
-
-          // Transpose per voice: soprano +12, alto 0, tenor -12, bass -24
-          const transpose = [12, 0, -12, -24][vi] || 0;
-          playNote(pitches[nextIdx] + transpose, vi, dur);
-        }
-      });
-    }, 80);
-  }
-
-  function stopAudioLoop() {
-    if (audioInterval) {
-      clearInterval(audioInterval);
-      audioInterval = null;
-    }
-  }
-
-  toggle.addEventListener('click', () => {
-    if (!audioCtx) initAudio();
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
-    isPlaying = !isPlaying;
-    toggle.classList.toggle('active', isPlaying);
-
-    if (isPlaying) {
-      masterGain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 0.5);
-      wave1.setAttribute('opacity', '1');
-      wave2.setAttribute('opacity', '1');
-      toggle.querySelector('.tooltip').textContent = 'Ton aus';
-      startAudioLoop();
-    } else {
-      masterGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 0.5);
-      wave1.setAttribute('opacity', '0.4');
-      wave2.setAttribute('opacity', '0.4');
-      toggle.querySelector('.tooltip').textContent = 'Fuge hören';
-      stopAudioLoop();
-    }
-  });
-})();
 </script>
 <script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
 </body>

@@ -442,11 +442,7 @@ canvas { display: block; }
     <h4>Satzfolge</h4>
     <ol id="dpTrackList"></ol>
   </div>
-  <div style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-top:0.3rem">
-    <a class="dp-link" id="dpYouTube" href="#" target="_blank" rel="noopener">YouTube &rarr;</a>
-    <a class="dp-link" id="dpSpotify" href="#" target="_blank" rel="noopener">Spotify &rarr;</a>
-    <a class="dp-link" id="dpAmazon" href="#" target="_blank" rel="noopener">Amazon &rarr;</a>
-  </div>
+  <a class="dp-link" id="dpYouTube" href="#" target="_blank" rel="noopener">Auf YouTube suchen &rarr;</a>
 </div>
 
 <!-- Stats -->
@@ -462,7 +458,6 @@ canvas { display: block; }
   <div class="legend-item"><span class="legend-dot" style="background:#7BA0B8"></span>Orgel</div>
 </div>
 
-<script type="module">import './src/lib/nav.js';</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 // ============================================================
@@ -1355,11 +1350,9 @@ function showDetail(idx) {
     ol.appendChild(li);
   });
 
-  // Streaming links
+  // YouTube link
   const ytQuery = encodeURIComponent('Helmuth Rilling ' + w.title + ' ' + w.bwv);
   document.getElementById('dpYouTube').href = 'https://www.youtube.com/results?search_query=' + ytQuery;
-  document.getElementById('dpSpotify').href = 'https://open.spotify.com/search/' + ytQuery;
-  document.getElementById('dpAmazon').href = 'https://music.amazon.com/search/' + ytQuery;
 
   // Geometric pattern
   drawPattern(idx, col);
