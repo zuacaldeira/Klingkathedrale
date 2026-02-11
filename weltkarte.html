@@ -242,6 +242,25 @@ body {
   transition: opacity 0.2s;
 }
 .info-card .card-close:hover { opacity: 1; }
+.info-card .listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.3s;
+  letter-spacing: 0.04em;
+}
+.info-card .listen-link:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--color-gold);
+}
 
 /* ── Timeline ── */
 .timeline-section {
@@ -563,6 +582,11 @@ body {
     <div class="card-city"></div>
     <div class="card-years"></div>
     <div class="card-body"></div>
+    <div class="card-links" style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-top:1rem">
+      <a class="listen-link" id="card-listen-yt" href="#" target="_blank" rel="noopener">&#9835; YouTube</a>
+      <a class="listen-link" id="card-listen-spotify" href="#" target="_blank" rel="noopener">&#9835; Spotify</a>
+      <a class="listen-link" id="card-listen-amazon" href="#" target="_blank" rel="noopener">&#9835; Amazon Music</a>
+    </div>
   </div>
 </div>
 
@@ -832,6 +856,10 @@ function showCard(city) {
   overlay.querySelector('.card-city').textContent = city.name;
   overlay.querySelector('.card-years').textContent = city.startYear + ' \u2013 ' + city.endYear;
   overlay.querySelector('.card-body').textContent = city.detail;
+  const query = encodeURIComponent('Helmuth Rilling Bach ' + city.name);
+  document.getElementById('card-listen-yt').href = 'https://www.youtube.com/results?search_query=' + query;
+  document.getElementById('card-listen-spotify').href = 'https://open.spotify.com/search/' + query;
+  document.getElementById('card-listen-amazon').href = 'https://music.amazon.com/search/' + query;
   overlay.classList.add('open');
 }
 cardClose.addEventListener('click', () => overlay.classList.remove('open'));

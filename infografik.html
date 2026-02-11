@@ -513,6 +513,27 @@ section {
 /* ========================== */
 /* RESPONSIVE                 */
 /* ========================== */
+/* Listen links */
+.listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.3s;
+  letter-spacing: 0.04em;
+}
+.listen-link:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--color-gold);
+}
+
 @media (max-width: 768px) {
   .nav-dots { right: 0.7rem; }
   .nav-dot { width: 8px; height: 8px; }
@@ -620,6 +641,11 @@ section {
       <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#6B9080"></div>Messen</div>
       <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#8B7EC8"></div>Instrumentalwerke</div>
       <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#7BA0B8"></div>Orgelwerke</div>
+    </div>
+    <div class="listen-link-row" style="display:flex;justify-content:center;gap:0.8rem;margin-top:1.5rem;flex-wrap:wrap">
+      <a href="https://www.youtube.com/results?search_query=Helmuth+Rilling+Bach+Kantaten+Gesamtaufnahme" target="_blank" rel="noopener" class="listen-link">&#9835; YouTube</a>
+      <a href="https://open.spotify.com/search/Helmuth%20Rilling%20Bach%20Kantaten" target="_blank" rel="noopener" class="listen-link">&#9835; Spotify</a>
+      <a href="https://music.amazon.com/search/Helmuth+Rilling+Bach+Kantaten" target="_blank" rel="noopener" class="listen-link">&#9835; Amazon Music</a>
     </div>
   </div>
 </section>

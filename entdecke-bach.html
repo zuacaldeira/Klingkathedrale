@@ -203,7 +203,9 @@ function showResults() {
       <div class="card-recording">${w.recording}</div>
       <div class="card-tip">${w.tip}</div>
       <div class="card-actions">
-        <a href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener" class="listen-btn">Anhören &rarr;</a>
+        <a href="https://www.youtube.com/results?search_query=${ytQuery}" target="_blank" rel="noopener" class="listen-btn">YouTube &rarr;</a>
+        <a href="https://open.spotify.com/search/${ytQuery}" target="_blank" rel="noopener" class="listen-btn">Spotify &rarr;</a>
+        <a href="https://music.amazon.com/search/${ytQuery}" target="_blank" rel="noopener" class="listen-btn">Amazon &rarr;</a>
         <button class="expand-btn" onclick="toggleDeep(this)">Mehr erfahren</button>
       </div>
       <div class="deep-dive">

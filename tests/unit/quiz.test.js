@@ -20,15 +20,34 @@ describe('SETS data integrity', () => {
     });
   });
 
-  it('each work has bwv and title', () => {
+  it('each work has all required fields', () => {
+    const requiredFields = ['bwv', 'title', 'desc', 'why', 'recording', 'tip', 'deep'];
     Object.values(SETS).forEach(set => {
       if (set && set.works) {
         set.works.forEach(work => {
-          expect(work).toHaveProperty('bwv');
-          expect(work).toHaveProperty('title');
+          requiredFields.forEach(field => {
+            expect(work).toHaveProperty(field);
+            expect(typeof work[field]).toBe('string');
+            expect(work[field].length).toBeGreaterThan(0);
+          });
           expect(work.bwv).toMatch(/^BWV/);
         });
       }
+    });
+  });
+
+  it('desc, why, recording, tip, deep are non-trivial strings', () => {
+    const baseSets = ['peaceful_beauty', 'peaceful_depth', 'energized_drama', 'energized_virtuosity',
+      'contemplative_depth', 'sad_stillness', 'curious_beauty', 'curious_virtuosity',
+      'sad_beauty', 'contemplative_stillness'];
+    baseSets.forEach(key => {
+      SETS[key].works.forEach(work => {
+        expect(work.desc.length).toBeGreaterThan(10);
+        expect(work.why.length).toBeGreaterThan(10);
+        expect(work.recording.length).toBeGreaterThan(10);
+        expect(work.tip.length).toBeGreaterThan(10);
+        expect(work.deep.length).toBeGreaterThan(30);
+      });
     });
   });
 

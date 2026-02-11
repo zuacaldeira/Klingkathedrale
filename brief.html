@@ -497,6 +497,27 @@ body {
   transition: width 0.3s ease;
 }
 
+/* Listen links */
+.listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.3s;
+  letter-spacing: 0.04em;
+}
+.listen-link:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--color-gold);
+}
+
 /* Mobile responsive */
 @media (max-width: 768px) {
   .stanza {
@@ -590,6 +611,16 @@ wie ein Versprechen, wie ein erster Gesang.</div>
 <div class="line">und gab dem Wort zurück, was Zeit vergisst.</div></div>
   </div>
 </section>
+
+<!-- Listen links between stanzas -->
+<div class="listen-links" style="display:flex;flex-direction:column;align-items:center;gap:0.8rem;padding:1.5rem 2rem;background:var(--color-ink)">
+  <span style="font-family:var(--font-body);font-size:0.85rem;color:rgba(201,168,76,0.5);letter-spacing:0.2em;text-transform:uppercase">Rillings Aufnahmen h&ouml;ren</span>
+  <div style="display:flex;justify-content:center;gap:0.6rem;flex-wrap:wrap">
+    <a href="https://www.youtube.com/results?search_query=Helmuth+Rilling+Bach+Kantate+BWV+147" target="_blank" rel="noopener" class="listen-link">&#9835; YouTube</a>
+    <a href="https://open.spotify.com/search/Helmuth%20Rilling%20Bach%20BWV%20147" target="_blank" rel="noopener" class="listen-link">&#9835; Spotify</a>
+    <a href="https://music.amazon.com/search/Helmuth+Rilling+Bach+BWV+147" target="_blank" rel="noopener" class="listen-link">&#9835; Amazon Music</a>
+  </div>
+</div>
 
 <!-- STANZA 4 — Die Lehre -->
 <section class="stanza" id="stanza-4">
