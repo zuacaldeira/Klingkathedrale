@@ -357,6 +357,32 @@ footer p {
   font-family: var(--font-serif);
   font-size: 0.8rem;
   color: rgba(245,240,232,0.25);
+}
+footer .streaming-links {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 0.8rem;
+}
+footer .listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.4rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.3s;
+  letter-spacing: 0.04em;
+}
+footer .listen-link:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--color-gold);
   font-style: italic;
   letter-spacing: 0.05em;
 }
@@ -437,6 +463,11 @@ footer p {
 
 <footer>
   <p>In Erinnerung an Helmuth Rilling (1933&ndash;2026) &mdash; Klangkathedrale</p>
+  <div class="streaming-links">
+    <a href="https://www.youtube.com/results?search_query=Helmuth+Rilling+Toccata+Fuge+d-Moll+BWV+565" target="_blank" rel="noopener" class="listen-link">&#9835; YouTube</a>
+    <a href="https://open.spotify.com/search/Helmuth%20Rilling%20Toccata%20Fuge%20BWV%20565" target="_blank" rel="noopener" class="listen-link">&#9835; Spotify</a>
+    <a href="https://music.amazon.com/search/Helmuth+Rilling+Toccata+Fuge+BWV+565" target="_blank" rel="noopener" class="listen-link">&#9835; Amazon Music</a>
+  </div>
 </footer>
 
 <script type="module">

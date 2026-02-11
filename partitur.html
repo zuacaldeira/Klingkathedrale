@@ -394,6 +394,32 @@ body::before {
   font-family: var(--font-serif);
   font-size: 0.85rem;
   color: var(--color-sepia);
+}
+.footer-partitur .streaming-links {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+  margin-top: 1.2rem;
+}
+.footer-partitur .listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.3s;
+  letter-spacing: 0.04em;
+}
+.footer-partitur .listen-link:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--color-gold);
   font-style: italic;
 }
 
@@ -487,6 +513,11 @@ body::before {
 <!-- Footer -->
 <footer class="footer-partitur">
   <p>&bdquo;Die Musik Bachs ist wie eine Kathedrale aus Klang.&ldquo; &mdash; Helmuth Rilling</p>
+  <div class="streaming-links">
+    <a href="https://www.youtube.com/results?search_query=Helmuth+Rilling+Air+G-Saite+BWV+1068" target="_blank" rel="noopener" class="listen-link">&#9835; YouTube</a>
+    <a href="https://open.spotify.com/search/Helmuth%20Rilling%20Air%20BWV%201068" target="_blank" rel="noopener" class="listen-link">&#9835; Spotify</a>
+    <a href="https://music.amazon.com/search/Helmuth+Rilling+Air+BWV+1068" target="_blank" rel="noopener" class="listen-link">&#9835; Amazon Music</a>
+  </div>
 </footer>
 
 <script type="module">

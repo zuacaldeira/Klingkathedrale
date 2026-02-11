@@ -554,6 +554,42 @@ section {
   color: rgba(245,240,232,0.25);
   margin-top: 2rem;
 }
+.streaming-section {
+  margin: 2rem 0;
+}
+.streaming-label {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: rgba(201,168,76,0.5);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.8rem;
+}
+.streaming-links {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+.listen-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.5rem 1.2rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  text-decoration: none;
+  transition: all 0.3s;
+  letter-spacing: 0.04em;
+}
+.listen-link:hover {
+  background: rgba(201,168,76,0.1);
+  border-color: var(--color-gold);
+}
 
 /* ═══ AMBIENT SOUND TOGGLE ═══ */
 .sound-toggle {
@@ -937,6 +973,14 @@ section {
     <a href="stimmen.html">Stimmen</a>
     <a href="netzwerk.html">Netzwerk</a>
     <a href="architektur.html">Architektur</a>
+  </div>
+  <div class="streaming-section">
+    <p class="streaming-label">Rillings Aufnahmen h&ouml;ren</p>
+    <div class="streaming-links">
+      <a href="https://www.youtube.com/results?search_query=Helmuth+Rilling+Bach+Gesamtaufnahme" target="_blank" rel="noopener" class="listen-link">&#9835; YouTube</a>
+      <a href="https://open.spotify.com/search/Helmuth%20Rilling%20Bach" target="_blank" rel="noopener" class="listen-link">&#9835; Spotify</a>
+      <a href="https://music.amazon.com/search/Helmuth+Rilling+Bach" target="_blank" rel="noopener" class="listen-link">&#9835; Amazon Music</a>
+    </div>
   </div>
   <p class="copyright">&copy; 2026 Klangkathedrale — Ein Projekt der Erinnerung</p>
 </section>
