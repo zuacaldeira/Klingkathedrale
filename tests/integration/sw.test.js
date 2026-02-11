@@ -44,13 +44,14 @@ describe('Service Worker', () => {
 
     // Load the service worker code by evaluating it
     // We re-implement the logic here for testing since we can't import non-module sw.js
-    const CACHE_NAME = 'klangkathedrale-v1';
+    const CACHE_NAME = 'klangkathedrale-v2';
     const PAGES = [
       '/', '/index.html', '/klangkathedrale.html', '/orgel.html',
       '/kathedrale.html', '/universum.html', '/fugenmaschine.html',
       '/partitur.html', '/entdecke-bach.html', '/weltkarte.html',
       '/infografik.html', '/brief.html', '/stimmen.html',
-      '/netzwerk.html', '/architektur.html', '/manifest.json'
+      '/netzwerk.html', '/architektur.html', '/src/lib/nav.js',
+      '/manifest.json'
     ];
 
     mockSelf.addEventListener('install', event => {
@@ -93,7 +94,7 @@ describe('Service Worker', () => {
       const event = { waitUntil: (p) => { waitPromise = p; } };
       handlers.install(event);
       await waitPromise;
-      expect(mockCaches.open).toHaveBeenCalledWith('klangkathedrale-v1');
+      expect(mockCaches.open).toHaveBeenCalledWith('klangkathedrale-v2');
     });
 
     it('calls skipWaiting', () => {
@@ -107,7 +108,7 @@ describe('Service Worker', () => {
       const event = { waitUntil: (p) => { waitPromise = p; } };
       handlers.install(event);
       await waitPromise;
-      const cache = await mockCaches.open('klangkathedrale-v1');
+      const cache = await mockCaches.open('klangkathedrale-v2');
       expect(cache.addAll).toHaveBeenCalledWith(expect.arrayContaining([
         '/', '/index.html', '/klangkathedrale.html', '/manifest.json'
       ]));
@@ -124,7 +125,7 @@ describe('Service Worker', () => {
     it('deletes old caches', async () => {
       // Seed an old cache
       mockCaches._store['old-cache-v0'] = {};
-      mockCaches.keys.mockResolvedValue(['klangkathedrale-v1', 'old-cache-v0']);
+      mockCaches.keys.mockResolvedValue(['klangkathedrale-v2', 'old-cache-v0']);
 
       let waitPromise;
       const event = { waitUntil: (p) => { waitPromise = p; } };
@@ -134,13 +135,13 @@ describe('Service Worker', () => {
     });
 
     it('keeps current cache', async () => {
-      mockCaches.keys.mockResolvedValue(['klangkathedrale-v1']);
+      mockCaches.keys.mockResolvedValue(['klangkathedrale-v2']);
 
       let waitPromise;
       const event = { waitUntil: (p) => { waitPromise = p; } };
       handlers.activate(event);
       await waitPromise;
-      expect(mockCaches.delete).not.toHaveBeenCalledWith('klangkathedrale-v1');
+      expect(mockCaches.delete).not.toHaveBeenCalledWith('klangkathedrale-v2');
     });
   });
 

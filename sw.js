@@ -1,5 +1,5 @@
 // Klangkathedrale Service Worker
-const CACHE_NAME = 'klangkathedrale-v1';
+const CACHE_NAME = 'klangkathedrale-v2';
 const PAGES = [
   '/',
   '/index.html',
@@ -16,6 +16,7 @@ const PAGES = [
   '/stimmen.html',
   '/netzwerk.html',
   '/architektur.html',
+  '/src/lib/nav.js',
   '/manifest.json'
 ];
 
