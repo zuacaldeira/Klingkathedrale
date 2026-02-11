@@ -2,21 +2,19 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import {
   NAV_SECTIONS,
   getCurrentPage,
-  createNavButton,
-  createNavOverlay,
-  injectStyles,
-  openNav,
-  closeNav,
-  trapFocus
+  findCurrentSection,
+  findCurrentPageTitle,
+  createDropdown,
+  toggleDropdown,
+  closeAllDropdowns,
+  createBreadcrumb,
+  injectStyles
 } from '../../src/lib/nav.js';
 
 describe('nav', () => {
   beforeEach(() => {
-    // Clean up any injected elements
-    document.getElementById('kk-nav-overlay')?.remove();
-    document.querySelector('.kk-nav-btn')?.remove();
+    document.querySelector('.kk-bc-bar')?.remove();
     document.getElementById('kk-nav-styles')?.remove();
-    document.body.style.overflow = '';
   });
 
   describe('NAV_SECTIONS', () => {
@@ -74,116 +72,322 @@ describe('nav', () => {
     });
   });
 
-  describe('createNavButton()', () => {
-    it('returns a button element', () => {
-      const btn = createNavButton();
-      expect(btn.tagName).toBe('BUTTON');
+  describe('findCurrentSection()', () => {
+    it('returns section for a page in Erleben', () => {
+      const section = findCurrentSection('orgel.html');
+      expect(section).not.toBeNull();
+      expect(section.label).toBe('Erleben');
     });
 
-    it('has correct class', () => {
-      const btn = createNavButton();
-      expect(btn.className).toBe('kk-nav-btn');
+    it('returns section for a page in Entdecken', () => {
+      const section = findCurrentSection('weltkarte.html');
+      expect(section.label).toBe('Entdecken');
     });
 
-    it('has aria-label', () => {
-      const btn = createNavButton();
-      expect(btn.getAttribute('aria-label')).toBe('Navigation öffnen');
+    it('returns section for a page in Erinnern', () => {
+      const section = findCurrentSection('stimmen.html');
+      expect(section.label).toBe('Erinnern');
     });
 
-    it('has aria-expanded=false', () => {
-      const btn = createNavButton();
-      expect(btn.getAttribute('aria-expanded')).toBe('false');
+    it('returns null for hub page', () => {
+      expect(findCurrentSection('klangkathedrale.html')).toBeNull();
     });
 
-    it('has aria-controls pointing to overlay', () => {
-      const btn = createNavButton();
-      expect(btn.getAttribute('aria-controls')).toBe('kk-nav-overlay');
+    it('returns null for architektur', () => {
+      expect(findCurrentSection('architektur.html')).toBeNull();
     });
 
-    it('contains SVG hamburger icon', () => {
-      const btn = createNavButton();
-      expect(btn.querySelector('svg')).not.toBeNull();
-      expect(btn.querySelectorAll('line')).toHaveLength(3);
+    it('returns null for unknown page', () => {
+      expect(findCurrentSection('unknown.html')).toBeNull();
     });
   });
 
-  describe('createNavOverlay()', () => {
-    it('returns a div with correct id', () => {
-      const overlay = createNavOverlay('orgel.html');
-      expect(overlay.id).toBe('kk-nav-overlay');
+  describe('findCurrentPageTitle()', () => {
+    it('returns title for section page', () => {
+      expect(findCurrentPageTitle('orgel.html')).toBe('Orgel');
     });
 
-    it('has role=dialog', () => {
-      const overlay = createNavOverlay('orgel.html');
-      expect(overlay.getAttribute('role')).toBe('dialog');
+    it('returns Architektur for architektur page', () => {
+      expect(findCurrentPageTitle('architektur.html')).toBe('Architektur');
     });
 
-    it('has aria-modal=true', () => {
-      const overlay = createNavOverlay('orgel.html');
-      expect(overlay.getAttribute('aria-modal')).toBe('true');
+    it('returns null for hub page', () => {
+      expect(findCurrentPageTitle('klangkathedrale.html')).toBeNull();
     });
 
-    it('is hidden by default', () => {
-      const overlay = createNavOverlay('orgel.html');
-      expect(overlay.hidden).toBe(true);
+    it('returns null for unknown page', () => {
+      expect(findCurrentPageTitle('unknown.html')).toBeNull();
+    });
+  });
+
+  describe('createDropdown()', () => {
+    const section = NAV_SECTIONS[0]; // Erleben
+
+    it('returns a span wrapper with correct class', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      expect(dd.tagName).toBe('SPAN');
+      expect(dd.className).toBe('kk-bc-dropdown');
     });
 
-    it('contains a close button', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const closeBtn = overlay.querySelector('.kk-nav-close');
-      expect(closeBtn).not.toBeNull();
-      expect(closeBtn.getAttribute('aria-label')).toBe('Navigation schließen');
+    it('has a trigger button with section label', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const trigger = dd.querySelector('.kk-bc-trigger');
+      expect(trigger).not.toBeNull();
+      expect(trigger.textContent).toContain('Erleben');
+      expect(trigger.textContent).toContain('\u25BE');
     });
 
-    it('contains hub link to klangkathedrale', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const hubLink = overlay.querySelector('.kk-nav-hub');
-      expect(hubLink).not.toBeNull();
-      expect(hubLink.href).toContain('klangkathedrale.html');
+    it('trigger has aria-expanded=false', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const trigger = dd.querySelector('.kk-bc-trigger');
+      expect(trigger.getAttribute('aria-expanded')).toBe('false');
     });
 
-    it('marks hub link as current when on klangkathedrale', () => {
-      const overlay = createNavOverlay('klangkathedrale.html');
-      const hubLink = overlay.querySelector('.kk-nav-hub');
-      expect(hubLink.getAttribute('aria-current')).toBe('page');
+    it('trigger has aria-haspopup=true', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const trigger = dd.querySelector('.kk-bc-trigger');
+      expect(trigger.getAttribute('aria-haspopup')).toBe('true');
     });
 
-    it('has 3 section headings', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const headings = overlay.querySelectorAll('.kk-nav-heading');
-      expect(headings).toHaveLength(3);
+    it('has a hidden menu with role=menu', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const menu = dd.querySelector('.kk-bc-menu');
+      expect(menu).not.toBeNull();
+      expect(menu.hidden).toBe(true);
+      expect(menu.getAttribute('role')).toBe('menu');
     });
 
-    it('has 11 page links', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const links = overlay.querySelectorAll('.kk-nav-link');
-      expect(links).toHaveLength(11);
+    it('menu has correct number of items', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const items = dd.querySelectorAll('.kk-bc-menu-item');
+      expect(items).toHaveLength(4);
     });
 
-    it('marks active page with aria-current', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const activeLink = overlay.querySelector('[aria-current="page"].kk-nav-link');
-      expect(activeLink).not.toBeNull();
-      expect(activeLink.href).toContain('orgel.html');
+    it('marks current page as active span (not a link)', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const active = dd.querySelector('.kk-bc-menu-active');
+      expect(active).not.toBeNull();
+      expect(active.tagName).toBe('SPAN');
+      expect(active.getAttribute('aria-current')).toBe('page');
+      expect(active.textContent).toBe('Orgel');
     });
 
-    it('does not mark other pages as current', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const currentLinks = overlay.querySelectorAll('.kk-nav-link[aria-current="page"]');
-      expect(currentLinks).toHaveLength(1);
+    it('other pages are links', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const links = dd.querySelectorAll('a.kk-bc-menu-item');
+      expect(links).toHaveLength(3);
     });
 
-    it('contains architektur footer link', () => {
-      const overlay = createNavOverlay('orgel.html');
-      const footerLink = overlay.querySelector('.kk-nav-footer-link');
-      expect(footerLink).not.toBeNull();
-      expect(footerLink.href).toContain('architektur.html');
+    it('menu items have role=menuitem', () => {
+      const dd = createDropdown(section, 'orgel.html');
+      const items = dd.querySelectorAll('[role="menuitem"]');
+      expect(items).toHaveLength(4);
+    });
+  });
+
+  describe('toggleDropdown()', () => {
+    it('opens a closed dropdown', () => {
+      const dd = createDropdown(NAV_SECTIONS[0], 'orgel.html');
+      toggleDropdown(dd);
+      expect(dd.querySelector('.kk-bc-menu').hidden).toBe(false);
+      expect(dd.querySelector('.kk-bc-trigger').getAttribute('aria-expanded')).toBe('true');
     });
 
-    it('marks architektur as current when active', () => {
-      const overlay = createNavOverlay('architektur.html');
-      const footerLink = overlay.querySelector('.kk-nav-footer-link');
-      expect(footerLink.getAttribute('aria-current')).toBe('page');
+    it('closes an open dropdown', () => {
+      const dd = createDropdown(NAV_SECTIONS[0], 'orgel.html');
+      toggleDropdown(dd); // open
+      toggleDropdown(dd); // close
+      expect(dd.querySelector('.kk-bc-menu').hidden).toBe(true);
+      expect(dd.querySelector('.kk-bc-trigger').getAttribute('aria-expanded')).toBe('false');
+    });
+  });
+
+  describe('closeAllDropdowns()', () => {
+    it('closes all open dropdowns in a bar', () => {
+      const bar = createBreadcrumb('orgel.html');
+      const dd = bar.querySelector('.kk-bc-dropdown');
+      toggleDropdown(dd); // open
+      expect(dd.querySelector('.kk-bc-menu').hidden).toBe(false);
+
+      closeAllDropdowns(bar);
+      expect(dd.querySelector('.kk-bc-menu').hidden).toBe(true);
+      expect(dd.querySelector('.kk-bc-trigger').getAttribute('aria-expanded')).toBe('false');
+    });
+  });
+
+  describe('createBreadcrumb()', () => {
+    describe('hub page (klangkathedrale.html)', () => {
+      it('returns a nav element', () => {
+        const bar = createBreadcrumb('klangkathedrale.html');
+        expect(bar.tagName).toBe('NAV');
+        expect(bar.className).toBe('kk-bc-bar');
+      });
+
+      it('has aria-label Breadcrumb', () => {
+        const bar = createBreadcrumb('klangkathedrale.html');
+        expect(bar.getAttribute('aria-label')).toBe('Breadcrumb');
+      });
+
+      it('has one breadcrumb item', () => {
+        const bar = createBreadcrumb('klangkathedrale.html');
+        const items = bar.querySelectorAll('.kk-bc-item');
+        expect(items).toHaveLength(1);
+      });
+
+      it('shows Klangkathedrale as current page (span, not link)', () => {
+        const bar = createBreadcrumb('klangkathedrale.html');
+        const current = bar.querySelector('.kk-bc-current');
+        expect(current).not.toBeNull();
+        expect(current.tagName).toBe('SPAN');
+        expect(current.textContent).toBe('Klangkathedrale');
+        expect(current.getAttribute('aria-current')).toBe('page');
+      });
+
+      it('has no dropdown', () => {
+        const bar = createBreadcrumb('klangkathedrale.html');
+        expect(bar.querySelector('.kk-bc-dropdown')).toBeNull();
+      });
+
+      it('has no home link', () => {
+        const bar = createBreadcrumb('klangkathedrale.html');
+        expect(bar.querySelector('.kk-bc-link')).toBeNull();
+      });
+    });
+
+    describe('section subpage (orgel.html)', () => {
+      it('has 3 breadcrumb items', () => {
+        const bar = createBreadcrumb('orgel.html');
+        const items = bar.querySelectorAll('.kk-bc-item');
+        expect(items).toHaveLength(3);
+      });
+
+      it('first item is a link to klangkathedrale', () => {
+        const bar = createBreadcrumb('orgel.html');
+        const link = bar.querySelector('.kk-bc-link');
+        expect(link).not.toBeNull();
+        expect(link.href).toContain('klangkathedrale.html');
+        expect(link.textContent).toBe('Klangkathedrale');
+      });
+
+      it('second item has section dropdown', () => {
+        const bar = createBreadcrumb('orgel.html');
+        const dd = bar.querySelector('.kk-bc-dropdown');
+        expect(dd).not.toBeNull();
+        expect(dd.querySelector('.kk-bc-trigger').textContent).toContain('Erleben');
+      });
+
+      it('third item shows current page name', () => {
+        const bar = createBreadcrumb('orgel.html');
+        const items = bar.querySelectorAll('.kk-bc-item');
+        const current = items[2].querySelector('.kk-bc-current');
+        expect(current.textContent).toBe('Orgel');
+        expect(current.getAttribute('aria-current')).toBe('page');
+      });
+
+      it('dropdown contains sibling pages', () => {
+        const bar = createBreadcrumb('orgel.html');
+        const menuItems = bar.querySelectorAll('.kk-bc-menu-item');
+        expect(menuItems).toHaveLength(4);
+      });
+    });
+
+    describe('Entdecken subpage (weltkarte.html)', () => {
+      it('shows Entdecken section in dropdown', () => {
+        const bar = createBreadcrumb('weltkarte.html');
+        const trigger = bar.querySelector('.kk-bc-trigger');
+        expect(trigger.textContent).toContain('Entdecken');
+      });
+
+      it('shows Weltkarte as current page', () => {
+        const bar = createBreadcrumb('weltkarte.html');
+        const items = bar.querySelectorAll('.kk-bc-item');
+        const current = items[2].querySelector('.kk-bc-current');
+        expect(current.textContent).toBe('Weltkarte');
+      });
+    });
+
+    describe('architektur page', () => {
+      it('has 2 breadcrumb items', () => {
+        const bar = createBreadcrumb('architektur.html');
+        const items = bar.querySelectorAll('.kk-bc-item');
+        expect(items).toHaveLength(2);
+      });
+
+      it('first item links home', () => {
+        const bar = createBreadcrumb('architektur.html');
+        const link = bar.querySelector('.kk-bc-link');
+        expect(link.href).toContain('klangkathedrale.html');
+      });
+
+      it('second item shows Architektur as current', () => {
+        const bar = createBreadcrumb('architektur.html');
+        const items = bar.querySelectorAll('.kk-bc-item');
+        const current = items[1].querySelector('.kk-bc-current');
+        expect(current.textContent).toBe('Architektur');
+        expect(current.getAttribute('aria-current')).toBe('page');
+      });
+
+      it('has no dropdown', () => {
+        const bar = createBreadcrumb('architektur.html');
+        expect(bar.querySelector('.kk-bc-dropdown')).toBeNull();
+      });
+    });
+
+    describe('interaction: dropdown toggle via click', () => {
+      it('opens dropdown when trigger is clicked', () => {
+        const bar = createBreadcrumb('orgel.html');
+        document.body.appendChild(bar);
+        const trigger = bar.querySelector('.kk-bc-trigger');
+        trigger.click();
+        expect(bar.querySelector('.kk-bc-menu').hidden).toBe(false);
+        bar.remove();
+      });
+
+      it('closes dropdown when trigger is clicked again', () => {
+        const bar = createBreadcrumb('orgel.html');
+        document.body.appendChild(bar);
+        const trigger = bar.querySelector('.kk-bc-trigger');
+        trigger.click();
+        trigger.click();
+        expect(bar.querySelector('.kk-bc-menu').hidden).toBe(true);
+        bar.remove();
+      });
+
+      it('closes dropdown when clicking elsewhere in the bar', () => {
+        const bar = createBreadcrumb('orgel.html');
+        document.body.appendChild(bar);
+        const trigger = bar.querySelector('.kk-bc-trigger');
+        trigger.click();
+        expect(bar.querySelector('.kk-bc-menu').hidden).toBe(false);
+        // Click the bar itself (not the trigger)
+        bar.querySelector('.kk-bc-link').click();
+        expect(bar.querySelector('.kk-bc-menu').hidden).toBe(true);
+        bar.remove();
+      });
+    });
+
+    describe('interaction: Escape closes dropdown', () => {
+      it('closes dropdown on Escape keydown', () => {
+        const bar = createBreadcrumb('orgel.html');
+        document.body.appendChild(bar);
+        const trigger = bar.querySelector('.kk-bc-trigger');
+        trigger.click();
+        expect(bar.querySelector('.kk-bc-menu').hidden).toBe(false);
+
+        bar.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+        expect(bar.querySelector('.kk-bc-menu').hidden).toBe(true);
+        expect(bar.querySelector('.kk-bc-trigger').getAttribute('aria-expanded')).toBe('false');
+        bar.remove();
+      });
+
+      it('does not error on Escape when no dropdown is open', () => {
+        const bar = createBreadcrumb('orgel.html');
+        document.body.appendChild(bar);
+        expect(() => {
+          bar.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+        }).not.toThrow();
+        bar.remove();
+      });
     });
   });
 
@@ -202,13 +406,13 @@ describe('nav', () => {
       expect(styles).toHaveLength(1);
     });
 
-    it('contains key selectors', () => {
+    it('contains breadcrumb selectors', () => {
       injectStyles();
       const css = document.getElementById('kk-nav-styles').textContent;
-      expect(css).toContain('.kk-nav-btn');
-      expect(css).toContain('.kk-nav-overlay');
-      expect(css).toContain('.kk-nav-close');
-      expect(css).toContain('.kk-nav-link');
+      expect(css).toContain('.kk-bc-bar');
+      expect(css).toContain('.kk-bc-link');
+      expect(css).toContain('.kk-bc-trigger');
+      expect(css).toContain('.kk-bc-menu');
     });
 
     it('contains reduced-motion media query', () => {
@@ -217,146 +421,28 @@ describe('nav', () => {
       expect(css).toContain('prefers-reduced-motion: reduce');
     });
 
-    it('sets z-index 9999 for button', () => {
-      injectStyles();
-      const css = document.getElementById('kk-nav-styles').textContent;
-      expect(css).toContain('z-index: 9999');
-    });
-
-    it('sets z-index 10000 for overlay', () => {
+    it('sets z-index 10000 for bar', () => {
       injectStyles();
       const css = document.getElementById('kk-nav-styles').textContent;
       expect(css).toContain('z-index: 10000');
     });
-  });
 
-  describe('openNav()', () => {
-    it('shows the overlay', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      expect(overlay.hidden).toBe(false);
+    it('uses fixed positioning', () => {
+      injectStyles();
+      const css = document.getElementById('kk-nav-styles').textContent;
+      expect(css).toContain('position: fixed');
     });
 
-    it('sets aria-expanded to true', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      expect(btn.getAttribute('aria-expanded')).toBe('true');
+    it('sets 44px height', () => {
+      injectStyles();
+      const css = document.getElementById('kk-nav-styles').textContent;
+      expect(css).toContain('height: 44px');
     });
 
-    it('locks body scroll', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      expect(document.body.style.overflow).toBe('hidden');
-    });
-
-    it('focuses close button', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      expect(document.activeElement).toBe(overlay.querySelector('.kk-nav-close'));
-    });
-  });
-
-  describe('closeNav()', () => {
-    it('hides the overlay', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      closeNav(btn, overlay);
-      expect(overlay.hidden).toBe(true);
-    });
-
-    it('sets aria-expanded to false', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      closeNav(btn, overlay);
-      expect(btn.getAttribute('aria-expanded')).toBe('false');
-    });
-
-    it('restores body scroll', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      closeNav(btn, overlay);
-      expect(document.body.style.overflow).toBe('');
-    });
-
-    it('returns focus to nav button', () => {
-      const btn = createNavButton();
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(btn);
-      document.body.appendChild(overlay);
-      openNav(btn, overlay);
-      closeNav(btn, overlay);
-      expect(document.activeElement).toBe(btn);
-    });
-  });
-
-  describe('trapFocus()', () => {
-    it('wraps focus from last to first on Tab', () => {
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(overlay);
-      overlay.hidden = false;
-      trapFocus(overlay);
-
-      const focusable = overlay.querySelectorAll('button, a[href]');
-      const last = focusable[focusable.length - 1];
-      const first = focusable[0];
-      last.focus();
-
-      const event = new KeyboardEvent('keydown', { key: 'Tab', bubbles: true });
-      const spy = vi.spyOn(event, 'preventDefault');
-      overlay.dispatchEvent(event);
-      expect(spy).toHaveBeenCalled();
-      expect(document.activeElement).toBe(first);
-    });
-
-    it('wraps focus from first to last on Shift+Tab', () => {
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(overlay);
-      overlay.hidden = false;
-      trapFocus(overlay);
-
-      const focusable = overlay.querySelectorAll('button, a[href]');
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-      first.focus();
-
-      const event = new KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true });
-      const spy = vi.spyOn(event, 'preventDefault');
-      overlay.dispatchEvent(event);
-      expect(spy).toHaveBeenCalled();
-      expect(document.activeElement).toBe(last);
-    });
-
-    it('does not interfere with non-Tab keys', () => {
-      const overlay = createNavOverlay('orgel.html');
-      document.body.appendChild(overlay);
-      overlay.hidden = false;
-      trapFocus(overlay);
-
-      const event = new KeyboardEvent('keydown', { key: 'Enter', bubbles: true });
-      const spy = vi.spyOn(event, 'preventDefault');
-      overlay.dispatchEvent(event);
-      expect(spy).not.toHaveBeenCalled();
+    it('includes gold border-bottom', () => {
+      injectStyles();
+      const css = document.getElementById('kk-nav-styles').textContent;
+      expect(css).toContain('border-bottom: 1px solid rgba(201,168,76');
     });
   });
 });
