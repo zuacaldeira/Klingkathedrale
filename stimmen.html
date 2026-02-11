@@ -851,7 +851,8 @@ footer .footer-note {
   <p class="footer-note">Ein digitales Denkmal für Helmuth Rilling (1933&ndash;2026)</p>
 </footer>
 
-<script>
+<script type="module">
+import { formatDate } from './src/lib/date.js';
 (function() {
   'use strict';
 
@@ -978,12 +979,7 @@ footer .footer-note {
   let entries = loadEntries();
   let currentMode = 'all'; // 'all' | 'random'
 
-  // ═══ FORMAT DATE ═══
-  function formatDate(isoStr) {
-    const d = new Date(isoStr);
-    const months = ['Jan.', 'Feb.', 'März', 'Apr.', 'Mai', 'Juni', 'Juli', 'Aug.', 'Sep.', 'Okt.', 'Nov.', 'Dez.'];
-    return d.getDate() + '. ' + months[d.getMonth()] + ' ' + d.getFullYear();
-  }
+  // formatDate imported from src/lib/date.js
 
   // ═══ UPDATE COUNTER ═══
   function updateCounter(animate) {

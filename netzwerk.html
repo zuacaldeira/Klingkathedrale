@@ -528,7 +528,8 @@ svg {
   <div class="node-count" id="node-count"></div>
 </div>
 
-<script>
+<script type="module">
+import { linkColor, linkWidth, isNodeVisible as _isNodeVisible, isLinkVisible as _isLinkVisible, debounce } from './src/lib/network.js';
 // ═══════════════════════════════════════════════
 // DATA: Rillings pädagogisches Netzwerk
 // ═══════════════════════════════════════════════
@@ -996,25 +997,7 @@ const tierColors = {
 const tierSizes = { 0: 28, 1: 12, 2: 8 };
 const institutionColor = '#6B9080';
 
-// Link type colors and widths
-function linkColor(d) {
-  const types = {
-    founded: 'rgba(201,168,76,0.4)',
-    led: 'rgba(201,168,76,0.3)',
-    taught: 'rgba(201,168,76,0.25)',
-    teacher: 'rgba(212,114,92,0.35)',
-    influence: 'rgba(139,126,200,0.25)',
-    colleague: 'rgba(200,149,110,0.25)',
-    successor: 'rgba(201,168,76,0.35)',
-    studied: 'rgba(107,144,128,0.25)',
-    member: 'rgba(107,144,128,0.3)'
-  };
-  return types[d.type] || 'rgba(245,240,232,0.1)';
-}
-
-function linkWidth(d) {
-  return Math.max(1, d.weight * 0.8);
-}
+// Link type colors and widths — imported from src/lib/network.js
 
 // State
 let currentFilter = 'all';
@@ -1443,20 +1426,8 @@ document.querySelectorAll('.filter-btn').forEach(btn => {
   });
 });
 
-function isNodeVisible(d) {
-  if (currentFilter === 'all') return true;
-  if (d.id === 'rilling') return true;
-  if (d.institutions && d.institutions.includes(currentFilter)) return true;
-  return false;
-}
-
-function isLinkVisible(l) {
-  const sid = typeof l.source === 'object' ? l.source.id : l.source;
-  const tid = typeof l.target === 'object' ? l.target.id : l.target;
-  const sNode = nodes.find(n => n.id === sid);
-  const tNode = nodes.find(n => n.id === tid);
-  return isNodeVisible(sNode) && isNodeVisible(tNode);
-}
+function isNodeVisible(d) { return _isNodeVisible(d, currentFilter); }
+function isLinkVisible(l) { return _isLinkVisible(l, nodes, currentFilter); }
 
 function applyFilter() {
   nodeElements.transition().duration(400)
@@ -1646,13 +1617,7 @@ function onResize() {
 window.addEventListener('resize', debounce(onResize, 200));
 onResize();
 
-function debounce(fn, ms) {
-  let timer;
-  return function(...args) {
-    clearTimeout(timer);
-    timer = setTimeout(() => fn.apply(this, args), ms);
-  };
-}
+// debounce imported from src/lib/network.js
 
 // ─── Initial zoom to fit ───
 setTimeout(() => {

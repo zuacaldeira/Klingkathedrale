@@ -154,107 +154,11 @@ body{background:var(--color-ink);color:var(--color-ivory);font-family:var(--font
   <div class="state" id="results"></div>
 </div>
 
-<script>
+<script type="module">
+import { SETS, getSetKey } from './src/lib/quiz.js';
 const answers = [null, null, null];
 
-// 18 curated recommendation sets
-const SETS = {
-  peaceful_beauty: {
-    works: [
-      {bwv:'BWV 1068',title:'Air aus der Orchestersuite Nr. 3 in D-Dur',desc:'Ein Gebet ohne Worte — die reinste Melodie, die Bach je schrieb.',why:'In Ihrer friedlichen Stimmung wird diese Melodie wie ein warmer Mantel wirken. Die Schönheit dieser Musik braucht keine Erklärung — sie spricht direkt zum Herzen.',recording:'Rilling, Bach-Collegium Stuttgart, 1984 (Hänssler Classic)',tip:'Schließen Sie die Augen und folgen Sie nur der Melodie der ersten Geige.',deep:'Dieses Stück, oft „Air on the G String" genannt, ist der zweite Satz der Orchestersuite Nr. 3. Bach schrieb es um 1731 in Leipzig. Rillings Interpretation zeichnet sich durch eine besondere Wärme und einen fließenden Atem aus — er lässt die Melodie singen, ohne sie zu sentimentalisieren.'},
-      {bwv:'BWV 988',title:'Goldberg-Variationen — Aria',desc:'30 Variationen über ein Thema von stiller Schönheit.',why:'Die Eröffnungs-Aria der Goldberg-Variationen ist eines der friedlichsten Stücke der Musikgeschichte. Ihre Suche nach Schönheit findet hier einen perfekten Ruhepol.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Hören Sie zunächst nur die Aria und lassen Sie das Thema in sich wirken.',deep:'Bach schrieb die Goldberg-Variationen 1741 — angeblich für den Grafen Kaiserling, der unter Schlaflosigkeit litt. Die Aria ist von einer zeitlosen Einfachheit, die bei jedem Hören neue Schichten offenbart.'},
-      {bwv:'BWV 147',title:'Jesu, bleibet meine Freude',desc:'Der berühmteste Choral Bachs — ein Lied der stillen Zuversicht.',why:'Dieses Stück vereint Frieden und Schönheit auf vollkommene Weise. Die fließende Oberstimme über dem Choral schafft einen Moment reiner Harmonie.',recording:'Rilling, Gächinger Kantorei, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Achten Sie auf das Zusammenspiel zwischen der instrumentalen Oberstimme und dem Chor.',deep:'„Jesu, Joy of Man\'s Desiring" stammt aus der Kantate BWV 147 „Herz und Mund und Tat und Leben" (1723). Rilling hat sie mehrfach aufgenommen, stets mit einem Gefühl natürlicher Schwerelosigkeit.'}
-    ]
-  },
-  peaceful_depth: {
-    works: [
-      {bwv:'BWV 232',title:'H-Moll-Messe — Et incarnatus est',desc:'Der Moment der Menschwerdung — Musik von überwältigender Zartheit.',why:'In Ihrer friedlichen, tiefgründigen Stimmung wird dieses Stück Sie in eine andere Dimension führen. Bach verdichtet hier die gesamte christliche Mystik in wenige Takte.',recording:'Rilling, Gächinger Kantorei, 1999 Neuaufnahme (Hänssler Classic)',tip:'Hören Sie, wie die absteigende Melodie das Herabsteigen Gottes zur Erde nachzeichnet.',deep:'Die H-Moll-Messe ist Bachs letztes großes Werk. Rilling hat sie dreimal aufgenommen. Das „Et incarnatus est" gilt als einer der ergreifendsten Momente der gesamten Musikliteratur.'},
-      {bwv:'BWV 639',title:'Ich ruf zu dir, Herr Jesu Christ (Orgelbüchlein)',desc:'Ein stilles Gebet auf der Orgel — eine Minute, die die Ewigkeit berührt.',why:'Diese kurze Choralbearbeitung ist von einer meditativen Tiefe, die perfekt zu Ihrer Stimmung passt. Bach sagt in dreißig Takten mehr als andere in dreißig Seiten.',recording:'Rilling, Bach-Gesamtausgabe Orgelwerke (Hänssler Classic)',tip:'Folgen Sie der gesanglichen Oberstimme — sie ist wie ein leises Gebet.',deep:'Das Orgelbüchlein enthält 46 kurze Choralbearbeitungen. „Ich ruf zu dir" wurde durch Tarkowskijs Film „Solaris" weltberühmt. Rilling versteht diese Miniaturen als konzentrierte theologische Aussagen.'},
-      {bwv:'BWV 1007',title:'Suite Nr. 1 für Violoncello solo — Prélude',desc:'Sechs Saiten, ein Bogen, und die ganze Welt.',why:'In seiner Einfachheit liegt die Tiefe dieses Stücks. Jeder Ton scheint aus der Stille geboren und kehrt in die Stille zurück.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Spüren Sie, wie die ersten Töne den Raum öffnen, als würde eine Tür aufgehen.',deep:'Die sechs Cellosuiten gehören zum Intimsten, was Bach geschrieben hat. Rilling hat auch Instrumentalwerke in seine Gesamtaufnahme einbezogen — stets mit dem Blick auf das große Ganze des Bachschen Kosmos.'}
-    ]
-  },
-  energized_drama: {
-    works: [
-      {bwv:'BWV 565',title:'Toccata und Fuge in d-Moll',desc:'Der Urknall der Orgelmusik — dramatischer geht es nicht.',why:'Ihre Energie trifft hier auf Bachs dramatischstes Werk. Die berühmte Eröffnung ist wie ein Blitz, der den Raum zerreißt — genau das Richtige für Ihren Zustand.',recording:'Rilling, Gedächtniskirche Stuttgart (Hänssler Classic)',tip:'Lassen Sie sich vom ersten Akkord überwältigen — und dann folgen Sie dem Sturm.',deep:'Die Toccata und Fuge BWV 565 ist das bekannteste Orgelwerk überhaupt. Obwohl manche Musikwissenschaftler die Autorschaft anzweifeln, bleibt es ein Monument dramatischer Kraft. Rilling spielte dieses Werk in seiner Jugend regelmäßig als Organist.'},
-      {bwv:'BWV 1052',title:'Cembalokonzert Nr. 1 in d-Moll',desc:'Virtuosität und Leidenschaft in einem atemlosen Dialog.',why:'Dieses Konzert ist Energie pur — ein dramatischer Dialog zwischen Solist und Orchester, der nie zur Ruhe kommt.',recording:'Rilling, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Achten Sie im ersten Satz auf den unerbittlichen Rhythmus des Orchesters.',deep:'Das Cembalokonzert Nr. 1 ist vermutlich eine Bearbeitung eines verlorenen Violinkonzerts. Der erste Satz gehört zum Dramatischsten, was Bach für Tasteninstrument geschrieben hat.'},
-      {bwv:'BWV 244',title:'Matthäus-Passion — Eröffnungschor',desc:'Ein Ozean aus Klang — der monumentalste Beginn in der Musikgeschichte.',why:'Der Eröffnungschor der Matthäus-Passion vereint Drama und Energie in einer Weise, die sprachlos macht. Zwei Chöre und zwei Orchester erschaffen ein klangliches Universum.',recording:'Rilling, Gächinger Kantorei, 1998 (Grammy-prämiert, Hänssler Classic)',tip:'Hören Sie den Wechsel zwischen den beiden Chören — wie ein Dialog zwischen Himmel und Erde.',deep:'Rillings Grammy-prämierte Matthäus-Passion von 1998 gilt als eine der großen Referenzaufnahmen. Der Eröffnungschor dauert fast zehn Minuten und entfaltet eine Wucht, die ihresgleichen sucht.'}
-    ]
-  },
-  energized_virtuosity: {
-    works: [
-      {bwv:'BWV 1046-1051',title:'Brandenburgische Konzerte',desc:'Sechs Konzerte wie sechs Feuerwerke — Bachs Visitenkarte.',why:'Ihre Energie und Ihr Sinn für Virtuosität finden hier das perfekte Ventil. Jedes Konzert ist ein Meisterwerk instrumentaler Brillanz.',recording:'Rilling, Bach-Collegium Stuttgart, 1982 (Hänssler Classic)',tip:'Beginnen Sie mit dem 3. Konzert — es ist pure rhythmische Energie.',deep:'Die Brandenburgischen Konzerte entstanden um 1721 und zeigen Bach als Meister der instrumentalen Farben. Rillings Aufnahme verbindet historisch informierte Praxis mit symphonischem Atem.'},
-      {bwv:'BWV 1001',title:'Sonate Nr. 1 für Violine solo — Fuga',desc:'Eine Fuge für ein einziges Instrument — ein Wunder der Virtuosität.',why:'Diese Solo-Fuge verlangt von einem einzigen Geiger, was sonst ein ganzes Ensemble leisten würde. Virtuosität in ihrer reinsten Form.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Staunen Sie, wie eine einzelne Violine vier Stimmen gleichzeitig spielen kann.',deep:'Die Sonaten und Partiten für Violine solo gehören zu den technisch anspruchsvollsten Werken der gesamten Violinliteratur. Die Fuge aus der ersten Sonate ist ein Meisterwerk kontrapunktischer Kunst.'},
-      {bwv:'BWV 903',title:'Chromatische Fantasie und Fuge in d-Moll',desc:'Tastensturm und Ordnung — Bach an der Grenze des Möglichen.',why:'Dieses Werk beginnt mit einer quasi-improvisierten Fantasie von wilder Freiheit und mündet in eine streng konstruierte Fuge. Der perfekte Spiegel Ihrer energiegeladenen Suche nach Virtuosität.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Die Fantasie klingt wie eine Improvisation — lassen Sie sich treiben.',deep:'Die Chromatische Fantasie und Fuge gilt als das expressivste Klavierwerk Bachs. Die Fantasie bricht alle Regeln, die Fuge setzt sie wieder zusammen.'}
-    ]
-  },
-  contemplative_depth: {
-    works: [
-      {bwv:'BWV 244',title:'Matthäus-Passion — Erbarme dich',desc:'Die schmerzvollste Arie, die je geschrieben wurde.',why:'In Ihrer nachdenklichen Stimmung wird dieses Stück wie ein Spiegel wirken. Die Solo-Violine weint, die Altstimme fleht — und Bach gibt dem menschlichen Leid eine Stimme von überwältigender Schönheit.',recording:'Rilling, Gächinger Kantorei, 1998 (Grammy-prämiert)',tip:'Achten Sie auf die Solo-Violine — sie erzählt die Geschichte parallel zur Singstimme.',deep:'„Erbarme dich" folgt auf die Verleugnung Petri. Rilling beschrieb diese Arie als den Moment, in dem die gesamte menschliche Erfahrung von Schuld und Reue in Musik verwandelt wird.'},
-      {bwv:'BWV 1080',title:'Die Kunst der Fuge — Contrapunctus XIV',desc:'Bachs letztes, unvollendetes Werk — ein Abbruch, der in die Ewigkeit reicht.',why:'Dieses Werk endet mitten im Satz — Bach starb, bevor er es vollenden konnte. Für jemanden in nachdenklicher Stimmung ist dieser Abbruch von erschütternder Wirkung.',recording:'Rilling, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Hören Sie bis zum Ende — der plötzliche Abbruch ist der ergreifendste Moment.',deep:'Die Kunst der Fuge ist Bachs Vermächtnis an die Musikwelt. Im Contrapunctus XIV verarbeitet Bach die Buchstaben seines Namens als Thema (B-A-C-H). Rilling sieht in diesem Werk die Summe von Bachs Lebensarbeit.'},
-      {bwv:'BWV 82',title:'Ich habe genug — Kantate',desc:'Die tiefste Akzeptanz — ein Mensch, der bereit ist loszulassen.',why:'Diese Kantate handelt von der Bereitschaft, das Leben anzunehmen und loszulassen. Für nachdenkliche Momente gibt es kaum etwas Tiefgründigeres.',recording:'Rilling, Gächinger Kantorei (Hänssler Classic)',tip:'Der Eingangssatz mit der Oboe ist einer der schönsten Monologe Bachs.',deep:'BWV 82 „Ich habe genug" wurde 1727 für den Fest Mariae Reinigung geschrieben. Es ist eine der intimsten Kantaten Bachs — ein Gespräch zwischen einem Menschen und seiner Seele.'}
-    ]
-  },
-  sad_stillness: {
-    works: [
-      {bwv:'BWV 245',title:'Johannes-Passion — Es ist vollbracht',desc:'Der letzte Atemzug — Musik von herzzerreißender Stille.',why:'In Ihrer Traurigkeit kann diese Arie ein Trost sein. Bach verwandelt den tiefsten Schmerz in Musik von solcher Schönheit, dass Tränen zur Erlösung werden.',recording:'Rilling, Gächinger Kantorei, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Spüren Sie den Kontrast zwischen dem stillen Mittelteil und dem triumphalen Schluss.',deep:'Die Johannes-Passion entstand 1724. „Es ist vollbracht" gehört zu den ergreifendsten Momenten der Passionsmusik. Rilling versteht die Passionen als existentielle Menschheitsdramen.'},
-      {bwv:'BWV 478',title:'Komm, süßer Tod',desc:'Der Tod als Freund — ein Lied von stiller Akzeptanz.',why:'Dieses schlichte Lied verwandelt die Traurigkeit in etwas Sanftes, Versöhnendes. Es ist kein Lied der Verzweiflung, sondern des Friedens.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Die Melodie ist von einer Schlichtheit, die zu Herzen geht.',deep:'„Komm, süßer Tod" stammt aus der Sammlung von Chorälen und geistlichen Liedern. Es wurde durch Leopold Stokowskis Orchesterbearbeitung weltweit bekannt.'},
-      {bwv:'BWV 4',title:'Christ lag in Todesbanden',desc:'Aus der Dunkelheit ins Licht — Bachs früheste Meisterkantate.',why:'Diese Kantate führt durch die Dunkelheit hindurch zum Licht. Wenn Traurigkeit und Stille sich verbinden, kann diese Musik den Weg weisen.',recording:'Rilling, Gächinger Kantorei, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Jeder Vers der Kantate wird anders vertont — verfolgen Sie die Reise vom Tod zum Leben.',deep:'BWV 4 ist eine der frühesten Kantaten Bachs und basiert auf Martin Luthers Osterlied. Rilling schätzte dieses Werk als eines der dichtesten und kunstvollsten der frühen Kantaten.'}
-    ]
-  },
-  curious_beauty: {
-    works: [
-      {bwv:'BWV 248',title:'Weihnachtsoratorium — Jauchzet, frohlocket!',desc:'Der strahlendste Beginn, den die Musik kennt.',why:'Ihre Neugier und Ihr Sinn für Schönheit finden hier den perfekten Einstieg. Dieser Eröffnungschor ist wie ein Tor in Bachs Welt — jubilierend, strahlend und unwiderstehlich.',recording:'Rilling, Gächinger Kantorei, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Die Pauken und Trompeten im Eröffnungschor sind Bachs Fanfare des Jubels.',deep:'Das Weihnachtsoratorium entstand 1734 und besteht aus sechs Kantaten für die Weihnachtszeit. Rillings Interpretation ist von einer ansteckenden Freude, die sofort in Bachs Welt hineinzieht.'},
-      {bwv:'BWV 846',title:'Wohltemperiertes Klavier I — Präludium in C-Dur',desc:'Der erste Ton einer Reise durch alle Tonarten.',why:'Das einfachste und zugleich genialste Präludium Bachs. Für neugierige Schönheitssucher ist es der perfekte Ausgangspunkt.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Hören Sie, wie Bach aus einem einzigen Muster eine ganze Welt erschafft.',deep:'Das Wohltemperierte Klavier ist das Alte Testament der Klaviermusik. Das erste Präludium in C-Dur besteht nur aus gebrochenen Akkorden — und ist doch eines der schönsten Stücke der Musikgeschichte.'},
-      {bwv:'BWV 1066',title:'Orchestersuite Nr. 1 in C-Dur',desc:'Tanz und Eleganz — Bach als Meister der französischen Ouvertüre.',why:'Diese Suite vereint Schönheit und Entdeckerfreude. Jeder Satz ist ein anderer Tanz — und jeder Tanz öffnet eine neue Tür.',recording:'Rilling, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Die verschiedenen Tanzsätze zeigen Bachs unglaubliche Vielseitigkeit.',deep:'Die vier Orchestersuiten zeigen Bach als Meister der Unterhaltungsmusik. Rilling behandelt sie nicht als leichte Kost, sondern als kunstvoll gestaltete Werke von großer Raffinesse.'}
-    ]
-  },
-  curious_virtuosity: {
-    works: [
-      {bwv:'BWV 1048',title:'Brandenburgisches Konzert Nr. 3 in G-Dur',desc:'Neun Solisten im Wettstreit — ein funkelndes Kaleidoskop.',why:'Ihre Neugier und Ihr Sinn für Virtuosität treffen hier auf ein Werk, das nie aufhört zu überraschen. Jedes Instrument hat seine Stimme im demokratischen Miteinander.',recording:'Rilling, Bach-Collegium Stuttgart, 1982 (Hänssler Classic)',tip:'Achten Sie darauf, wie die drei Violinen, drei Bratschen und drei Celli miteinander dialogisieren.',deep:'Das dritte Brandenburgische Konzert ist das rhythmisch mitreißendste der Sammlung. Der mysteriöse Mittelsatz besteht nur aus zwei Akkorden — ein Rätsel, das Musiker seit 300 Jahren beschäftigt.'},
-      {bwv:'BWV 578',title:'Fuge in g-Moll (Kleine Fuge)',desc:'Die volkstümlichste Fuge Bachs — Ohrwurm in vier Stimmen.',why:'Diese Fuge ist der perfekte Einstieg in die Kunst des Kontrapunkts. Das Thema ist so eingängig, dass man es sofort mitsingen kann.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Verfolgen Sie das Thema durch alle vier Stimmen — es wandert von oben nach unten.',deep:'Die „Kleine Fuge" in g-Moll zeigt, dass Bach auch komplexe Formen volkstümlich und zugänglich gestalten konnte. Rilling hat als junger Organist unzählige Fugen gespielt und analysiert.'},
-      {bwv:'BWV 971',title:'Italienisches Konzert in F-Dur',desc:'Ein Solokonzert ohne Orchester — Bachs genialster Trick.',why:'Bach simuliert hier ein ganzes Orchester auf einem einzigen Instrument. Für Neugierige, die Virtuosität schätzen, ist dieses Werk eine Offenbarung.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Hören Sie, wie Bach zwischen „Tutti" und „Solo" wechselt — auf nur einem Instrument!',deep:'Das Italienische Konzert von 1735 nutzt die zwei Manuale des Cembalos, um den Kontrast zwischen Orchester und Solist zu imitieren. Es ist eines der populärsten Cembalowerke überhaupt.'}
-    ]
-  },
-  sad_beauty: {
-    works: [
-      {bwv:'BWV 106',title:'Gottes Zeit ist die allerbeste Zeit (Actus tragicus)',desc:'Bachs frühestes Meisterwerk — über Leben, Tod und Trost.',why:'Diese Trauerkantate ist von einer Schönheit, die den Schmerz nicht leugnet, sondern verwandelt. Sie zeigt: Auch in der Traurigkeit kann Schönheit trösten.',recording:'Rilling, Gächinger Kantorei, Bach-Collegium Stuttgart (Hänssler Classic)',tip:'Die Eröffnung mit den Blockflöten ist von herzzerreißender Zartheit.',deep:'BWV 106, der Actus tragicus, entstand vermutlich 1707 und ist eines der frühesten Werke Bachs. Rilling hat diese Kantate als einen der tiefsten Ausdrücke menschlicher Trauer und göttlichen Trostes beschrieben.'},
-      {bwv:'BWV 1068',title:'Air aus der Orchestersuite Nr. 3',desc:'Ein Gebet ohne Worte.',why:'In Momenten der Traurigkeit kann dieses Stück wie ein stiller Begleiter wirken — es versteht Ihren Schmerz und hüllt ihn in Schönheit.',recording:'Rilling, Bach-Collegium Stuttgart, 1984',tip:'Lassen Sie die Melodie einfach fließen — sie braucht keine Analyse, nur Ihr Herz.',deep:'Die Air ist der Inbegriff musikalischer Trostspendung. Rillings Interpretation ist getragen von einer ruhigen Gewissheit, dass Schönheit auch im Dunkelsten Bestand hat.'},
-      {bwv:'BWV 12',title:'Weinen, Klagen, Sorgen, Zagen',desc:'Tränen in Tönen — Bachs klanggewordene Trauer.',why:'Diese Kantate beginnt mit einem der ergreifendsten Trauersätze Bachs. Die absteigende Basslinie (Passacaglia) symbolisiert die Last des Leidens.',recording:'Rilling, Gächinger Kantorei (Hänssler Classic)',tip:'Achten Sie auf die absteigende Basslinie — sie ist das Fundament des Schmerzes.',deep:'BWV 12 wurde 1714 in Weimar geschrieben. Bach verwendete das Material des Eingangschors später im Crucifixus der H-Moll-Messe — ein Zeichen für die besondere Qualität dieser Musik.'}
-    ]
-  },
-  contemplative_stillness: {
-    works: [
-      {bwv:'BWV 639',title:'Ich ruf zu dir, Herr Jesu Christ',desc:'Ein leises Gebet auf der Orgel.',why:'Für nachdenkliche Momente, die nach Stille suchen, ist diese kurze Choralbearbeitung wie ein Atemzug der Ewigkeit.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Dieses Stück dauert nur zwei Minuten — aber es enthält eine ganze Welt.',deep:'Andrei Tarkowski verwendete dieses Stück in seinem Film „Solaris" — es wurde zum Symbol für die Sehnsucht des Menschen nach Transzendenz.'},
-      {bwv:'BWV 659',title:'Nun komm der Heiden Heiland (Orgel)',desc:'Adventssehnsucht in einer einzigen Melodie.',why:'Diese langsame, ornamentierte Version des Adventschorals ist reine Meditation. Für nachdenkliche Menschen, die Stille suchen, ein Geschenk.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Die verzierte Melodie klingt wie eine improvisierte Meditation über den Choral.',deep:'Bach schuf drei verschiedene Bearbeitungen dieses Chorals — jede mit einer anderen Perspektive. Die Leipziger Fassung BWV 659 ist die kontemplativste.'},
-      {bwv:'BWV 988',title:'Goldberg-Variationen — Variation 25',desc:'Die „schwarze Perle" — die schmerzlichste Variation.',why:'Mitten in den heiteren Goldberg-Variationen steht diese Variation wie ein Fenster in eine andere Welt. Für nachdenkliche Stille-Sucher ein Moment der Wahrheit.',recording:'Rilling, Bach-Gesamtausgabe (Hänssler Classic)',tip:'Diese Moll-Variation ist das emotionale Zentrum des ganzen Werks.',deep:'Die 25. Variation in g-Moll wird oft als „schwarze Perle" der Goldberg-Variationen bezeichnet. Sie ist die einzige Variation im Werk, die sich ganz dem Schmerz hingibt.'}
-    ]
-  }
-};
-
-// Additional set aliases for different combos
-SETS.peaceful_stillness = SETS.contemplative_stillness;
-SETS.peaceful_drama = SETS.energized_drama;
-SETS.peaceful_virtuosity = SETS.curious_virtuosity;
-SETS.energized_beauty = SETS.curious_beauty;
-SETS.energized_depth = SETS.contemplative_depth;
-SETS.energized_stillness = SETS.peaceful_beauty;
-SETS.contemplative_beauty = SETS.peaceful_beauty;
-SETS.contemplative_drama = SETS.energized_drama;
-SETS.contemplative_virtuosity = SETS.curious_virtuosity;
-SETS.sad_drama = SETS.energized_drama;
-SETS.sad_depth = SETS.contemplative_depth;
-SETS.sad_virtuosity = SETS.curious_virtuosity;
-SETS.curious_depth = SETS.contemplative_depth;
-SETS.curious_drama = SETS.energized_drama;
-SETS.curious_stillness = SETS.contemplative_stillness;
-SETS.neugierig_beauty = SETS.curious_beauty;
-SETS.traurig_stillness = SETS.sad_stillness;
-
-// Map mood + aesthetic to a set key
-function getSetKey(mood, aesthetic) {
-  const key = mood + '_' + aesthetic;
-  return SETS[key] ? key : 'peaceful_beauty';
-}
+// SETS and getSetKey imported from src/lib/quiz.js
 
 function showState(id) {
   document.querySelectorAll('.state').forEach(s => {

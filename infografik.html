@@ -712,19 +712,16 @@ section {
   </div>
 </section>
 
-<script>
+<script type="module">
+import { lerp, clamp } from './src/lib/math.js';
+import { yearToX as _yearToX, valToY as _valToY, getSectionProgress as _getSectionProgress, buildAreaPath as _buildAreaPath } from './src/lib/chart.js';
+
 // ================================================
 // UTILITIES
 // ================================================
-function lerp(a, b, t) { return a + (b - a) * t; }
-function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
-
 function getSectionProgress(sectionEl) {
   const rect = sectionEl.getBoundingClientRect();
-  const vh = window.innerHeight;
-  // 0 when section top hits viewport bottom, 1 when section top hits viewport top
-  const progress = 1 - (rect.top / vh);
-  return clamp(progress, 0, 1);
+  return _getSectionProgress(rect, window.innerHeight);
 }
 
 // ================================================
@@ -782,35 +779,11 @@ const bergPadLeft = 80, bergPadRight = 40, bergPadTop = 40, bergPadBot = 70;
 const bergW = 1000, bergH = 500;
 const bergMaxY = 172;
 
-function yearToX(year) {
-  return bergPadLeft + ((year - 1970) / (2000 - 1970)) * (bergW - bergPadLeft - bergPadRight);
-}
-function valToY(val) {
-  return bergH - bergPadBot - (val / bergMaxY) * (bergH - bergPadTop - bergPadBot);
-}
-
-function buildAreaPath(layerIdx, progress) {
-  const pts = stackedData.map((d, i) => {
-    const x = yearToX(d.year);
-    const animatedY1 = d.layers[layerIdx].y1 * progress;
-    const animatedY0 = d.layers[layerIdx].y0 * progress;
-    return { x, y0: valToY(animatedY0), y1: valToY(animatedY1) };
-  });
-
-  let path = `M ${pts[0].x},${pts[0].y0}`;
-  // Top line (y1)
-  for (let i = 0; i < pts.length - 1; i++) {
-    const cpx = (pts[i].x + pts[i + 1].x) / 2;
-    path += ` C ${cpx},${pts[i].y1} ${cpx},${pts[i + 1].y1} ${pts[i + 1].x},${pts[i + 1].y1}`;
-  }
-  // Bottom line (y0) reverse
-  for (let i = pts.length - 1; i > 0; i--) {
-    const cpx = (pts[i].x + pts[i - 1].x) / 2;
-    path += ` C ${cpx},${pts[i].y0} ${cpx},${pts[i - 1].y0} ${pts[i - 1].x},${pts[i - 1].y0}`;
-  }
-  path += ' Z';
-  return path;
-}
+const bergConfig = { padLeft: bergPadLeft, padRight: bergPadRight, width: bergW, startYear: 1970, endYear: 2000 };
+const bergYConfig = { padTop: bergPadTop, padBot: bergPadBot, height: bergH, maxY: bergMaxY };
+function yearToX(year) { return _yearToX(year, bergConfig); }
+function valToY(val) { return _valToY(val, bergYConfig); }
+function buildAreaPath(layerIdx, progress) { return _buildAreaPath(stackedData, layerIdx, progress, yearToX, valToY); }
 
 const bergLayersGroup = document.getElementById('berg-layers');
 // Create path elements

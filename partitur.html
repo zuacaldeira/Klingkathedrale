@@ -489,7 +489,9 @@ body::before {
   <p>&bdquo;Die Musik Bachs ist wie eine Kathedrale aus Klang.&ldquo; &mdash; Helmuth Rilling</p>
 </footer>
 
-<script>
+<script type="module">
+import { NOTE_SEMI, pitchToY as _pitchToY, pitchToFreq } from './src/lib/music.js';
+
 // ============================================================
 // BACHS FEDER — Interactive Animated Score Viewer
 // ============================================================
@@ -510,43 +512,16 @@ const STAFF_COLOR = '#4A3F30';
 const CLEF_COLOR = '#8B7355';
 
 // ---- Pitch to Y mapping ----
-// Middle C (C4) sits on the ledger line between staves
-// Treble: lines E4 G4 B4 D5 F5 (bottom to top)
-// Bass:   lines G2 B2 D3 F3 A3 (bottom to top)
-const TREBLE_BOTTOM = STAFF_Y_TREBLE + 4 * LINE_SPACING; // E4 line
-const BASS_BOTTOM = STAFF_Y_BASS + 4 * LINE_SPACING;     // G2 line
-
-// Note name to semitone (C=0)
-const NOTE_SEMI = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+const TREBLE_BOTTOM = STAFF_Y_TREBLE + 4 * LINE_SPACING;
+const BASS_BOTTOM = STAFF_Y_BASS + 4 * LINE_SPACING;
 
 function pitchToY(noteStr) {
-  // noteStr like "D5", "F#4", "Bb3"
-  const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
-  if (!match) return STAFF_Y_TREBLE + 20;
-  const [, letter, acc, octStr] = match;
-  const oct = parseInt(octStr);
-  // Calculate position based on note name and octave
-  // Each staff position = LINE_SPACING/2 = 5px
-  // Reference: B4 = treble middle line = STAFF_Y_TREBLE + 2*LINE_SPACING
-  const noteOrder = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
-  const refOct = 4, refNote = 2; // E4 = bottom line of treble
-  const refY = TREBLE_BOTTOM;
-  const stepsFromRef = (oct - refOct) * 7 + (noteOrder[letter] - refNote);
-  return refY - stepsFromRef * (LINE_SPACING / 2);
+  return _pitchToY(noteStr, { lineSpacing: LINE_SPACING, staffYTreble: STAFF_Y_TREBLE, trebleBottom: TREBLE_BOTTOM });
 }
 
-function pitchToFreq(noteStr) {
-  const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
-  if (!match) return 440;
-  const [, letter, acc, octStr] = match;
-  const oct = parseInt(octStr);
-  let semi = NOTE_SEMI[letter];
-  if (acc === '#') semi++;
-  if (acc === 'b') semi--;
-  // A4 = 440Hz = semitone 9, octave 4
-  const semiFromA4 = (oct - 4) * 12 + (semi - 9);
-  return 440 * Math.pow(2, semiFromA4 / 12);
-}
+// keep pitchToFreq from module (already imported above)
+
+// Remove old inline pitchToY body — now delegated to module
 
 // ---- Piece Data ----
 // Each note: { pitch, duration (beats), clef: 't'|'b', beat position }

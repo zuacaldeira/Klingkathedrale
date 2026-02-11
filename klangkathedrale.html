@@ -951,7 +951,8 @@ section {
   <span class="tooltip">Klangkathedrale erleben</span>
 </button>
 
-<script>
+<script type="module">
+import { Particle } from './src/lib/klangkathedrale.js';
 // ═══ PARTICLE BACKGROUND ═══
 (function() {
   const canvas = document.getElementById('particle-canvas');
@@ -967,36 +968,15 @@ section {
   resize();
   window.addEventListener('resize', resize);
 
-  class Particle {
-    constructor() { this.reset(); }
-    reset() {
-      this.x = Math.random() * w;
-      this.y = Math.random() * h;
-      this.vx = (Math.random() - 0.5) * 0.3;
-      this.vy = (Math.random() - 0.5) * 0.3;
-      this.size = Math.random() * 2 + 0.5;
-      this.alpha = Math.random() * 0.4 + 0.1;
-      this.life = Math.random() * 200 + 100;
-      this.maxLife = this.life;
-    }
-    update() {
-      this.x += this.vx;
-      this.y += this.vy;
-      this.life--;
-      if (this.life <= 0 || this.x < -10 || this.x > w + 10 || this.y < -10 || this.y > h + 10) this.reset();
-    }
-    draw() {
-      const fade = Math.min(1, this.life / 30, (this.maxLife - this.life) / 30);
-      ctx.beginPath();
-      ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(${GOLD[0]},${GOLD[1]},${GOLD[2]},${this.alpha * fade})`;
-      ctx.fill();
-    }
+  // Particle class imported from src/lib/klangkathedrale.js
+  // Wrap update to keep w/h in sync on resize
+  function createParticle() {
+    return new Particle(w, h);
   }
 
   const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const count = prefersReducedMotion ? 30 : 120;
-  for (let i = 0; i < count; i++) particles.push(new Particle());
+  for (let i = 0; i < count; i++) particles.push(createParticle());
 
   function animate() {
     ctx.clearRect(0, 0, w, h);
@@ -1015,7 +995,7 @@ section {
         }
       }
     }
-    particles.forEach(p => { p.update(); p.draw(); });
+    particles.forEach(p => { p.update(); p.draw(ctx, GOLD); });
     requestAnimationFrame(animate);
   }
   animate();
