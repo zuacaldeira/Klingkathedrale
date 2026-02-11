@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Weltkarte — Helmuth Rillings globaler Wirkungskreis</title>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Back link ── */
+.back-link {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 100;
+  color: var(--color-gold);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+.back-link:hover { opacity: 1; }
+.back-link::before { content: '\2190\00a0'; }
+
+/* ── Header ── */
+.page-header {
+  text-align: center;
+  padding: 4rem 2rem 1.5rem;
+}
+.page-header h1 {
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 4vw, 2.8rem);
+  color: var(--color-gold);
+  letter-spacing: 0.08em;
+  margin-bottom: 0.4rem;
+}
+.page-header .subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  color: rgba(245,240,232,0.6);
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+
+/* ── Stats bar ── */
+.stats-bar {
+  display: flex;
+  justify-content: center;
+  gap: 3rem;
+  padding: 1rem 2rem 2rem;
+  flex-wrap: wrap;
+}
+.stat-item {
+  text-align: center;
+}
+.stat-number {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  color: var(--color-gold);
+  display: block;
+  line-height: 1.1;
+}
+.stat-label {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: rgba(245,240,232,0.5);
+  letter-spacing: 0.06em;
+}
+
+/* ── Map container ── */
+.map-container {
+  position: relative;
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 1rem;
+}
+.map-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: grab;
+}
+.map-svg:active { cursor: grabbing; }
+
+/* continent fills */
+.continent {
+  fill: #23201a;
+  stroke: rgba(201,168,76,0.1);
+  stroke-width: 0.5;
+  transition: fill 0.3s;
+}
+
+/* ── City markers ── */
+.city-marker { cursor: pointer; }
+.city-marker .dot {
+  fill: var(--color-gold);
+  transition: r 0.25s, opacity 0.3s;
+}
+.city-marker.primary .dot { filter: url(#glow); }
+.city-marker .pulse {
+  fill: none;
+  stroke: var(--color-gold);
+  stroke-width: 0.4;
+  opacity: 0;
+}
+.city-marker.primary .pulse {
+  animation: pulse-ring 2.5s ease-out infinite;
+}
+@keyframes pulse-ring {
+  0% { r: 3; opacity: 0.6; }
+  100% { r: 10; opacity: 0; }
+}
+.city-marker.hidden .dot,
+.city-marker.hidden .pulse,
+.city-marker.hidden .label-group {
+  opacity: 0 !important;
+  pointer-events: none;
+}
+
+/* Flight paths */
+.flight-path {
+  fill: none;
+  stroke: var(--color-gold);
+  stroke-width: 0.4;
+  opacity: 0.25;
+  stroke-dasharray: 4 3;
+  animation: dash-flow 20s linear infinite;
+  transition: opacity 0.4s;
+}
+.flight-path.hidden { opacity: 0; pointer-events: none; }
+@keyframes dash-flow {
+  to { stroke-dashoffset: -70; }
+}
+
+/* ── Tooltip ── */
+.map-tooltip {
+  position: fixed;
+  background: rgba(26,20,16,0.95);
+  border: 1px solid rgba(201,168,76,0.4);
+  padding: 0.6rem 1rem;
+  border-radius: 4px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 50;
+  max-width: 260px;
+  backdrop-filter: blur(6px);
+}
+.map-tooltip.visible { opacity: 1; }
+.map-tooltip .tt-city {
+  font-family: var(--font-display);
+  color: var(--color-gold);
+  font-size: 1rem;
+  margin-bottom: 0.15rem;
+}
+.map-tooltip .tt-note {
+  font-family: var(--font-body);
+  color: rgba(245,240,232,0.7);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+/* ── Info card (click) ── */
+.info-card-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(10,8,6,0.7);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s;
+}
+.info-card-overlay.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.info-card {
+  background: var(--color-ink);
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 6px;
+  padding: 2.5rem 2rem;
+  max-width: 440px;
+  width: 90%;
+  position: relative;
+}
+.info-card .card-city {
+  font-family: var(--font-display);
+  color: var(--color-gold);
+  font-size: 1.5rem;
+  margin-bottom: 0.3rem;
+}
+.info-card .card-years {
+  font-family: var(--font-body);
+  color: rgba(245,240,232,0.45);
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  letter-spacing: 0.08em;
+}
+.info-card .card-body {
+  font-family: var(--font-body);
+  color: rgba(245,240,232,0.8);
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+.info-card .card-close {
+  position: absolute;
+  top: 0.8rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: var(--color-gold);
+  font-size: 1.5rem;
+  cursor: pointer;
+  opacity: 0.6;
+  transition: opacity 0.2s;
+}
+.info-card .card-close:hover { opacity: 1; }
+
+/* ── Timeline ── */
+.timeline-section {
+  max-width: 1000px;
+  margin: 2.5rem auto 0;
+  padding: 0 2rem;
+}
+.timeline-label-row {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: rgba(245,240,232,0.4);
+  margin-bottom: 0.35rem;
+}
+.timeline-current {
+  font-family: var(--font-display);
+  color: var(--color-gold);
+  font-size: 1.1rem;
+  text-align: center;
+  margin-bottom: 0.5rem;
+  min-height: 1.4em;
+}
+.timeline-track {
+  position: relative;
+  width: 100%;
+  height: 36px;
+  display: flex;
+  align-items: center;
+}
+.timeline-track input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 3px;
+  background: rgba(201,168,76,0.15);
+  border-radius: 2px;
+  outline: none;
+}
+.timeline-track input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  cursor: pointer;
+  box-shadow: 0 0 8px rgba(201,168,76,0.5);
+}
+.timeline-track input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 0 8px rgba(201,168,76,0.5);
+}
+.timeline-hint {
+  text-align: center;
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.3);
+  margin-top: 0.3rem;
+  font-style: italic;
+}
+
+/* ── Quote ── */
+.quote-section {
+  text-align: center;
+  padding: 3rem 2rem 1.5rem;
+  max-width: 700px;
+  margin: 0 auto;
+}
+.quote-section blockquote {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1rem, 2.2vw, 1.3rem);
+  color: rgba(245,240,232,0.55);
+  line-height: 1.6;
+  border-left: 2px solid rgba(201,168,76,0.3);
+  padding-left: 1.5rem;
+  text-align: left;
+}
+.quote-section .attribution {
+  margin-top: 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: rgba(201,168,76,0.5);
+  text-align: right;
+}
+
+/* ── Footer ── */
+.page-footer {
+  text-align: center;
+  padding: 2rem;
+  font-size: 0.85rem;
+  color: rgba(245,240,232,0.25);
+  letter-spacing: 0.06em;
+}
+
+/* ── Legend ── */
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  padding: 0.5rem 2rem 1rem;
+  flex-wrap: wrap;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-size: 0.82rem;
+  color: rgba(245,240,232,0.45);
+}
+.legend-dot {
+  border-radius: 50%;
+  background: var(--color-gold);
+  display: inline-block;
+}
+.legend-dot.lg { width: 10px; height: 10px; }
+.legend-dot.md { width: 7px; height: 7px; }
+.legend-dot.sm { width: 4px; height: 4px; }
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .stats-bar { gap: 1.5rem; }
+  .page-header { padding: 3rem 1rem 1rem; }
+  .legend { gap: 1rem; }
+  .info-card { padding: 1.8rem 1.4rem; }
+}
+</style>
+</head>
+<body>
+
+<a href="klangkathedrale.html" class="back-link">Klangkathedrale</a>
+
+<header class="page-header">
+  <h1>Die Musik kennt keine Grenzen</h1>
+  <p class="subtitle">Helmuth Rillings globaler Wirkungskreis, 1954 &ndash; 2026</p>
+</header>
+
+<!-- Stats -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <span class="stat-number" data-target="30" data-suffix="+">0</span>
+    <span class="stat-label">L&auml;nder</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number" data-target="6">0</span>
+    <span class="stat-label">Kontinente</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number" data-target="100" data-suffix="+">0</span>
+    <span class="stat-label">Konzerte in Israel</span>
+  </div>
+  <div class="stat-item">
+    <span class="stat-number" data-target="43">0</span>
+    <span class="stat-label">Jahre Oregon Bach Festival</span>
+  </div>
+</div>
+
+<!-- Legend -->
+<div class="legend">
+  <div class="legend-item"><span class="legend-dot lg"></span> Lebensmittelpunkte</div>
+  <div class="legend-item"><span class="legend-dot md"></span> Wichtige Wirkungsst&auml;tten</div>
+  <div class="legend-item"><span class="legend-dot sm"></span> Gastkonzerte &amp; Tourneen</div>
+</div>
+
+<!-- Map -->
+<div class="map-container">
+<svg class="map-svg" viewBox="0 0 1000 500" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+<defs>
+  <filter id="glow">
+    <feGaussianBlur stdDeviation="2" result="g"/>
+    <feMerge><feMergeNode in="g"/><feMergeNode in="SourceGraphic"/></feMerge>
+  </filter>
+  <radialGradient id="dotGrad">
+    <stop offset="0%" stop-color="#e8c95a"/>
+    <stop offset="100%" stop-color="#C9A84C"/>
+  </radialGradient>
+</defs>
+
+<!-- Ocean background -->
+<rect width="1000" height="500" fill="#141110"/>
+
+<!-- ─── CONTINENT PATHS (simplified Natural-Earth-style outlines) ─── -->
+<!-- North America -->
+<path class="continent" d="
+  M 100,55 L 115,52 130,50 150,52 168,48 180,42 195,38 205,42 215,50
+  225,55 235,52 240,58 248,62 260,68 265,78 258,88 255,98 248,108
+  240,115 235,125 228,130 225,138 218,145 215,152 208,158 200,165
+  195,172 192,178 190,185 185,190 178,195 172,198 165,200 162,208
+  158,215 152,218 148,225 145,228 140,225 135,218 138,210 142,202
+  148,195 145,188 140,182 132,178 125,175 118,178 112,182 108,188
+  102,192 98,198 92,202 88,195 85,188 82,180 78,175 75,168
+  72,162 75,155 80,148 85,142 82,135 78,128 75,122 80,115
+  85,108 90,102 88,95 85,88 82,82 85,75 90,68 95,62 100,55 Z"/>
+
+<!-- Central America & Caribbean -->
+<path class="continent" d="
+  M 192,198 L 195,205 198,212 200,218 195,222 190,228 185,232
+  182,238 180,242 178,248 175,252 172,248 168,242 165,238 162,235
+  158,238 155,242 152,248 150,252 148,255 152,258 158,255 162,252
+  168,250 175,252 172,258 168,262 172,265 178,262 Z"/>
+
+<!-- South America -->
+<path class="continent" d="
+  M 210,262 L 215,258 222,255 228,258 235,262 240,268 248,275
+  252,285 258,295 262,305 265,315 268,325 270,338 272,348 272,360
+  270,370 268,380 265,388 260,395 255,400 248,405 242,410 235,415
+  228,418 222,412 218,405 215,398 210,392 205,385 200,378 198,370
+  196,362 198,352 200,345 202,338 205,328 208,318 210,308 210,298
+  208,288 205,278 205,270 210,262 Z"/>
+
+<!-- Europe -->
+<path class="continent" d="
+  M 440,58 L 450,55 462,52 475,54 488,50 498,48 505,52 510,58
+  515,62 520,58 528,55 535,58 540,62 535,68 530,72 525,78
+  520,82 518,88 522,92 528,88 535,85 540,88 535,92 530,98
+  525,102 520,108 518,112 515,118 510,122 505,128 500,132
+  498,138 495,142 490,138 485,132 480,128 475,132 470,138
+  468,142 465,148 462,152 458,148 455,142 450,138 445,142
+  440,148 435,145 432,138 435,132 440,125 442,118 445,112
+  448,105 445,98 440,92 435,88 438,82 442,75 445,68 440,62 440,58 Z"/>
+
+<!-- Africa -->
+<path class="continent" d="
+  M 440,178 L 448,175 455,172 465,170 475,172 485,175 495,178
+  505,182 512,188 518,195 522,205 525,215 528,228 530,240
+  532,252 530,265 528,278 525,290 520,302 515,312 510,322
+  505,330 498,338 492,345 485,350 478,352 472,348 465,342
+  460,335 455,328 452,318 450,308 448,298 448,288 450,278
+  452,268 450,258 448,248 445,238 442,228 440,218 438,208
+  438,198 438,188 440,178 Z"/>
+
+<!-- Asia -->
+<path class="continent" d="
+  M 535,52 L 548,48 562,45 578,42 595,40 615,38 635,35
+  655,38 675,42 695,40 715,38 735,42 755,45 775,48
+  790,52 800,58 808,62 815,55 822,58 830,62 840,58
+  848,62 855,68 860,75 865,82 862,90 858,98 862,105
+  868,110 872,118 868,125 862,130 855,135 850,142
+  845,148 838,152 832,158 825,162 820,168 815,172
+  808,175 800,178 795,185 790,190 785,195 778,198
+  772,195 765,192 758,195 752,200 745,205 738,202
+  732,198 725,195 718,198 712,202 705,198 698,195
+  692,200 685,205 678,208 672,212 665,215 658,212
+  652,208 648,202 642,198 635,195 628,198 622,202
+  618,208 615,215 610,218 605,212 600,205 595,198
+  590,192 585,185 580,178 575,172 568,168 562,165
+  555,162 548,158 542,152 538,145 535,138 530,132
+  528,125 530,118 535,112 538,105 540,98 538,92
+  535,85 538,78 540,72 538,65 535,58 535,52 Z"/>
+
+<!-- India subcontinent -->
+<path class="continent" d="
+  M 648,202 L 655,212 660,222 665,232 668,245 665,258
+  660,268 655,275 648,280 642,275 638,265 635,255
+  632,245 635,235 638,225 642,215 645,208 648,202 Z"/>
+
+<!-- Southeast Asia / Indonesia -->
+<path class="continent" d="
+  M 725,222 L 732,218 738,222 745,228 752,232 758,228
+  762,235 768,240 775,238 780,242 785,248 792,245
+  798,248 802,252 798,258 792,255 785,258 778,255
+  772,252 765,248 758,245 752,242 745,238 738,235
+  732,232 725,228 725,222 Z
+  M 755,252 L 762,255 768,258 775,262 780,265 775,268
+  768,265 762,262 755,258 755,252 Z
+  M 790,260 L 798,262 805,265 810,268 815,272 810,275
+  805,272 798,268 792,265 790,260 Z"/>
+
+<!-- Japan -->
+<path class="continent" d="
+  M 842,108 L 848,102 852,108 855,115 858,122 855,130
+  850,138 845,145 840,140 838,132 840,125 842,118 842,108 Z
+  M 835,148 L 840,152 838,158 835,155 835,148 Z"/>
+
+<!-- Australia -->
+<path class="continent" d="
+  M 775,325 L 790,318 805,315 822,318 838,322 852,328
+  862,338 868,348 870,360 868,372 862,382 852,390
+  842,395 828,398 815,395 802,390 790,385 782,378
+  778,368 775,358 772,348 772,338 775,325 Z"/>
+
+<!-- New Zealand -->
+<path class="continent" d="
+  M 905,385 L 910,378 915,382 918,390 915,398 910,402
+  905,398 905,392 905,385 Z
+  M 908,405 L 912,408 910,415 905,412 908,405 Z"/>
+
+<!-- Greenland -->
+<path class="continent" d="
+  M 295,22 L 310,18 328,20 342,25 350,32 348,42 342,50
+  332,55 320,52 308,48 298,42 292,35 295,22 Z"/>
+
+<!-- ─── FLIGHT PATHS from Stuttgart ─── -->
+<g id="flight-paths">
+<!-- Stuttgart coords approx: 490, 115 -->
+</g>
+
+<!-- ─── CITY MARKERS ─── -->
+<g id="city-markers">
+</g>
+
+</svg>
+</div>
+
+<!-- Tooltip -->
+<div class="map-tooltip" id="tooltip">
+  <div class="tt-city"></div>
+  <div class="tt-note"></div>
+</div>
+
+<!-- Info Card overlay -->
+<div class="info-card-overlay" id="infoOverlay">
+  <div class="info-card">
+    <button class="card-close" id="cardClose">&times;</button>
+    <div class="card-city"></div>
+    <div class="card-years"></div>
+    <div class="card-body"></div>
+  </div>
+</div>
+
+<!-- Timeline -->
+<section class="timeline-section">
+  <div class="timeline-current" id="timelineYear">Alle Jahre: 1954 &ndash; 2026</div>
+  <div class="timeline-track">
+    <input type="range" id="timelineRange" min="1954" max="2026" value="2026" step="1">
+  </div>
+  <div class="timeline-label-row">
+    <span>1954</span>
+    <span>1970</span>
+    <span>1990</span>
+    <span>2010</span>
+    <span>2026</span>
+  </div>
+  <div class="timeline-hint">Ziehen Sie den Regler, um Rillings Wirkungsorte in einem bestimmten Jahr zu sehen</div>
+</section>
+
+<!-- Quote -->
+<section class="quote-section">
+  <blockquote>
+    &bdquo;Musik muss die Menschen aufschrecken, aufregen und dazu bringen, &uuml;ber ihr Leben nachzudenken. Dazu ist sie da.&ldquo;
+  </blockquote>
+  <p class="attribution">&mdash; Helmuth Rilling</p>
+</section>
+
+<footer class="page-footer">
+  Helmuth Rilling &middot; 29. Mai 1933 &ndash; 16. Februar 2026
+</footer>
+
+<script>
+// ════════════════════════════════════════════
+// City data
+// ════════════════════════════════════════════
+const CITIES = [
+  // PRIMARY
+  { id:'stuttgart', name:'Stuttgart', x:490, y:115, tier:'primary',
+    startYear:1954, endYear:2026,
+    note:'Bachakademie, G\u00e4chinger Kantorei \u2014 Lebensmittelpunkt',
+    detail:'Stuttgart war das Zentrum von Rillings Schaffen. 1954 gr\u00fcndete er die G\u00e4chinger Kantorei, 1965 das Bach-Collegium Stuttgart. Die Internationale Bachakademie Stuttgart (gegr. 1981) wurde sein Lebenswerk \u2014 ein weltweites Zentrum f\u00fcr die Pflege und Interpretation Bachscher Musik.' },
+  { id:'eugene', name:'Eugene, Oregon', x:108, y:118, tier:'primary',
+    startYear:1970, endYear:2013,
+    note:'Oregon Bach Festival \u2014 43 Jahre k\u00fcnstlerische Leitung',
+    detail:'Von 1970 bis 2013 leitete Rilling das Oregon Bach Festival in Eugene als Music Director. \u00dcber 43 Jahre formte er es zu einem der bedeutendsten Bachfestivals Nordamerikas und brachte zahllose junge Musiker mit dem Werk Bachs in Ber\u00fchrung.' },
+  { id:'frankfurt', name:'Frankfurt am Main', x:487, y:110, tier:'primary',
+    startYear:1965, endYear:1985,
+    note:'Professor an der Hochschule f\u00fcr Musik, 1965\u20131985',
+    detail:'Zwei Jahrzehnte lang unterrichtete Rilling an der Frankfurter Musikhochschule Chor- und Orchesterleitung. Generationen von Dirigenten wurden hier von ihm gepr\u00e4gt. Seine P\u00e4dagogik verband tiefes Bach-Verst\u00e4ndnis mit praktischer Musikerziehung.' },
+
+  // SECONDARY
+  { id:'newyork', name:'New York', x:255, y:128, tier:'secondary',
+    startYear:1968, endYear:2020,
+    note:'Carnegie Hall, Lincoln Center \u2014 regelm\u00e4\u00dfige Gastauftritte',
+    detail:'Rilling trat wiederholt in der Carnegie Hall und im Lincoln Center auf. Seine Auff\u00fchrungen der Bach-Passionen und des Weihnachtsoratoriums wurden vom New Yorker Publikum und der Kritik gefeiert.' },
+  { id:'vienna', name:'Wien', x:510, y:115, tier:'secondary',
+    startYear:1972, endYear:2018,
+    note:'Wiener Musikverein, Konzerthaus',
+    detail:'Im Wiener Musikverein und Konzerthaus dirigierte Rilling das Bach-Collegium Stuttgart und die Wiener Philharmoniker. Die Wiener Auftritte geh\u00f6rten zu den H\u00f6hepunkten seiner europ\u00e4ischen Konzertt\u00e4tigkeit.' },
+  { id:'telaviv', name:'Tel Aviv', x:555, y:180, tier:'secondary',
+    startYear:1968, endYear:2022,
+    note:'\u00dcber 100 Konzerte \u2014 Israel Philharmonic Orchestra',
+    detail:'Rillings Beziehung zu Israel war einzigartig. Mit \u00fcber 100 Konzerten, vielen davon mit dem Israel Philharmonic Orchestra, setzte er ein Zeichen f\u00fcr Vers\u00f6hnung durch Musik. Bach in Israel aufzuf\u00fchren war ihm ein Herzensanliegen.' },
+  { id:'tokyo', name:'Tokyo', x:848, y:148, tier:'secondary',
+    startYear:1975, endYear:2019,
+    note:'NHK Hall, Suntory Hall \u2014 Regelm\u00e4\u00dfige Japan-Tourneen',
+    detail:'Japan wurde ein zweites musikalisches Zuhause f\u00fcr Rilling. Seine Tourneen f\u00fchrten ihn in die gr\u00f6\u00dften Konzerth\u00e4user Tokyos und durch das ganze Land. Die japanische Bach-Begeisterung inspirierte ihn stets aufs Neue.' },
+  { id:'rome', name:'Rom', x:495, y:142, tier:'secondary',
+    startYear:1978, endYear:2016,
+    note:'Accademia Nazionale di Santa Cecilia',
+    detail:'In der Accademia Nazionale di Santa Cecilia und anderen r\u00f6mischen Spielst\u00e4tten brachte Rilling Bach und die deutsche Chortradition dem italienischen Publikum nahe.' },
+  { id:'siena', name:'Siena', x:493, y:138, tier:'secondary',
+    startYear:1980, endYear:2010,
+    note:'Accademia Musicale Chigiana',
+    detail:'An der renommierten Accademia Musicale Chigiana in Siena gab Rilling Meisterkurse f\u00fcr Dirigenten und Chorleiter aus aller Welt.' },
+
+  // TERTIARY
+  { id:'moscow', name:'Moskau', x:570, y:88, tier:'tertiary',
+    startYear:1988, endYear:2015,
+    note:'Gastkonzerte mit dem Moskauer Philharmonischen Orchester',
+    detail:'Nach dem Fall des Eisernen Vorhangs dirigierte Rilling in Moskau und brachte Bachs Musik einem begeisterten russischen Publikum.' },
+  { id:'stpetersburg', name:'St. Petersburg', x:558, y:75, tier:'tertiary',
+    startYear:1990, endYear:2015,
+    note:'Mariinski-Theater, Philharmonie',
+    detail:'In der Philharmonie St. Petersburg und im Mariinski-Theater f\u00fchrte Rilling die gro\u00dfen Werke Bachs und Mendelssohns auf.' },
+  { id:'buenosaires', name:'Buenos Aires', x:240, y:365, tier:'tertiary',
+    startYear:1982, endYear:2012,
+    note:'Teatro Col\u00f3n',
+    detail:'Im weltber\u00fchmten Teatro Col\u00f3n dirigierte Rilling Gastkonzerte und Chorfestivals, die das s\u00fcdamerikanische Musikleben bereicherten.' },
+  { id:'caracas', name:'Caracas', x:220, y:235, tier:'tertiary',
+    startYear:1985, endYear:2008,
+    note:'Gastkonzerte, Chorakademie',
+    detail:'In Venezuela unterst\u00fctzte Rilling junge Musiker und arbeitete mit lokalen Ensembles zusammen, um Bach in Lateinamerika zu verbreiten.' },
+  { id:'krakow', name:'Krak\u00f3w', x:520, y:102, tier:'tertiary',
+    startYear:1985, endYear:2014,
+    note:'Philharmonie Krak\u00f3w',
+    detail:'In der Krak\u00f3wer Philharmonie und beim Musikfestival dirigierte Rilling polnische und deutsche Chormusik.' },
+  { id:'toronto', name:'Toronto', x:232, y:118, tier:'tertiary',
+    startYear:1975, endYear:2010,
+    note:'Roy Thomson Hall, Gastkonzerte',
+    detail:'Bei Gastkonzerten in Toronto arbeitete Rilling mit kanadischen Orchestern und brachte sein Bach-Repertoire nach Nordamerika.' },
+  { id:'beijing', name:'Peking', x:770, y:138, tier:'tertiary',
+    startYear:1998, endYear:2018,
+    note:'National Centre for the Performing Arts',
+    detail:'Rilling war einer der ersten westlichen Bach-Interpreten, die regelm\u00e4\u00dfig in China auftraten. Er dirigierte im National Centre for the Performing Arts und gab Meisterkurse.' },
+  { id:'taipei', name:'Taipei', x:795, y:190, tier:'tertiary',
+    startYear:1995, endYear:2016,
+    note:'National Concert Hall',
+    detail:'In der National Concert Hall Taipei f\u00fchrte Rilling Bach-Kantaten und Oratorien auf und inspirierte die taiwanesische Musikszene.' },
+  { id:'hongkong', name:'Hongkong', x:782, y:198, tier:'tertiary',
+    startYear:1992, endYear:2015,
+    note:'Hong Kong Cultural Centre',
+    detail:'Im Hong Kong Cultural Centre dirigierte Rilling das Bach-Collegium Stuttgart auf mehreren Asien-Tourneen.' },
+  { id:'madrid', name:'Madrid', x:458, y:142, tier:'tertiary',
+    startYear:1980, endYear:2015,
+    note:'Auditorio Nacional de M\u00fasica',
+    detail:'In Spaniens gr\u00f6\u00dftem Konzertsaal dirigierte Rilling Gastkonzerte und Festivalauftritte.' },
+  { id:'budapest', name:'Budapest', x:520, y:115, tier:'tertiary',
+    startYear:1982, endYear:2016,
+    note:'Pal\u00e1st der K\u00fcnste, Gastkonzerte',
+    detail:'In Budapest pflegte Rilling die Verbindung zur ungarischen Chortradition und dirigierte im Palast der K\u00fcnste.' },
+  { id:'warsaw', name:'Warschau', x:522, y:98, tier:'tertiary',
+    startYear:1985, endYear:2014,
+    note:'Nationalphilharmonie',
+    detail:'In der Warschauer Nationalphilharmonie brachte Rilling Bach und die deutsche Chortradition dem polnischen Publikum nahe.' },
+  { id:'london', name:'London', x:462, y:105, tier:'tertiary',
+    startYear:1970, endYear:2018,
+    note:'Royal Festival Hall, Barbican Centre',
+    detail:'In London trat Rilling in der Royal Festival Hall und im Barbican Centre auf, dirigierte das London Philharmonic und andere Ensembles.' },
+  { id:'berlin', name:'Berlin', x:500, y:98, tier:'tertiary',
+    startYear:1968, endYear:2020,
+    note:'Philharmonie, Konzerthaus',
+    detail:'In der Berliner Philharmonie und im Konzerthaus dirigierte Rilling die gro\u00dfen Bach-Werke. Berlin war ein wichtiger Ort f\u00fcr seine k\u00fcnstlerische Arbeit.' },
+  { id:'spandau', name:'Spandau', x:502, y:97, tier:'tertiary',
+    startYear:1978, endYear:2005,
+    note:'Spandauer Chorkonzerte',
+    detail:'In der Spandauer Nikolaikirche und anderen Spielst\u00e4tten leitete Rilling Chorkonzerte und Workshops.' },
+  { id:'weimar', name:'Weimar', x:496, y:104, tier:'tertiary',
+    startYear:1982, endYear:2010,
+    note:'Bachfeste, Nationaltheater',
+    detail:'In Bachs Wirkungsst\u00e4tte Weimar dirigierte Rilling bei Bachfesten und im Nationaltheater \u2014 eine Pilgerreise zu den Wurzeln.' },
+  { id:'badenbaden', name:'Baden-Baden', x:484, y:118, tier:'tertiary',
+    startYear:1975, endYear:2020,
+    note:'Festspielhaus Baden-Baden',
+    detail:'Im Festspielhaus Baden-Baden, einem der gr\u00f6\u00dften Opern- und Konzerth\u00e4user Europas, war Rilling regelm\u00e4\u00dfig zu Gast.' },
+  { id:'saopaulo', name:'S\u00e3o Paulo', x:242, y:328, tier:'tertiary',
+    startYear:1985, endYear:2014,
+    note:'Sala S\u00e3o Paulo',
+    detail:'In der akustisch herausragenden Sala S\u00e3o Paulo f\u00fchrte Rilling brasilianisches Publikum an Bachs Chorwerke heran.' },
+  { id:'sydney', name:'Sydney', x:870, y:370, tier:'tertiary',
+    startYear:1990, endYear:2010,
+    note:'Sydney Opera House',
+    detail:'Im legend\u00e4ren Sydney Opera House brachte Rilling die Bach-Passionen auf die B\u00fchne und begeisterte das australische Publikum.' },
+  { id:'paris', name:'Paris', x:470, y:115, tier:'tertiary',
+    startYear:1972, endYear:2018,
+    note:'Salle Pleyel, Ph\u00e9lharmonie de Paris',
+    detail:'In Paris dirigierte Rilling in der Salle Pleyel und sp\u00e4ter in der Philharmonie de Paris. Seine Bach-Interpretationen fanden in Frankreich gro\u00dfe Beachtung.' },
+  { id:'zurich', name:'Z\u00fcrich', x:486, y:120, tier:'tertiary',
+    startYear:1970, endYear:2018,
+    note:'Tonhalle Z\u00fcrich',
+    detail:'In der Tonhalle Z\u00fcrich war Rilling h\u00e4ufig zu Gast und pflegte enge Verbindungen zur Schweizer Musikszene.' },
+  { id:'seoul', name:'Seoul', x:810, y:148, tier:'tertiary',
+    startYear:1998, endYear:2018,
+    note:'Seoul Arts Center',
+    detail:'Im Seoul Arts Center f\u00fchrte Rilling Bachs Werke einem begeisterten s\u00fcdkoreanischen Publikum vor.' },
+];
+
+// Stuttgart as the hub
+const STUTTGART = { x: 490, y: 115 };
+
+// ════════════════════════════════════════════
+// Render SVG elements
+// ════════════════════════════════════════════
+const svg = document.querySelector('.map-svg');
+const pathsGroup = document.getElementById('flight-paths');
+const markersGroup = document.getElementById('city-markers');
+
+function quadBezier(x1, y1, x2, y2) {
+  const mx = (x1 + x2) / 2;
+  const my = (y1 + y2) / 2;
+  const dist = Math.sqrt((x2-x1)**2 + (y2-y1)**2);
+  // arc upward proportional to distance
+  const bulge = Math.min(dist * 0.25, 60);
+  const angle = Math.atan2(y2 - y1, x2 - x1) - Math.PI / 2;
+  const cx = mx + Math.cos(angle) * bulge;
+  const cy = my + Math.sin(angle) * bulge;
+  return `M${x1},${y1} Q${cx},${cy} ${x2},${y2}`;
+}
+
+// Create flight paths and markers
+CITIES.forEach(city => {
+  // Skip flight path to Stuttgart itself (and Frankfurt is so close)
+  if (city.id !== 'stuttgart') {
+    const path = document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('class','flight-path');
+    path.setAttribute('d', quadBezier(STUTTGART.x, STUTTGART.y, city.x, city.y));
+    path.dataset.city = city.id;
+    path.dataset.start = city.startYear;
+    path.dataset.end = city.endYear;
+    pathsGroup.appendChild(path);
+  }
+
+  // Marker group
+  const g = document.createElementNS('http://www.w3.org/2000/svg','g');
+  g.setAttribute('class', `city-marker ${city.tier}`);
+  g.dataset.city = city.id;
+  g.dataset.start = city.startYear;
+  g.dataset.end = city.endYear;
+
+  const r = city.tier === 'primary' ? 3.5 : city.tier === 'secondary' ? 2.2 : 1.4;
+
+  // pulse ring for primary
+  if (city.tier === 'primary') {
+    const pulse = document.createElementNS('http://www.w3.org/2000/svg','circle');
+    pulse.setAttribute('class','pulse');
+    pulse.setAttribute('cx', city.x);
+    pulse.setAttribute('cy', city.y);
+    pulse.setAttribute('r', '3');
+    g.appendChild(pulse);
+  }
+
+  // dot
+  const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('class','dot');
+  dot.setAttribute('cx', city.x);
+  dot.setAttribute('cy', city.y);
+  dot.setAttribute('r', r);
+  dot.setAttribute('fill','url(#dotGrad)');
+  g.appendChild(dot);
+
+  markersGroup.appendChild(g);
+
+  // Events
+  g.addEventListener('mouseenter', (e) => showTooltip(e, city));
+  g.addEventListener('mousemove', moveTooltip);
+  g.addEventListener('mouseleave', hideTooltip);
+  g.addEventListener('click', () => showCard(city));
+});
+
+// ════════════════════════════════════════════
+// Tooltip
+// ════════════════════════════════════════════
+const tooltip = document.getElementById('tooltip');
+function showTooltip(e, city) {
+  tooltip.querySelector('.tt-city').textContent = city.name;
+  tooltip.querySelector('.tt-note').textContent = city.note;
+  tooltip.classList.add('visible');
+  moveTooltip(e);
+  // highlight flight path
+  const fp = pathsGroup.querySelector(`[data-city="${city.id}"]`);
+  if (fp) { fp.style.opacity = '0.7'; fp.style.strokeWidth = '0.9'; }
+}
+function moveTooltip(e) {
+  const pad = 14;
+  let left = e.clientX + pad;
+  let top = e.clientY + pad;
+  if (left + 260 > window.innerWidth) left = e.clientX - 270;
+  if (top + 80 > window.innerHeight) top = e.clientY - 90;
+  tooltip.style.left = left + 'px';
+  tooltip.style.top = top + 'px';
+}
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+  document.querySelectorAll('.flight-path').forEach(p => {
+    p.style.opacity = '';
+    p.style.strokeWidth = '';
+  });
+}
+
+// ════════════════════════════════════════════
+// Info Card
+// ════════════════════════════════════════════
+const overlay = document.getElementById('infoOverlay');
+const cardClose = document.getElementById('cardClose');
+function showCard(city) {
+  overlay.querySelector('.card-city').textContent = city.name;
+  overlay.querySelector('.card-years').textContent = city.startYear + ' \u2013 ' + city.endYear;
+  overlay.querySelector('.card-body').textContent = city.detail;
+  overlay.classList.add('open');
+}
+cardClose.addEventListener('click', () => overlay.classList.remove('open'));
+overlay.addEventListener('click', (e) => {
+  if (e.target === overlay) overlay.classList.remove('open');
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') overlay.classList.remove('open');
+});
+
+// ════════════════════════════════════════════
+// Timeline scrubber
+// ════════════════════════════════════════════
+const rangeInput = document.getElementById('timelineRange');
+const yearDisplay = document.getElementById('timelineYear');
+
+rangeInput.addEventListener('input', () => {
+  const year = parseInt(rangeInput.value);
+  if (year >= 2026) {
+    yearDisplay.innerHTML = 'Alle Jahre: 1954 &ndash; 2026';
+  } else {
+    yearDisplay.textContent = year;
+  }
+  filterByYear(year);
+});
+
+function filterByYear(year) {
+  document.querySelectorAll('.city-marker').forEach(m => {
+    const s = parseInt(m.dataset.start);
+    const e = parseInt(m.dataset.end);
+    if (year >= 2026 || (year >= s && year <= e)) {
+      m.classList.remove('hidden');
+    } else {
+      m.classList.add('hidden');
+    }
+  });
+  document.querySelectorAll('.flight-path').forEach(p => {
+    const s = parseInt(p.dataset.start);
+    const e = parseInt(p.dataset.end);
+    if (year >= 2026 || (year >= s && year <= e)) {
+      p.classList.remove('hidden');
+    } else {
+      p.classList.add('hidden');
+    }
+  });
+}
+
+// ════════════════════════════════════════════
+// Animated counters
+// ════════════════════════════════════════════
+function animateCounters() {
+  document.querySelectorAll('.stat-number').forEach(el => {
+    const target = parseInt(el.dataset.target);
+    const suffix = el.dataset.suffix || '';
+    const duration = 1800;
+    const start = performance.now();
+    function tick(now) {
+      const elapsed = now - start;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      const val = Math.round(eased * target);
+      el.textContent = val + suffix;
+      if (progress < 1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+
+// trigger counters when visible
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      animateCounters();
+      statsObserver.disconnect();
+    }
+  });
+}, { threshold: 0.3 });
+statsObserver.observe(document.querySelector('.stats-bar'));
+
+// ════════════════════════════════════════════
+// Touch-friendly tooltip for mobile
+// ════════════════════════════════════════════
+if ('ontouchstart' in window) {
+  document.querySelectorAll('.city-marker').forEach(g => {
+    g.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      const city = CITIES.find(c => c.id === g.dataset.city);
+      if (city) {
+        const touch = e.touches[0];
+        showTooltip({ clientX: touch.clientX, clientY: touch.clientY }, city);
+        setTimeout(hideTooltip, 3000);
+      }
+    }, { passive: false });
+  });
+}
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

@@ -1,0 +1,1490 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kathedrale — Klangkathedrale für Helmuth Rilling</title>
+<meta name="description" content="Betreten Sie die virtuelle Kathedrale — ein 3D-Denkmal für Helmuth Rilling (1933–2026)">
+<meta name="theme-color" content="#C9A84C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+}
+
+html, body {
+  width: 100%; height: 100%;
+  overflow: hidden;
+  background: #0a0806;
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+}
+
+#canvas-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
+
+canvas { display: block; }
+
+/* ═══ OVERLAY UI ═══ */
+#ui-overlay {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 10;
+  pointer-events: none;
+}
+
+#ui-overlay * { pointer-events: auto; }
+
+/* Back link */
+#back-link {
+  position: fixed;
+  top: 1.2rem; left: 1.5rem;
+  z-index: 100;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--color-gold);
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+  text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+}
+#back-link:hover { opacity: 1; }
+
+/* Title overlay */
+#title-overlay {
+  position: fixed;
+  top: 1rem; left: 0; right: 0;
+  text-align: center;
+  z-index: 50;
+  opacity: 0.9;
+  transition: opacity 1s;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.9);
+}
+#title-overlay h1 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 400;
+  color: var(--color-gold);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+#title-overlay .subtitle {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: rgba(245,240,232,0.5);
+  margin-top: 0.2rem;
+}
+body.locked #title-overlay { opacity: 0; }
+
+/* Crosshair */
+#crosshair {
+  position: fixed;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 16px; height: 16px;
+  border: 1px solid rgba(201,168,76,0.35);
+  border-radius: 50%;
+  display: none;
+  z-index: 20;
+}
+#crosshair::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  width: 2px; height: 2px;
+  background: rgba(201,168,76,0.6);
+  border-radius: 50%;
+}
+body.locked #crosshair { display: block; }
+
+/* Info panel for windows */
+#info-panel {
+  position: fixed;
+  bottom: 2.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 550px;
+  width: 90%;
+  background: rgba(26,20,16,0.92);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 4px;
+  padding: 1.2rem 1.8rem;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 30;
+  backdrop-filter: blur(8px);
+}
+#info-panel.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+#info-panel .year {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  color: var(--color-gold);
+  letter-spacing: 0.15em;
+  line-height: 1;
+}
+#info-panel .era-text {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: rgba(245,240,232,0.8);
+  margin-top: 0.6rem;
+  line-height: 1.5;
+}
+
+/* Start screen */
+#start-screen {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: rgba(10,8,6,0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  transition: opacity 1s;
+}
+#start-screen.hidden { opacity: 0; pointer-events: none; }
+
+#start-screen h1 {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  color: var(--color-gold);
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  margin-bottom: 0.3rem;
+}
+#start-screen .sub {
+  font-family: var(--font-body);
+  font-size: 1.15rem;
+  color: rgba(245,240,232,0.5);
+  margin-bottom: 2.5rem;
+}
+
+.btn-enter {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  color: var(--color-gold);
+  background: transparent;
+  border: 1px solid var(--color-gold);
+  padding: 0.8rem 2.5rem;
+  cursor: pointer;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  margin: 0.4rem;
+}
+.btn-enter:hover {
+  background: var(--color-gold);
+  color: var(--color-ink);
+}
+
+#start-screen .controls-hint {
+  margin-top: 2rem;
+  font-size: 0.85rem;
+  color: rgba(245,240,232,0.3);
+  text-align: center;
+  line-height: 1.8;
+}
+
+/* Tour button */
+#tour-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  z-index: 60;
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--color-gold);
+  background: rgba(26,20,16,0.85);
+  border: 1px solid rgba(201,168,76,0.35);
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  transition: all 0.3s;
+  border-radius: 3px;
+}
+#tour-btn:hover {
+  background: rgba(201,168,76,0.15);
+  border-color: var(--color-gold);
+}
+
+/* Audio toggle */
+#audio-btn {
+  position: fixed;
+  bottom: 1.5rem;
+  left: 1.5rem;
+  z-index: 60;
+  font-family: var(--font-body);
+  font-size: 1.2rem;
+  color: var(--color-gold);
+  background: rgba(26,20,16,0.85);
+  border: 1px solid rgba(201,168,76,0.35);
+  width: 38px; height: 38px;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+#audio-btn:hover {
+  background: rgba(201,168,76,0.15);
+}
+
+/* Mobile touch controls */
+#touch-controls {
+  display: none;
+  position: fixed;
+  bottom: 0; left: 0;
+  width: 100%; height: 40%;
+  z-index: 40;
+}
+.touch-zone {
+  position: absolute;
+  opacity: 0;
+}
+#touch-forward { top: 0; left: 25%; width: 50%; height: 50%; }
+#touch-backward { bottom: 0; left: 25%; width: 50%; height: 50%; }
+#touch-left { top: 0; left: 0; width: 25%; height: 100%; }
+#touch-right { top: 0; right: 0; width: 25%; height: 100%; }
+
+/* Loading */
+#loading {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  background: #0a0806;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+  transition: opacity 0.8s;
+}
+#loading.hidden { opacity: 0; pointer-events: none; }
+#loading span {
+  font-family: var(--font-display);
+  color: var(--color-gold);
+  font-size: 1rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  #touch-controls { display: block; }
+  #start-screen h1 { font-size: 1.8rem; }
+  #start-screen .controls-hint { display: none; }
+  #info-panel { bottom: 12rem; }
+}
+
+@media (hover: none) and (pointer: coarse) {
+  #touch-controls { display: block; }
+}
+</style>
+</head>
+<body>
+
+<div id="loading"><span>Kathedrale wird errichtet...</span></div>
+
+<div id="start-screen">
+  <h1>Kathedrale</h1>
+  <p class="sub">Helmuth Rilling (1933&ndash;2026)</p>
+  <div>
+    <button class="btn-enter" id="btn-explore">Betreten</button>
+    <button class="btn-enter" id="btn-tour">F&uuml;hrung</button>
+  </div>
+  <div class="controls-hint">
+    WASD &mdash; Bewegen &nbsp;|&nbsp; Maus &mdash; Umsehen<br>
+    ESC &mdash; Men&uuml; &nbsp;|&nbsp; Klick &mdash; Steuerung aktivieren
+  </div>
+</div>
+
+<div id="canvas-container"></div>
+
+<div id="ui-overlay">
+  <a id="back-link" href="klangkathedrale.html">&larr; Klangkathedrale</a>
+  <div id="title-overlay">
+    <h1>Kathedrale</h1>
+    <div class="subtitle">Ein begehbares Denkmal</div>
+  </div>
+  <div id="crosshair"></div>
+  <div id="info-panel">
+    <div class="year"></div>
+    <div class="era-text"></div>
+  </div>
+  <button id="tour-btn">F&uuml;hrung</button>
+  <button id="audio-btn" title="Klang an/aus">&#9835;</button>
+</div>
+
+<div id="touch-controls">
+  <div class="touch-zone" id="touch-forward"></div>
+  <div class="touch-zone" id="touch-backward"></div>
+  <div class="touch-zone" id="touch-left"></div>
+  <div class="touch-zone" id="touch-right"></div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+(function() {
+  'use strict';
+
+  // ════════════════════════════════════════════
+  // DESIGN TOKENS
+  // ════════════════════════════════════════════
+  const GOLD    = 0xC9A84C;
+  const INK     = 0x1A1410;
+  const IVORY   = 0xF5F0E8;
+  const STONE_DARK  = 0x3A3530;
+  const STONE_MID   = 0x5A5550;
+  const STONE_LIGHT = 0x7A756E;
+  const FOG_COLOR   = 0x0C0A08;
+
+  // ════════════════════════════════════════════
+  // CATHEDRAL DIMENSIONS
+  // ════════════════════════════════════════════
+  const NAVE_LENGTH = 80;
+  const NAVE_WIDTH  = 25;
+  const NAVE_HEIGHT = 40;
+  const COLUMN_RADIUS = 0.6;
+  const COLUMN_COUNT = 10;
+  const AISLE_OFFSET = NAVE_WIDTH / 2 - 2;
+
+  // ════════════════════════════════════════════
+  // RILLING BIOGRAPHY DATA
+  // ════════════════════════════════════════════
+  const windowDataLeft = [
+    { year: '1933', color: 0xD4A055, emissive: 0xB8862E,
+      text: 'Geboren am 29. Mai in Stuttgart. Eine Kindheit zwischen Kirchenmusik und dem Erbe schwäbischer Kantoren.' },
+    { year: '1954', color: 0xC88A6A, emissive: 0xA06830,
+      text: 'Studium an der Musikhochschule Stuttgart. Die Grundlagen einer lebenslangen Hingabe an Johann Sebastian Bach.' },
+    { year: '1965', color: 0xD4725C, emissive: 0xB05040,
+      text: 'Gründung der Gächinger Kantorei — ein Ensemble, das zum Maßstab für Bachpflege werden sollte.' },
+    { year: '1967', color: 0x6B9080, emissive: 0x4A7060,
+      text: 'Gründung des Bach-Collegium Stuttgart. Beginn einer historisch informierten, doch stets lebendigen Aufführungspraxis.' },
+    { year: '1970', color: 0x7BA0B8, emissive: 0x507890,
+      text: 'Die erste Gesamtaufnahme aller Bach-Kantaten nimmt Gestalt an — ein monumentales Lebenswerk beginnt.' },
+    { year: '1981', color: 0x8B7EC8, emissive: 0x6A58A0,
+      text: 'Gründung der Internationalen Bachakademie Stuttgart — eine Heimstatt für Bachs Musik und ihre Vermittlung.' }
+  ];
+
+  const windowDataRight = [
+    { year: '1985', color: 0xC8956E, emissive: 0xA07048,
+      text: 'Das Oregon Bach Festival wird zu einem internationalen Leuchtturm. Rilling verbindet Kontinente durch Musik.' },
+    { year: '2000', color: 0xD4A055, emissive: 0xB8862E,
+      text: 'Die Gesamteinspielung aller Bach-Kantaten — 70 CDs — wird vollendet. Ein beispielloser Beitrag zur Musikgeschichte.' },
+    { year: '2001', color: 0xC86040, emissive: 0xA04428,
+      text: 'Das „Projekt Europäische Kirchenmusik" in Schwäbisch Gmünd: Rilling als Brückenbauer zwischen Glauben und Kunst.' },
+    { year: '2011', color: 0x7BA0B8, emissive: 0x507890,
+      text: 'Abschied vom Oregon Bach Festival nach über drei Jahrzehnten. Ein Vermächtnis, das in Eugene weiterlebt.' },
+    { year: '2014', color: 0x8B7EC8, emissive: 0x6A58A0,
+      text: 'Übergabe der Bachakademie-Leitung an Hans-Christoph Rademann. Die nächste Generation trägt das Erbe weiter.' },
+    { year: '2026', color: 0xC9A84C, emissive: 0xA08030,
+      text: 'Am 3. Februar verstummt der Taktstock — doch die Klänge hallen wider. Helmuth Rilling geht in die Ewigkeit ein.' }
+  ];
+
+  // ════════════════════════════════════════════
+  // SCENE SETUP
+  // ════════════════════════════════════════════
+  let scene, camera, renderer, clock;
+  let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
+  let velocity = new THREE.Vector3();
+  let isLocked = false;
+  let euler = new THREE.Euler(0, 0, 0, 'YXZ');
+  let windowMeshes = [];
+  let activeWindow = null;
+  let particles;
+  let lightRays = [];
+  let organPipes = [];
+  let tourMode = false;
+  let tourIndex = 0;
+  let tourProgress = 0;
+  let tourPaused = 0;
+  let audioCtx = null;
+  let audioStarted = false;
+  let droneGain = null;
+  const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+
+  function init() {
+    clock = new THREE.Clock();
+
+    // Scene
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(FOG_COLOR);
+    scene.fog = new THREE.FogExp2(FOG_COLOR, 0.018);
+
+    // Camera
+    camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.set(0, 1.7, NAVE_LENGTH / 2 - 2);
+    camera.rotation.order = 'YXZ';
+
+    // Renderer
+    renderer = new THREE.WebGLRenderer({ antialias: true, powerPreference: 'high-performance' });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = false;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 0.8;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    document.getElementById('canvas-container').appendChild(renderer.domElement);
+
+    // Lights
+    setupLights();
+
+    // Build cathedral
+    buildFloor();
+    buildWalls();
+    buildColumns();
+    buildArches();
+    buildVaulting();
+    buildStainedGlassWindows();
+    buildOrgan();
+    buildLightRays();
+    buildParticles();
+
+    // Events
+    setupControls();
+
+    // Hide loading
+    setTimeout(() => {
+      document.getElementById('loading').classList.add('hidden');
+    }, 600);
+
+    // Start render loop
+    animate();
+  }
+
+  // ════════════════════════════════════════════
+  // LIGHTING
+  // ════════════════════════════════════════════
+  function setupLights() {
+    // Dim ambient
+    const ambient = new THREE.AmbientLight(0x1A1820, 0.3);
+    scene.add(ambient);
+
+    // Main directional — high window light
+    const dirLight = new THREE.DirectionalLight(0xFFE8C0, 0.4);
+    dirLight.position.set(10, 35, -20);
+    scene.add(dirLight);
+
+    // Warm fill from organ end
+    const organGlow = new THREE.PointLight(0xC9A84C, 1.2, 60, 2);
+    organGlow.position.set(0, 20, -NAVE_LENGTH / 2 + 3);
+    scene.add(organGlow);
+
+    // Subtle blue moonlight from above
+    const moonlight = new THREE.DirectionalLight(0x4466AA, 0.15);
+    moonlight.position.set(-5, 40, 0);
+    scene.add(moonlight);
+
+    // Hemisphere for subtle ground bounce
+    const hemi = new THREE.HemisphereLight(0x2A2440, 0x1A1008, 0.25);
+    scene.add(hemi);
+  }
+
+  // ════════════════════════════════════════════
+  // MATERIALS
+  // ════════════════════════════════════════════
+  function stoneMaterial(color) {
+    return new THREE.MeshStandardMaterial({
+      color: color || STONE_MID,
+      roughness: 0.92,
+      metalness: 0.02
+    });
+  }
+
+  // ════════════════════════════════════════════
+  // FLOOR — checkered stone
+  // ════════════════════════════════════════════
+  function buildFloor() {
+    const tileSize = 2.5;
+    const tilesX = Math.ceil(NAVE_WIDTH / tileSize);
+    const tilesZ = Math.ceil(NAVE_LENGTH / tileSize);
+    const darkMat = stoneMaterial(0x2A2520);
+    const lightMat = stoneMaterial(0x4A4540);
+
+    // Use merged geometry for performance
+    const geom = new THREE.PlaneGeometry(tileSize, tileSize);
+    for (let ix = 0; ix < tilesX; ix++) {
+      for (let iz = 0; iz < tilesZ; iz++) {
+        const isDark = (ix + iz) % 2 === 0;
+        const tile = new THREE.Mesh(geom, isDark ? darkMat : lightMat);
+        tile.rotation.x = -Math.PI / 2;
+        tile.position.set(
+          (ix - tilesX / 2 + 0.5) * tileSize,
+          0,
+          (iz - tilesZ / 2 + 0.5) * tileSize
+        );
+        scene.add(tile);
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // WALLS
+  // ════════════════════════════════════════════
+  function buildWalls() {
+    const wallMat = stoneMaterial(STONE_DARK);
+    const wallThickness = 1.2;
+
+    // Left wall
+    const leftWall = new THREE.Mesh(
+      new THREE.BoxGeometry(wallThickness, NAVE_HEIGHT, NAVE_LENGTH),
+      wallMat
+    );
+    leftWall.position.set(-NAVE_WIDTH / 2 - wallThickness / 2, NAVE_HEIGHT / 2, 0);
+    scene.add(leftWall);
+
+    // Right wall
+    const rightWall = leftWall.clone();
+    rightWall.position.set(NAVE_WIDTH / 2 + wallThickness / 2, NAVE_HEIGHT / 2, 0);
+    scene.add(rightWall);
+
+    // Back wall (entrance)
+    const backWall = new THREE.Mesh(
+      new THREE.BoxGeometry(NAVE_WIDTH + wallThickness * 2, NAVE_HEIGHT, wallThickness),
+      wallMat
+    );
+    backWall.position.set(0, NAVE_HEIGHT / 2, NAVE_LENGTH / 2 + wallThickness / 2);
+    scene.add(backWall);
+
+    // Front wall (organ end)
+    const frontWall = backWall.clone();
+    frontWall.position.set(0, NAVE_HEIGHT / 2, -NAVE_LENGTH / 2 - wallThickness / 2);
+    scene.add(frontWall);
+
+    // Ceiling
+    const ceiling = new THREE.Mesh(
+      new THREE.PlaneGeometry(NAVE_WIDTH, NAVE_LENGTH),
+      stoneMaterial(0x222020)
+    );
+    ceiling.rotation.x = Math.PI / 2;
+    ceiling.position.set(0, NAVE_HEIGHT, 0);
+    scene.add(ceiling);
+  }
+
+  // ════════════════════════════════════════════
+  // COLUMNS
+  // ════════════════════════════════════════════
+  function buildColumns() {
+    const colGeom = new THREE.CylinderGeometry(COLUMN_RADIUS, COLUMN_RADIUS * 1.1, NAVE_HEIGHT, 12);
+    const colMat = stoneMaterial(STONE_MID);
+    const capGeom = new THREE.CylinderGeometry(COLUMN_RADIUS * 1.5, COLUMN_RADIUS * 1.3, 0.8, 12);
+    const baseGeom = new THREE.CylinderGeometry(COLUMN_RADIUS * 1.3, COLUMN_RADIUS * 1.6, 1.0, 12);
+
+    const spacing = NAVE_LENGTH / (COLUMN_COUNT + 1);
+
+    for (let i = 1; i <= COLUMN_COUNT; i++) {
+      const z = NAVE_LENGTH / 2 - i * spacing;
+
+      for (let side = -1; side <= 1; side += 2) {
+        const x = side * AISLE_OFFSET;
+
+        // Column shaft
+        const col = new THREE.Mesh(colGeom, colMat);
+        col.position.set(x, NAVE_HEIGHT / 2, z);
+        scene.add(col);
+
+        // Capital
+        const cap = new THREE.Mesh(capGeom, colMat);
+        cap.position.set(x, NAVE_HEIGHT - 0.4, z);
+        scene.add(cap);
+
+        // Base
+        const base = new THREE.Mesh(baseGeom, colMat);
+        base.position.set(x, 0.5, z);
+        scene.add(base);
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // POINTED ARCHES between columns
+  // ════════════════════════════════════════════
+  function buildArches() {
+    const archMat = stoneMaterial(0x4A4540);
+    const ribRadius = 0.15;
+    const spacing = NAVE_LENGTH / (COLUMN_COUNT + 1);
+
+    for (let i = 1; i <= COLUMN_COUNT; i++) {
+      const z = NAVE_LENGTH / 2 - i * spacing;
+
+      // Transverse arch across nave
+      createPointedArch(-AISLE_OFFSET, AISLE_OFFSET, NAVE_HEIGHT, z, ribRadius, archMat, 'x');
+
+      // Side arches along the nave (between consecutive columns)
+      if (i < COLUMN_COUNT) {
+        const zNext = z - spacing;
+        createPointedArch(z, zNext, NAVE_HEIGHT, -AISLE_OFFSET, ribRadius, archMat, 'z');
+        createPointedArch(z, zNext, NAVE_HEIGHT, AISLE_OFFSET, ribRadius, archMat, 'z');
+      }
+    }
+  }
+
+  function createPointedArch(start, end, height, fixedCoord, radius, material, axis) {
+    const segments = 16;
+    const span = Math.abs(end - start);
+    const midVal = (start + end) / 2;
+    const archHeight = height - 1;
+    const peakHeight = archHeight + span * 0.3;
+
+    for (let i = 0; i < segments; i++) {
+      const t0 = i / segments;
+      const t1 = (i + 1) / segments;
+
+      const p0 = getArchPoint(t0, start, end, archHeight, peakHeight);
+      const p1 = getArchPoint(t1, start, end, archHeight, peakHeight);
+
+      const length = Math.sqrt(
+        Math.pow(p1.h - p0.h, 2) + Math.pow(p1.y - p0.y, 2)
+      );
+
+      const segGeom = new THREE.CylinderGeometry(radius, radius, length, 6);
+      const seg = new THREE.Mesh(segGeom, material);
+
+      const midH = (p0.h + p1.h) / 2;
+      const midY = (p0.y + p1.y) / 2;
+
+      if (axis === 'x') {
+        seg.position.set(midH, midY, fixedCoord);
+        const angle = Math.atan2(p1.y - p0.y, p1.h - p0.h);
+        seg.rotation.z = angle - Math.PI / 2;
+      } else {
+        seg.position.set(fixedCoord, midY, midH);
+        const angle = Math.atan2(p1.y - p0.y, p1.h - p0.h);
+        seg.rotation.x = -(angle - Math.PI / 2);
+      }
+
+      scene.add(seg);
+    }
+  }
+
+  function getArchPoint(t, start, end, baseHeight, peakHeight) {
+    const h = start + (end - start) * t;
+    // Pointed arch: two circular arcs meeting at a point
+    const mid = (start + end) / 2;
+    const halfSpan = Math.abs(end - start) / 2;
+    const normalized = Math.abs(h - mid) / halfSpan; // 0 at center, 1 at edges
+    const y = baseHeight + (peakHeight - baseHeight) * Math.pow(1 - normalized, 1.5);
+    return { h, y };
+  }
+
+  // ════════════════════════════════════════════
+  // RIBBED VAULTING
+  // ════════════════════════════════════════════
+  function buildVaulting() {
+    const ribMat = stoneMaterial(0x504A44);
+    const ribRadius = 0.12;
+    const spacing = NAVE_LENGTH / (COLUMN_COUNT + 1);
+
+    for (let i = 1; i < COLUMN_COUNT; i++) {
+      const z0 = NAVE_LENGTH / 2 - i * spacing;
+      const z1 = z0 - spacing;
+      const zMid = (z0 + z1) / 2;
+
+      // Diagonal ribs (X pattern in each bay)
+      createDiagonalRib(-AISLE_OFFSET, z0, AISLE_OFFSET, z1, NAVE_HEIGHT, ribRadius, ribMat);
+      createDiagonalRib(AISLE_OFFSET, z0, -AISLE_OFFSET, z1, NAVE_HEIGHT, ribRadius, ribMat);
+
+      // Ridge rib along the center
+      const ridgeGeom = new THREE.CylinderGeometry(ribRadius * 0.8, ribRadius * 0.8, spacing, 6);
+      const ridge = new THREE.Mesh(ridgeGeom, ribMat);
+      ridge.position.set(0, NAVE_HEIGHT + NAVE_WIDTH * 0.15, zMid);
+      ridge.rotation.x = Math.PI / 2;
+      scene.add(ridge);
+    }
+  }
+
+  function createDiagonalRib(x0, z0, x1, z1, baseH, radius, material) {
+    const segments = 12;
+    const peakH = baseH + Math.sqrt(Math.pow(x1 - x0, 2) + Math.pow(z1 - z0, 2)) * 0.15;
+
+    for (let i = 0; i < segments; i++) {
+      const t0 = i / segments;
+      const t1 = (i + 1) / segments;
+
+      const px0 = x0 + (x1 - x0) * t0;
+      const pz0 = z0 + (z1 - z0) * t0;
+      const py0 = baseH + (peakH - baseH) * Math.sin(t0 * Math.PI);
+
+      const px1 = x0 + (x1 - x0) * t1;
+      const pz1 = z0 + (z1 - z0) * t1;
+      const py1 = baseH + (peakH - baseH) * Math.sin(t1 * Math.PI);
+
+      const dx = px1 - px0;
+      const dy = py1 - py0;
+      const dz = pz1 - pz0;
+      const length = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+      const segGeom = new THREE.CylinderGeometry(radius, radius, length, 5);
+      const seg = new THREE.Mesh(segGeom, material);
+
+      seg.position.set((px0 + px1) / 2, (py0 + py1) / 2, (pz0 + pz1) / 2);
+
+      // Orient cylinder along the segment direction
+      const dir = new THREE.Vector3(dx, dy, dz).normalize();
+      const up = new THREE.Vector3(0, 1, 0);
+      const quat = new THREE.Quaternion().setFromUnitVectors(up, dir);
+      seg.quaternion.copy(quat);
+
+      scene.add(seg);
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // STAINED GLASS WINDOWS
+  // ════════════════════════════════════════════
+  function buildStainedGlassWindows() {
+    const windowWidth = 3.5;
+    const windowHeight = 12;
+    const windowBottom = 12;
+    const spacing = NAVE_LENGTH / (6 + 1);
+
+    // Left side windows
+    windowDataLeft.forEach((data, i) => {
+      const z = NAVE_LENGTH / 2 - (i + 1) * spacing;
+      createStainedGlassWindow(
+        -NAVE_WIDTH / 2 + 0.05, windowBottom + windowHeight / 2, z,
+        windowWidth, windowHeight,
+        data, 'left'
+      );
+    });
+
+    // Right side windows
+    windowDataRight.forEach((data, i) => {
+      const z = NAVE_LENGTH / 2 - (i + 1) * spacing;
+      createStainedGlassWindow(
+        NAVE_WIDTH / 2 - 0.05, windowBottom + windowHeight / 2, z,
+        windowWidth, windowHeight,
+        data, 'right'
+      );
+    });
+  }
+
+  function createStainedGlassWindow(x, y, z, w, h, data, side) {
+    const group = new THREE.Group();
+    group.position.set(x, y, z);
+
+    if (side === 'left') {
+      group.rotation.y = Math.PI / 2;
+    } else {
+      group.rotation.y = -Math.PI / 2;
+    }
+
+    // Main window pane — emissive glass
+    const glassMat = new THREE.MeshStandardMaterial({
+      color: data.color,
+      emissive: data.emissive,
+      emissiveIntensity: 1.5,
+      transparent: true,
+      opacity: 0.85,
+      side: THREE.DoubleSide,
+      roughness: 0.3,
+      metalness: 0.1
+    });
+
+    // Pointed arch window shape using multiple planes
+    // Main rectangular body
+    const bodyGeom = new THREE.PlaneGeometry(w, h * 0.75);
+    const body = new THREE.Mesh(bodyGeom, glassMat);
+    body.position.y = -h * 0.125;
+    group.add(body);
+
+    // Pointed top — triangle
+    const topShape = new THREE.Shape();
+    topShape.moveTo(-w / 2, 0);
+    topShape.lineTo(0, h * 0.3);
+    topShape.lineTo(w / 2, 0);
+    topShape.closePath();
+    const topGeom = new THREE.ShapeGeometry(topShape);
+    const top = new THREE.Mesh(topGeom, glassMat);
+    top.position.y = h * 0.75 / 2 - h * 0.125;
+    group.add(top);
+
+    // Stone tracery — frame
+    const frameMat = stoneMaterial(0x3A3530);
+    const frameThickness = 0.2;
+
+    // Vertical mullion
+    const mullion = new THREE.Mesh(
+      new THREE.BoxGeometry(frameThickness, h * 0.75, 0.15),
+      frameMat
+    );
+    mullion.position.y = -h * 0.125;
+    group.add(mullion);
+
+    // Horizontal transom
+    const transom = new THREE.Mesh(
+      new THREE.BoxGeometry(w, frameThickness, 0.15),
+      frameMat
+    );
+    transom.position.y = -h * 0.125 + h * 0.2;
+    group.add(transom);
+
+    // Light source behind each window
+    const windowLight = new THREE.PointLight(data.color, 0.6, 18, 2);
+    windowLight.position.set(0, 0, side === 'left' ? -1 : 1);
+    group.add(windowLight);
+
+    // Secondary glow panels for richer color effect
+    const glowMat = new THREE.MeshBasicMaterial({
+      color: data.color,
+      transparent: true,
+      opacity: 0.08,
+      side: THREE.DoubleSide
+    });
+    const glowPlane = new THREE.Mesh(
+      new THREE.PlaneGeometry(w * 2, h * 1.2),
+      glowMat
+    );
+    glowPlane.position.z = side === 'left' ? 0.3 : -0.3;
+    group.add(glowPlane);
+
+    scene.add(group);
+
+    // Store for proximity detection
+    windowMeshes.push({
+      position: new THREE.Vector3(x, 1.7, z),
+      data: data,
+      light: windowLight
+    });
+  }
+
+  // ════════════════════════════════════════════
+  // ORGAN
+  // ════════════════════════════════════════════
+  function buildOrgan() {
+    const organZ = -NAVE_LENGTH / 2 + 2;
+    const organGroup = new THREE.Group();
+    organGroup.position.set(0, 0, organZ);
+
+    const pipeMat = new THREE.MeshStandardMaterial({
+      color: GOLD,
+      metalness: 0.85,
+      roughness: 0.2,
+      emissive: 0x3A2A10,
+      emissiveIntensity: 0.2
+    });
+
+    const caseMat = stoneMaterial(0x2A2520);
+
+    // Organ case
+    const caseGeom = new THREE.BoxGeometry(14, 25, 2);
+    const organCase = new THREE.Mesh(caseGeom, caseMat);
+    organCase.position.set(0, 14, 0);
+    organGroup.add(organCase);
+
+    // Pipes — varying heights, arranged in groups
+    const pipeConfigs = [];
+    const totalPipes = 45;
+    const pipeSpread = 12;
+
+    for (let i = 0; i < totalPipes; i++) {
+      const t = i / (totalPipes - 1);
+      const x = (t - 0.5) * pipeSpread;
+      // Parabolic arrangement — tallest in center
+      const normalizedDist = Math.abs(t - 0.5) * 2;
+      const baseHeight = 5 + (1 - normalizedDist * normalizedDist) * 18;
+      const radius = 0.08 + (1 - normalizedDist) * 0.12;
+
+      const pipeGeom = new THREE.CylinderGeometry(radius, radius, baseHeight, 8);
+      const pipe = new THREE.Mesh(pipeGeom, pipeMat);
+      pipe.position.set(x, baseHeight / 2 + 3, 0.5);
+      organGroup.add(pipe);
+
+      pipeConfigs.push({ mesh: pipe, baseHeight: baseHeight, baseY: baseHeight / 2 + 3 });
+    }
+
+    organPipes = pipeConfigs;
+
+    // Golden halo behind organ
+    const haloMat = new THREE.MeshBasicMaterial({
+      color: 0xC9A84C,
+      transparent: true,
+      opacity: 0.06,
+      side: THREE.DoubleSide
+    });
+    const haloGeom = new THREE.CircleGeometry(12, 32);
+    const halo = new THREE.Mesh(haloGeom, haloMat);
+    halo.position.set(0, 18, -0.5);
+    organGroup.add(halo);
+
+    // Outer halo ring
+    const halo2Mat = new THREE.MeshBasicMaterial({
+      color: 0xC9A84C,
+      transparent: true,
+      opacity: 0.03,
+      side: THREE.DoubleSide
+    });
+    const halo2 = new THREE.Mesh(new THREE.RingGeometry(10, 16, 32), halo2Mat);
+    halo2.position.set(0, 18, -0.6);
+    organGroup.add(halo2);
+
+    // Organ loft (raised platform)
+    const loftGeom = new THREE.BoxGeometry(16, 3, 4);
+    const loft = new THREE.Mesh(loftGeom, caseMat);
+    loft.position.set(0, 1.5, 1);
+    organGroup.add(loft);
+
+    scene.add(organGroup);
+
+    // Golden halo point light
+    const haloLight = new THREE.PointLight(0xC9A84C, 1.5, 35, 2);
+    haloLight.position.set(0, 20, organZ - 1);
+    scene.add(haloLight);
+  }
+
+  // ════════════════════════════════════════════
+  // VOLUMETRIC LIGHT RAYS
+  // ════════════════════════════════════════════
+  function buildLightRays() {
+    const rayMat = new THREE.MeshBasicMaterial({
+      color: 0xFFE8C0,
+      transparent: true,
+      opacity: 0.02,
+      side: THREE.DoubleSide,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+
+    const spacing = NAVE_LENGTH / 7;
+    for (let i = 1; i <= 6; i++) {
+      const z = NAVE_LENGTH / 2 - i * spacing;
+
+      for (let side = -1; side <= 1; side += 2) {
+        const rayGeom = new THREE.PlaneGeometry(4, 25);
+        const ray = new THREE.Mesh(rayGeom, rayMat.clone());
+        ray.position.set(side * (NAVE_WIDTH / 2 - 3), 18, z);
+        ray.rotation.y = side * 0.3;
+        ray.rotation.z = side * -0.15;
+        scene.add(ray);
+        lightRays.push(ray);
+      }
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // FLOATING DUST PARTICLES
+  // ════════════════════════════════════════════
+  function buildParticles() {
+    const count = 1500;
+    const positions = new Float32Array(count * 3);
+    const sizes = new Float32Array(count);
+
+    for (let i = 0; i < count; i++) {
+      positions[i * 3]     = (Math.random() - 0.5) * NAVE_WIDTH;
+      positions[i * 3 + 1] = Math.random() * NAVE_HEIGHT * 0.8 + 1;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * NAVE_LENGTH;
+      sizes[i] = Math.random() * 0.06 + 0.02;
+    }
+
+    const geom = new THREE.BufferGeometry();
+    geom.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    geom.setAttribute('size', new THREE.BufferAttribute(sizes, 1));
+
+    const mat = new THREE.PointsMaterial({
+      color: 0xFFE8C0,
+      size: 0.08,
+      transparent: true,
+      opacity: 0.35,
+      sizeAttenuation: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending
+    });
+
+    particles = new THREE.Points(geom, mat);
+    scene.add(particles);
+  }
+
+  // ════════════════════════════════════════════
+  // INLINE POINTER LOCK CONTROLS
+  // ════════════════════════════════════════════
+  function setupControls() {
+    const canvas = renderer.domElement;
+
+    // Pointer lock
+    canvas.addEventListener('click', () => {
+      if (!isLocked && !isMobile) {
+        canvas.requestPointerLock();
+      }
+    });
+
+    document.addEventListener('pointerlockchange', () => {
+      isLocked = document.pointerLockElement === canvas;
+      document.body.classList.toggle('locked', isLocked);
+    });
+
+    // Mouse look
+    document.addEventListener('mousemove', (e) => {
+      if (!isLocked) return;
+      const sensitivity = 0.002;
+      euler.setFromQuaternion(camera.quaternion);
+      euler.y -= e.movementX * sensitivity;
+      euler.x -= e.movementY * sensitivity;
+      euler.x = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, euler.x));
+      camera.quaternion.setFromEuler(euler);
+    });
+
+    // Keyboard
+    document.addEventListener('keydown', (e) => {
+      switch(e.code) {
+        case 'KeyW': case 'ArrowUp':    moveForward = true; break;
+        case 'KeyS': case 'ArrowDown':  moveBackward = true; break;
+        case 'KeyA': case 'ArrowLeft':  moveLeft = true; break;
+        case 'KeyD': case 'ArrowRight': moveRight = true; break;
+      }
+    });
+
+    document.addEventListener('keyup', (e) => {
+      switch(e.code) {
+        case 'KeyW': case 'ArrowUp':    moveForward = false; break;
+        case 'KeyS': case 'ArrowDown':  moveBackward = false; break;
+        case 'KeyA': case 'ArrowLeft':  moveLeft = false; break;
+        case 'KeyD': case 'ArrowRight': moveRight = false; break;
+      }
+    });
+
+    // Mobile touch controls
+    setupTouchControls();
+
+    // Mobile look: touch drag on canvas
+    let touchStartX = 0, touchStartY = 0;
+    let isTouchLooking = false;
+
+    canvas.addEventListener('touchstart', (e) => {
+      if (e.touches.length === 1) {
+        isTouchLooking = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+    }, { passive: true });
+
+    canvas.addEventListener('touchmove', (e) => {
+      if (!isTouchLooking || e.touches.length !== 1) return;
+      const dx = e.touches[0].clientX - touchStartX;
+      const dy = e.touches[0].clientY - touchStartY;
+      touchStartX = e.touches[0].clientX;
+      touchStartY = e.touches[0].clientY;
+
+      euler.setFromQuaternion(camera.quaternion);
+      euler.y -= dx * 0.003;
+      euler.x -= dy * 0.003;
+      euler.x = Math.max(-Math.PI / 2.5, Math.min(Math.PI / 2.5, euler.x));
+      camera.quaternion.setFromEuler(euler);
+    }, { passive: true });
+
+    canvas.addEventListener('touchend', () => { isTouchLooking = false; }, { passive: true });
+
+    // Window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // UI buttons
+    document.getElementById('btn-explore').addEventListener('click', startExplore);
+    document.getElementById('btn-tour').addEventListener('click', startTour);
+    document.getElementById('tour-btn').addEventListener('click', toggleTour);
+    document.getElementById('audio-btn').addEventListener('click', toggleAudio);
+  }
+
+  function setupTouchControls() {
+    const zones = {
+      'touch-forward':  () => { moveForward = true; },
+      'touch-backward': () => { moveBackward = true; },
+      'touch-left':     () => { moveLeft = true; },
+      'touch-right':    () => { moveRight = true; }
+    };
+
+    Object.entries(zones).forEach(([id, activate]) => {
+      const el = document.getElementById(id);
+      el.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        activate();
+      });
+      el.addEventListener('touchend', () => {
+        moveForward = moveBackward = moveLeft = moveRight = false;
+      });
+    });
+  }
+
+  // ════════════════════════════════════════════
+  // AUDIO — ambient organ drone + footsteps
+  // ════════════════════════════════════════════
+  function initAudio() {
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+      droneGain = audioCtx.createGain();
+      droneGain.gain.value = 0;
+      droneGain.connect(audioCtx.destination);
+
+      // Organ drone — layered oscillators
+      const fundamentals = [65.41, 130.81, 196.0]; // C2, C3, G3
+      fundamentals.forEach((freq, i) => {
+        const osc = audioCtx.createOscillator();
+        osc.type = i === 0 ? 'sawtooth' : 'sine';
+        osc.frequency.value = freq;
+
+        const oscGain = audioCtx.createGain();
+        oscGain.gain.value = i === 0 ? 0.03 : 0.02;
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.value = 200 + i * 100;
+        filter.Q.value = 1;
+
+        osc.connect(filter);
+        filter.connect(oscGain);
+        oscGain.connect(droneGain);
+        osc.start();
+      });
+
+      // Sub bass
+      const subOsc = audioCtx.createOscillator();
+      subOsc.type = 'sine';
+      subOsc.frequency.value = 32.7; // C1
+      const subGain = audioCtx.createGain();
+      subGain.gain.value = 0.04;
+      subOsc.connect(subGain);
+      subGain.connect(droneGain);
+      subOsc.start();
+
+      // Reverb convolution — simple filtered noise
+      const reverbLen = audioCtx.sampleRate * 3;
+      const reverbBuffer = audioCtx.createBuffer(2, reverbLen, audioCtx.sampleRate);
+      for (let ch = 0; ch < 2; ch++) {
+        const data = reverbBuffer.getChannelData(ch);
+        for (let i = 0; i < reverbLen; i++) {
+          data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / reverbLen, 2.5) * 0.3;
+        }
+      }
+      const convolver = audioCtx.createConvolver();
+      convolver.buffer = reverbBuffer;
+
+      const reverbSend = audioCtx.createGain();
+      reverbSend.gain.value = 0.15;
+      droneGain.connect(reverbSend);
+      reverbSend.connect(convolver);
+      convolver.connect(audioCtx.destination);
+
+      audioStarted = true;
+    } catch(e) {
+      console.warn('Audio not available:', e);
+    }
+  }
+
+  function toggleAudio() {
+    if (!audioCtx) {
+      initAudio();
+    }
+    if (!audioStarted) return;
+
+    const btn = document.getElementById('audio-btn');
+    if (droneGain.gain.value > 0.01) {
+      droneGain.gain.linearRampToValueAtTime(0, audioCtx.currentTime + 1);
+      btn.style.opacity = '0.4';
+    } else {
+      droneGain.gain.linearRampToValueAtTime(0.7, audioCtx.currentTime + 2);
+      btn.style.opacity = '1';
+    }
+  }
+
+  let lastFootstepTime = 0;
+  function playFootstep(time) {
+    if (!audioCtx || !audioStarted) return;
+    if (time - lastFootstepTime < 0.45) return;
+    lastFootstepTime = time;
+
+    try {
+      const bufferSize = audioCtx.sampleRate * 0.08;
+      const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+      const data = buffer.getChannelData(0);
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / bufferSize, 8) * 0.15;
+      }
+
+      const source = audioCtx.createBufferSource();
+      source.buffer = buffer;
+
+      const filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 600 + Math.random() * 400;
+
+      const gain = audioCtx.createGain();
+      gain.gain.value = 0.08;
+
+      source.connect(filter);
+      filter.connect(gain);
+      gain.connect(audioCtx.destination);
+      source.start();
+    } catch(e) { /* silence errors */ }
+  }
+
+  // ════════════════════════════════════════════
+  // START MODES
+  // ════════════════════════════════════════════
+  function startExplore() {
+    document.getElementById('start-screen').classList.add('hidden');
+    initAudio();
+    if (droneGain) droneGain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 3);
+    if (!isMobile) {
+      renderer.domElement.requestPointerLock();
+    }
+  }
+
+  function startTour() {
+    document.getElementById('start-screen').classList.add('hidden');
+    initAudio();
+    if (droneGain) droneGain.gain.linearRampToValueAtTime(0.5, audioCtx.currentTime + 3);
+    tourMode = true;
+    tourIndex = 0;
+    tourProgress = 0;
+    tourPaused = 0;
+    // Start position
+    camera.position.set(0, 1.7, NAVE_LENGTH / 2 - 3);
+    euler.set(0, Math.PI, 0);
+    camera.quaternion.setFromEuler(euler);
+  }
+
+  function toggleTour() {
+    if (tourMode) {
+      tourMode = false;
+      document.getElementById('tour-btn').textContent = 'Führung';
+    } else {
+      tourMode = true;
+      tourIndex = 0;
+      tourProgress = 0;
+      tourPaused = 0;
+      camera.position.set(0, 1.7, NAVE_LENGTH / 2 - 3);
+      document.getElementById('tour-btn').textContent = 'Stopp';
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // TOUR LOGIC
+  // ════════════════════════════════════════════
+  function updateTour(delta) {
+    if (!tourMode) return;
+
+    const allWindows = [];
+    const spacing = NAVE_LENGTH / 7;
+
+    // Build tour waypoints: approach each window from the nave center
+    for (let i = 0; i < 6; i++) {
+      const z = NAVE_LENGTH / 2 - (i + 1) * spacing;
+      // Left window
+      allWindows.push({ x: -4, z: z, lookX: -NAVE_WIDTH / 2, lookZ: z });
+      // Right window
+      allWindows.push({ x: 4, z: z, lookX: NAVE_WIDTH / 2, lookZ: z });
+    }
+
+    // Add organ at end
+    allWindows.push({ x: 0, z: -NAVE_LENGTH / 2 + 10, lookX: 0, lookZ: -NAVE_LENGTH / 2 });
+
+    if (tourIndex >= allWindows.length) {
+      tourMode = false;
+      document.getElementById('tour-btn').textContent = 'Führung';
+      return;
+    }
+
+    const target = allWindows[tourIndex];
+    const targetPos = new THREE.Vector3(target.x, 1.7, target.z);
+    const dist = camera.position.distanceTo(targetPos);
+
+    if (dist > 0.5) {
+      // Move toward target
+      const moveSpeed = 4.0 * delta;
+      const dir = targetPos.clone().sub(camera.position).normalize();
+      camera.position.add(dir.multiplyScalar(Math.min(moveSpeed, dist)));
+
+      // Smoothly rotate to look at the window
+      const lookTarget = new THREE.Vector3(target.lookX, 10, target.lookZ);
+      const targetQuat = new THREE.Quaternion();
+      const lookMat = new THREE.Matrix4().lookAt(camera.position, lookTarget, new THREE.Vector3(0, 1, 0));
+      targetQuat.setFromRotationMatrix(lookMat);
+      camera.quaternion.slerp(targetQuat, 2.0 * delta);
+    } else {
+      // Pause at window
+      tourPaused += delta;
+      if (tourPaused > 3.5) {
+        tourPaused = 0;
+        tourIndex++;
+      }
+    }
+
+    // Update euler from camera quaternion for consistency
+    euler.setFromQuaternion(camera.quaternion);
+  }
+
+  // ════════════════════════════════════════════
+  // MOVEMENT
+  // ════════════════════════════════════════════
+  function updateMovement(delta) {
+    if (tourMode) return;
+
+    const speed = 10.0;
+    const friction = 8.0;
+
+    // Deceleration
+    velocity.x -= velocity.x * friction * delta;
+    velocity.z -= velocity.z * friction * delta;
+
+    // Camera-relative direction
+    const forward = new THREE.Vector3();
+    camera.getWorldDirection(forward);
+    forward.y = 0;
+    forward.normalize();
+
+    const right = new THREE.Vector3();
+    right.crossVectors(forward, new THREE.Vector3(0, 1, 0)).normalize();
+
+    if (moveForward)  { velocity.add(forward.multiplyScalar(speed * delta)); }
+    if (moveBackward) {
+      camera.getWorldDirection(forward); forward.y = 0; forward.normalize();
+      velocity.sub(forward.multiplyScalar(speed * delta));
+    }
+    if (moveLeft)  { velocity.sub(right.multiplyScalar(speed * delta)); }
+    if (moveRight) {
+      right.crossVectors(
+        new THREE.Vector3().copy(camera.getWorldDirection(new THREE.Vector3())).setY(0).normalize(),
+        new THREE.Vector3(0, 1, 0)
+      ).normalize();
+      velocity.add(right.multiplyScalar(speed * delta));
+    }
+
+    camera.position.add(velocity.clone().multiplyScalar(delta));
+
+    // Clamp to cathedral bounds
+    const margin = 1.5;
+    camera.position.x = Math.max(-NAVE_WIDTH / 2 + margin, Math.min(NAVE_WIDTH / 2 - margin, camera.position.x));
+    camera.position.z = Math.max(-NAVE_LENGTH / 2 + margin, Math.min(NAVE_LENGTH / 2 - margin, camera.position.z));
+    camera.position.y = 1.7;
+
+    // Footsteps
+    if ((moveForward || moveBackward || moveLeft || moveRight) && velocity.length() > 0.5) {
+      playFootstep(clock.elapsedTime);
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // WINDOW PROXIMITY
+  // ════════════════════════════════════════════
+  function updateWindowProximity() {
+    const infoPanel = document.getElementById('info-panel');
+    const yearEl = infoPanel.querySelector('.year');
+    const textEl = infoPanel.querySelector('.era-text');
+
+    let closest = null;
+    let closestDist = Infinity;
+
+    windowMeshes.forEach((win) => {
+      const dist = camera.position.distanceTo(win.position);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closest = win;
+      }
+    });
+
+    if (closest && closestDist < 10) {
+      if (activeWindow !== closest) {
+        activeWindow = closest;
+        yearEl.textContent = closest.data.year;
+        textEl.textContent = closest.data.text;
+      }
+      infoPanel.classList.add('visible');
+    } else {
+      infoPanel.classList.remove('visible');
+      activeWindow = null;
+    }
+  }
+
+  // ════════════════════════════════════════════
+  // ANIMATION LOOP
+  // ════════════════════════════════════════════
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = Math.min(clock.getDelta(), 0.05);
+    const elapsed = clock.elapsedTime;
+
+    // Movement
+    updateMovement(delta);
+    updateTour(delta);
+
+    // Window proximity
+    updateWindowProximity();
+
+    // Animate particles
+    if (particles) {
+      const positions = particles.geometry.attributes.position.array;
+      for (let i = 0; i < positions.length; i += 3) {
+        positions[i]     += Math.sin(elapsed * 0.3 + i) * 0.002;
+        positions[i + 1] += Math.sin(elapsed * 0.15 + i * 0.5) * 0.003;
+        positions[i + 2] += Math.cos(elapsed * 0.2 + i * 0.3) * 0.002;
+
+        // Wrap around
+        if (positions[i + 1] > NAVE_HEIGHT * 0.8) positions[i + 1] = 1;
+        if (positions[i + 1] < 1) positions[i + 1] = NAVE_HEIGHT * 0.8;
+      }
+      particles.geometry.attributes.position.needsUpdate = true;
+    }
+
+    // Animate light rays
+    lightRays.forEach((ray, i) => {
+      ray.material.opacity = 0.015 + Math.sin(elapsed * 0.4 + i * 0.7) * 0.008;
+    });
+
+    // Animate organ pipes
+    organPipes.forEach((pipe, i) => {
+      const oscillation = Math.sin(elapsed * 0.8 + i * 0.3) * 0.15;
+      const newHeight = pipe.baseHeight + oscillation;
+      pipe.mesh.scale.y = newHeight / pipe.baseHeight;
+      pipe.mesh.position.y = pipe.baseY + oscillation / 2;
+    });
+
+    renderer.render(scene, camera);
+  }
+
+  // ════════════════════════════════════════════
+  // INIT
+  // ════════════════════════════════════════════
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+})();
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

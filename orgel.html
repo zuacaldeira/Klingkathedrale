@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Die Orgel — Klangkathedrale</title>
+<meta name="description" content="Interaktive Bach-Orgel — Ein digitales Denkmal für Helmuth Rilling (1933–2026)">
+<meta name="theme-color" content="#C9A84C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-rose: #D4725C;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-serif: 'EB Garamond', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══ HEADER ═══ */
+header {
+  padding: 1.2rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(26,20,16,0.98), rgba(26,20,16,0.85));
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  flex-shrink: 0;
+}
+
+.back-link {
+  color: rgba(245,240,232,0.6);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.back-link:hover { color: var(--color-gold); }
+.back-link .arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+.back-link:hover .arrow { transform: translateX(-3px); }
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  color: var(--color-gold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  flex: 1;
+}
+
+.header-spacer { width: 140px; }
+
+/* ═══ MAIN CONTAINER ═══ */
+main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem 1rem 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Background cathedral glow */
+main::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 120%;
+  height: 60%;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* ═══ STOPS / REGISTERS ═══ */
+.stops-container {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  justify-content: center;
+  z-index: 1;
+}
+
+.stop-btn {
+  background: rgba(201,168,76,0.08);
+  border: 1px solid rgba(201,168,76,0.3);
+  color: rgba(245,240,232,0.5);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  padding: 0.6rem 1.4rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+}
+.stop-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0;
+  width: 4px; height: 100%;
+  background: var(--color-gold);
+  transform: scaleY(0);
+  transition: transform 0.3s ease;
+}
+.stop-btn.active {
+  background: rgba(201,168,76,0.18);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+  box-shadow: 0 0 20px rgba(201,168,76,0.15);
+}
+.stop-btn.active::before { transform: scaleY(1); }
+.stop-btn:hover {
+  border-color: rgba(201,168,76,0.6);
+  color: rgba(245,240,232,0.8);
+}
+
+/* ═══ ORGAN PIPE DECORATION ═══ */
+.pipes-decoration {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 3px;
+  margin-bottom: 1rem;
+  opacity: 0.4;
+  z-index: 1;
+}
+.deco-pipe {
+  width: 8px;
+  background: linear-gradient(to bottom, var(--color-gold), rgba(201,168,76,0.3));
+  border-radius: 4px 4px 0 0;
+  border: 1px solid rgba(201,168,76,0.3);
+  border-bottom: none;
+}
+
+/* ═══ KEYBOARD ═══ */
+.keyboard-wrapper {
+  position: relative;
+  z-index: 1;
+  max-width: 100%;
+  overflow-x: auto;
+  padding-bottom: 0.5rem;
+}
+
+.keyboard {
+  display: flex;
+  position: relative;
+  height: 220px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+.key {
+  position: relative;
+  cursor: pointer;
+  transition: background 0.08s, box-shadow 0.08s, transform 0.08s;
+  flex-shrink: 0;
+}
+
+.key-white {
+  width: 44px;
+  height: 220px;
+  background: linear-gradient(to bottom,
+    var(--color-parchment) 0%,
+    var(--color-ivory) 30%,
+    #DDD8CC 100%
+  );
+  border: 1px solid rgba(201,168,76,0.25);
+  border-top: 3px solid var(--color-gold);
+  border-radius: 0 0 4px 4px;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  padding-bottom: 10px;
+}
+.key-white:hover {
+  background: linear-gradient(to bottom,
+    #F0EADD 0%,
+    var(--color-parchment) 30%,
+    #D8D2C5 100%
+  );
+}
+.key-white.active {
+  background: linear-gradient(to bottom,
+    rgba(201,168,76,0.35) 0%,
+    rgba(201,168,76,0.2) 40%,
+    rgba(201,168,76,0.1) 100%
+  );
+  box-shadow:
+    0 0 25px rgba(201,168,76,0.4),
+    0 0 50px rgba(201,168,76,0.15),
+    inset 0 0 15px rgba(201,168,76,0.1);
+  transform: translateY(2px);
+  border-top-color: #E0C060;
+}
+
+.key-black {
+  width: 28px;
+  height: 140px;
+  background: linear-gradient(to bottom,
+    #2A2218 0%,
+    var(--color-ink) 40%,
+    #0D0A07 100%
+  );
+  border: 1px solid rgba(201,168,76,0.2);
+  border-top: 3px solid rgba(201,168,76,0.6);
+  border-radius: 0 0 3px 3px;
+  position: absolute;
+  z-index: 2;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.5);
+}
+.key-black:hover {
+  background: linear-gradient(to bottom,
+    #352C20 0%,
+    #1E1812 40%,
+    #0D0A07 100%
+  );
+}
+.key-black.active {
+  background: linear-gradient(to bottom,
+    rgba(201,168,76,0.3) 0%,
+    rgba(201,168,76,0.12) 40%,
+    rgba(26,20,16,0.95) 100%
+  );
+  box-shadow:
+    0 0 20px rgba(201,168,76,0.35),
+    0 0 40px rgba(201,168,76,0.1),
+    1px 1px 4px rgba(0,0,0,0.5);
+  transform: translateY(2px);
+}
+
+.key-label {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  color: rgba(26,20,16,0.35);
+  letter-spacing: 0.05em;
+  text-align: center;
+  pointer-events: none;
+}
+.key-black .key-label {
+  color: rgba(201,168,76,0.3);
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ═══ PLAY BACH BUTTON ═══ */
+.bach-section {
+  margin-top: 2rem;
+  text-align: center;
+  z-index: 1;
+}
+
+.play-bach-btn {
+  background: transparent;
+  border: 2px solid var(--color-gold);
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  padding: 0.8rem 2.5rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.4s ease;
+}
+.play-bach-btn::before {
+  content: '';
+  position: absolute;
+  top: 0; left: -100%;
+  width: 100%; height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(201,168,76,0.15), transparent);
+  transition: left 0.6s ease;
+}
+.play-bach-btn:hover::before { left: 100%; }
+.play-bach-btn:hover {
+  background: rgba(201,168,76,0.1);
+  box-shadow: 0 0 30px rgba(201,168,76,0.2);
+}
+.play-bach-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+.play-bach-btn:disabled:hover {
+  background: transparent;
+  box-shadow: none;
+}
+
+.bach-subtitle {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: rgba(245,240,232,0.4);
+  font-size: 0.9rem;
+  margin-top: 0.6rem;
+  letter-spacing: 0.05em;
+}
+
+/* ═══ KEYBOARD HINTS ═══ */
+.keyboard-hints {
+  margin-top: 1.5rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.25);
+  text-align: center;
+  letter-spacing: 0.03em;
+  z-index: 1;
+}
+
+/* ═══ FOOTER ═══ */
+footer {
+  text-align: center;
+  padding: 1.2rem;
+  border-top: 1px solid rgba(201,168,76,0.1);
+  flex-shrink: 0;
+}
+footer p {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.25);
+  font-style: italic;
+  letter-spacing: 0.05em;
+}
+
+/* ═══ RESPONSIVE ═══ */
+@media (max-width: 900px) {
+  .keyboard { height: 180px; }
+  .key-white { width: 36px; height: 180px; }
+  .key-black { width: 24px; height: 115px; }
+}
+
+@media (max-width: 600px) {
+  header { padding: 0.8rem 1rem; flex-wrap: wrap; gap: 0.3rem; }
+  .back-link { font-size: 0.85rem; }
+  .header-spacer { display: none; }
+  .page-title { order: -1; width: 100%; margin-bottom: 0.3rem; }
+  .stops-container { gap: 0.6rem; }
+  .stop-btn { font-size: 0.7rem; padding: 0.5rem 0.8rem; }
+  .keyboard { height: 160px; }
+  .key-white { width: 30px; height: 160px; }
+  .key-black { width: 20px; height: 100px; }
+  .key-label { font-size: 0.5rem; }
+  .play-bach-btn { font-size: 0.85rem; padding: 0.6rem 1.5rem; }
+}
+
+@media (max-width: 420px) {
+  .keyboard { height: 140px; }
+  .key-white { width: 26px; height: 140px; }
+  .key-black { width: 17px; height: 88px; }
+}
+</style>
+</head>
+<body>
+
+<header>
+  <a href="klangkathedrale.html" class="back-link">
+    <span class="arrow">&larr;</span> Klangkathedrale
+  </a>
+  <h1 class="page-title">Die Orgel</h1>
+  <div class="header-spacer"></div>
+</header>
+
+<main>
+  <!-- Organ Stops -->
+  <div class="stops-container">
+    <button class="stop-btn active" data-stop="principal" onclick="toggleStop('principal', this)">
+      Prinzipal 8'
+    </button>
+    <button class="stop-btn" data-stop="oktave" onclick="toggleStop('oktave', this)">
+      Oktave 4'
+    </button>
+    <button class="stop-btn" data-stop="mixtur" onclick="toggleStop('mixtur', this)">
+      Mixtur
+    </button>
+  </div>
+
+  <!-- Decorative Pipes -->
+  <div class="pipes-decoration" id="pipesDecoration"></div>
+
+  <!-- Keyboard -->
+  <div class="keyboard-wrapper">
+    <div class="keyboard" id="keyboard"></div>
+  </div>
+
+  <!-- Play Bach -->
+  <div class="bach-section">
+    <button class="play-bach-btn" id="playBachBtn" onclick="playBach()">
+      Play Bach
+    </button>
+    <p class="bach-subtitle">Toccata und Fuge d-moll, BWV 565</p>
+  </div>
+
+  <!-- Keyboard Hints -->
+  <p class="keyboard-hints">
+    Tastatur: A&ndash;K spielen die wei&szlig;en Tasten &middot; W E T Y U spielen die schwarzen Tasten
+  </p>
+</main>
+
+<footer>
+  <p>In Erinnerung an Helmuth Rilling (1933&ndash;2026) &mdash; Klangkathedrale</p>
+</footer>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// AUDIO CONTEXT & REVERB
+// ═══════════════════════════════════════════════════════
+let audioCtx = null;
+let convolver = null;
+let masterGain = null;
+
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+  // Master gain
+  masterGain = audioCtx.createGain();
+  masterGain.gain.value = 0.35;
+
+  // Convolver (reverb) — procedural impulse response, 2.8s cathedral decay
+  convolver = audioCtx.createConvolver();
+  convolver.buffer = createReverbImpulse(2.8, 4.0);
+
+  // Dry/wet mix for reverb
+  const dryGain = audioCtx.createGain();
+  dryGain.gain.value = 0.6;
+  const wetGain = audioCtx.createGain();
+  wetGain.gain.value = 0.4;
+
+  masterGain.connect(dryGain);
+  masterGain.connect(convolver);
+  convolver.connect(wetGain);
+  dryGain.connect(audioCtx.destination);
+  wetGain.connect(audioCtx.destination);
+}
+
+function createReverbImpulse(duration, decay) {
+  const sampleRate = audioCtx.sampleRate;
+  const length = sampleRate * duration;
+  const impulse = audioCtx.createBuffer(2, length, sampleRate);
+
+  for (let channel = 0; channel < 2; channel++) {
+    const data = impulse.getChannelData(channel);
+    for (let i = 0; i < length; i++) {
+      const t = i / sampleRate;
+      // Exponential decay with early reflections for cathedral character
+      let envelope = Math.exp(-t * decay);
+      if (t < 0.08) {
+        envelope += 0.3 * Math.exp(-t * 20) * Math.sin(t * 200);
+      }
+      data[i] = (Math.random() * 2 - 1) * envelope;
+    }
+  }
+  return impulse;
+}
+
+// ═══════════════════════════════════════════════════════
+// STOPS / REGISTERS
+// ═══════════════════════════════════════════════════════
+const stops = {
+  principal: true,  // Prinzipal 8' — fundamental
+  oktave: false,    // Oktave 4' — octave up
+  mixtur: false     // Mixtur — adds the fifth (freq * 3)
+};
+
+function toggleStop(name, btn) {
+  stops[name] = !stops[name];
+  btn.classList.toggle('active', stops[name]);
+  // Ensure at least one stop is always active
+  if (!stops.principal && !stops.oktave && !stops.mixtur) {
+    stops.principal = true;
+    document.querySelector('[data-stop="principal"]').classList.add('active');
+  }
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTE DEFINITIONS — C3 (MIDI 48) to C5 (MIDI 72)
+// ═══════════════════════════════════════════════════════
+const NOTES = [];
+const NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+
+for (let midi = 48; midi <= 72; midi++) {
+  const octave = Math.floor(midi / 12) - 1;
+  const noteIndex = midi % 12;
+  const name = NOTE_NAMES[noteIndex];
+  const isBlack = [1, 3, 6, 8, 10].includes(noteIndex);
+  const freq = 440 * Math.pow(2, (midi - 69) / 12);
+  NOTES.push({ midi, name: name + octave, noteName: name, octave, isBlack, freq });
+}
+
+// Computer keyboard mapping -> MIDI note
+const KEY_MAP = {
+  'a': 48,  // C3
+  'w': 49,  // C#3
+  's': 50,  // D3
+  'e': 51,  // D#3
+  'd': 52,  // E3
+  'f': 53,  // F3
+  't': 54,  // F#3
+  'g': 55,  // G3
+  'y': 56,  // G#3 (Y for German QWERTZ)
+  'z': 56,  // G#3 (Z for English QWERTY)
+  'h': 57,  // A3
+  'u': 58,  // A#3
+  'j': 59,  // B3
+  'k': 60,  // C4
+};
+
+// ═══════════════════════════════════════════════════════
+// ORGAN PIPE OSCILLATOR — custom periodic wave for rich pipe tone
+// ═══════════════════════════════════════════════════════
+function createOrganOsc(freq, volume) {
+  // Custom periodic wave with harmonics for authentic pipe organ character
+  const real = new Float32Array(16);
+  const imag = new Float32Array(16);
+  real[0] = 0; imag[0] = 0;
+  real[1] = 1.0;    // Fundamental
+  real[2] = 0.35;   // 2nd harmonic
+  real[3] = 0.15;   // 3rd
+  real[4] = 0.08;   // 4th
+  real[5] = 0.04;   // 5th
+  real[6] = 0.02;   // 6th
+  real[7] = 0.01;   // 7th
+  real[8] = 0.008;  // 8th
+
+  const wave = audioCtx.createPeriodicWave(real, imag, { disableNormalization: false });
+  const osc = audioCtx.createOscillator();
+  osc.setPeriodicWave(wave);
+  osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+  // Slight random detune for organic warmth
+  osc.detune.setValueAtTime((Math.random() - 0.5) * 6, audioCtx.currentTime);
+
+  const oscGain = audioCtx.createGain();
+  oscGain.gain.setValueAtTime(volume, audioCtx.currentTime);
+  osc.connect(oscGain);
+
+  return { gainNode: oscGain, oscillator: osc };
+}
+
+// ═══════════════════════════════════════════════════════
+// NOTE ON / NOTE OFF — with ADSR envelope
+// ═══════════════════════════════════════════════════════
+const activeNotes = new Map(); // midi -> { parts[], envelopeGain }
+
+function noteOn(midi) {
+  if (activeNotes.has(midi)) return;
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  // Calculate frequency — works for any MIDI note (keyboard range + Bach playback)
+  const noteData = NOTES.find(n => n.midi === midi);
+  const freq = noteData
+    ? noteData.freq
+    : 440 * Math.pow(2, (midi - 69) / 12);
+
+  const now = audioCtx.currentTime;
+
+  // Envelope gain node: ADSR — attack 0.1s, full sustain, release 0.5s (on noteOff)
+  const envelopeGain = audioCtx.createGain();
+  envelopeGain.gain.setValueAtTime(0, now);
+  envelopeGain.gain.linearRampToValueAtTime(0.25, now + 0.1);
+  envelopeGain.connect(masterGain);
+
+  const parts = []; // { gainNode, oscillator } for each active stop
+
+  // Prinzipal 8' — fundamental frequency
+  if (stops.principal) {
+    const p = createOrganOsc(freq, 0.7);
+    p.gainNode.connect(envelopeGain);
+    p.oscillator.start(now);
+    parts.push(p);
+  }
+
+  // Oktave 4' — one octave up (freq * 2)
+  if (stops.oktave) {
+    const p = createOrganOsc(freq * 2, 0.4);
+    p.gainNode.connect(envelopeGain);
+    p.oscillator.start(now);
+    parts.push(p);
+  }
+
+  // Mixtur — adds the fifth / third harmonic (freq * 3)
+  if (stops.mixtur) {
+    const p = createOrganOsc(freq * 3, 0.25);
+    p.gainNode.connect(envelopeGain);
+    p.oscillator.start(now);
+    parts.push(p);
+  }
+
+  activeNotes.set(midi, { parts, envelopeGain });
+
+  // Visual highlight (only for keys within the visual keyboard range 48-72)
+  const keyEl = document.querySelector('[data-midi="' + midi + '"]');
+  if (keyEl) keyEl.classList.add('active');
+}
+
+function noteOff(midi) {
+  const entry = activeNotes.get(midi);
+  if (!entry) return;
+
+  const now = audioCtx.currentTime;
+  const { parts, envelopeGain } = entry;
+
+  // Release envelope: 0.5s fade out
+  envelopeGain.gain.cancelScheduledValues(now);
+  envelopeGain.gain.setValueAtTime(envelopeGain.gain.value, now);
+  envelopeGain.gain.linearRampToValueAtTime(0, now + 0.5);
+
+  // Stop all oscillators after release completes
+  parts.forEach(p => {
+    p.oscillator.stop(now + 0.55);
+  });
+
+  activeNotes.delete(midi);
+
+  // Visual
+  const keyEl = document.querySelector('[data-midi="' + midi + '"]');
+  if (keyEl) keyEl.classList.remove('active');
+}
+
+// ═══════════════════════════════════════════════════════
+// BUILD KEYBOARD UI
+// ═══════════════════════════════════════════════════════
+function buildKeyboard() {
+  const keyboard = document.getElementById('keyboard');
+  keyboard.innerHTML = '';
+
+  const whiteNotes = NOTES.filter(n => !n.isBlack);
+  const blackNotes = NOTES.filter(n => n.isBlack);
+  const whiteKeyWidth = getWhiteKeyWidth();
+
+  // White keys
+  whiteNotes.forEach(note => {
+    const key = document.createElement('div');
+    key.className = 'key key-white';
+    key.dataset.midi = note.midi;
+
+    const shortcut = Object.entries(KEY_MAP).find(([k, v]) => v === note.midi);
+    const label = document.createElement('span');
+    label.className = 'key-label';
+    label.textContent = shortcut ? shortcut[0].toUpperCase() : '';
+    key.appendChild(label);
+
+    keyboard.appendChild(key);
+  });
+
+  // Black keys — absolutely positioned between white keys
+  blackNotes.forEach(note => {
+    const key = document.createElement('div');
+    key.className = 'key key-black';
+    key.dataset.midi = note.midi;
+
+    const shortcut = Object.entries(KEY_MAP).find(([k, v]) => v === note.midi);
+    const label = document.createElement('span');
+    label.className = 'key-label';
+    label.textContent = shortcut ? shortcut[0].toUpperCase() : '';
+    key.appendChild(label);
+
+    // Position: count white keys before this black key
+    const whiteKeyBefore = NOTES.filter(n => !n.isBlack && n.midi < note.midi).length;
+    const leftPos = whiteKeyBefore * whiteKeyWidth - (getBlackKeyWidth() / 2);
+    key.style.left = leftPos + 'px';
+
+    keyboard.appendChild(key);
+  });
+
+  keyboard.style.width = (whiteNotes.length * whiteKeyWidth) + 'px';
+}
+
+function getWhiteKeyWidth() {
+  if (window.innerWidth <= 420) return 26;
+  if (window.innerWidth <= 600) return 30;
+  if (window.innerWidth <= 900) return 36;
+  return 44;
+}
+
+function getBlackKeyWidth() {
+  if (window.innerWidth <= 420) return 17;
+  if (window.innerWidth <= 600) return 20;
+  if (window.innerWidth <= 900) return 24;
+  return 28;
+}
+
+// ═══════════════════════════════════════════════════════
+// DECORATIVE PIPES
+// ═══════════════════════════════════════════════════════
+function buildPipes() {
+  const container = document.getElementById('pipesDecoration');
+  container.innerHTML = '';
+  const heights = [50, 65, 80, 95, 110, 95, 80, 65, 50, 42, 55, 70, 85, 70, 55, 42];
+  heights.forEach(h => {
+    const pipe = document.createElement('div');
+    pipe.className = 'deco-pipe';
+    pipe.style.height = h + 'px';
+    container.appendChild(pipe);
+  });
+}
+
+// ═══════════════════════════════════════════════════════
+// MOUSE / TOUCH EVENTS (Pointer Events for unified mouse+touch)
+// ═══════════════════════════════════════════════════════
+let pointerIsDown = false;
+let currentPointerNote = null;
+
+function setupPointerEvents() {
+  const keyboard = document.getElementById('keyboard');
+
+  keyboard.addEventListener('pointerdown', (e) => {
+    e.preventDefault();
+    pointerIsDown = true;
+    const key = e.target.closest('.key');
+    if (key) {
+      const midi = parseInt(key.dataset.midi);
+      currentPointerNote = midi;
+      noteOn(midi);
+      key.setPointerCapture(e.pointerId);
+    }
+  });
+
+  keyboard.addEventListener('pointermove', (e) => {
+    if (!pointerIsDown) return;
+    const el = document.elementFromPoint(e.clientX, e.clientY);
+    if (el) {
+      const key = el.closest('.key');
+      if (key) {
+        const midi = parseInt(key.dataset.midi);
+        if (midi !== currentPointerNote) {
+          if (currentPointerNote !== null) noteOff(currentPointerNote);
+          currentPointerNote = midi;
+          noteOn(midi);
+        }
+      }
+    }
+  });
+
+  keyboard.addEventListener('pointerup', (e) => {
+    pointerIsDown = false;
+    if (currentPointerNote !== null) {
+      noteOff(currentPointerNote);
+      currentPointerNote = null;
+    }
+  });
+
+  keyboard.addEventListener('pointerleave', (e) => {
+    if (pointerIsDown && currentPointerNote !== null) {
+      noteOff(currentPointerNote);
+      currentPointerNote = null;
+      pointerIsDown = false;
+    }
+  });
+
+  // Prevent context menu on long press (mobile)
+  keyboard.addEventListener('contextmenu', (e) => e.preventDefault());
+}
+
+// ═══════════════════════════════════════════════════════
+// COMPUTER KEYBOARD EVENTS
+// ═══════════════════════════════════════════════════════
+const pressedKeys = new Set();
+
+document.addEventListener('keydown', (e) => {
+  if (e.repeat) return;
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key] !== undefined && !pressedKeys.has(key)) {
+    pressedKeys.add(key);
+    noteOn(KEY_MAP[key]);
+  }
+});
+
+document.addEventListener('keyup', (e) => {
+  const key = e.key.toLowerCase();
+  if (KEY_MAP[key] !== undefined) {
+    pressedKeys.delete(key);
+    noteOff(KEY_MAP[key]);
+  }
+});
+
+// ═══════════════════════════════════════════════════════
+// PLAY BACH — Toccata and Fugue in D minor, BWV 565
+// ═══════════════════════════════════════════════════════
+let bachPlaying = false;
+
+function playBach() {
+  if (bachPlaying) return;
+  bachPlaying = true;
+  initAudio();
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const btn = document.getElementById('playBachBtn');
+  btn.disabled = true;
+  btn.textContent = 'Spielt...';
+
+  // Enable all stops for the full Bach sound
+  const prevStops = { ...stops };
+  stops.principal = true;
+  stops.oktave = true;
+  stops.mixtur = true;
+  document.querySelectorAll('.stop-btn').forEach(b => b.classList.add('active'));
+
+  // BWV 565 Opening Motif
+  // The iconic mordent: A-G#-A then fermata, descending scale, resolution to D
+  // First phrase in octave 5, repeated in octave 4, then grand D minor chord
+  // MIDI: A4=69, A5=81, G#5=80, D5=74, D4=62, D3=50, etc.
+  const sequence = [
+    // --- First phrase (octave 5) ---
+    // Mordent ornament on A5: A-G#-A very fast
+    { notes: [81], dur: 60 },      // A5
+    { notes: [],   dur: 20 },
+    { notes: [80], dur: 60 },      // G#5
+    { notes: [],   dur: 20 },
+    { notes: [81], dur: 60 },      // A5
+    { notes: [],   dur: 20 },
+
+    // Fermata — long held A5
+    { notes: [81], dur: 900 },     // A5
+    { notes: [],   dur: 100 },
+
+    // Descending scale: G5 F5 E5 D5
+    { notes: [79], dur: 120 },     // G5
+    { notes: [],   dur: 30 },
+    { notes: [77], dur: 120 },     // F5
+    { notes: [],   dur: 30 },
+    { notes: [76], dur: 120 },     // E5
+    { notes: [],   dur: 30 },
+    { notes: [74], dur: 120 },     // D5
+    { notes: [],   dur: 30 },
+
+    // C#5 held
+    { notes: [73], dur: 500 },     // C#5
+    { notes: [],   dur: 80 },
+
+    // D5 resolution
+    { notes: [74], dur: 800 },     // D5
+    { notes: [],   dur: 200 },
+
+    // --- Second phrase (octave 4) ---
+    // Mordent on A4
+    { notes: [69], dur: 60 },      // A4
+    { notes: [],   dur: 20 },
+    { notes: [68], dur: 60 },      // G#4
+    { notes: [],   dur: 20 },
+    { notes: [69], dur: 60 },      // A4
+    { notes: [],   dur: 20 },
+
+    // Fermata — long A4
+    { notes: [69], dur: 900 },     // A4
+    { notes: [],   dur: 100 },
+
+    // Descending: G4 F4 E4 D4
+    { notes: [67], dur: 120 },     // G4
+    { notes: [],   dur: 30 },
+    { notes: [65], dur: 120 },     // F4
+    { notes: [],   dur: 30 },
+    { notes: [64], dur: 120 },     // E4
+    { notes: [],   dur: 30 },
+    { notes: [62], dur: 120 },     // D4
+    { notes: [],   dur: 30 },
+
+    // C#4 held
+    { notes: [61], dur: 500 },     // C#4
+    { notes: [],   dur: 80 },
+
+    // D — resolution in two octaves for grandeur
+    { notes: [50, 62], dur: 1200 }, // D3 + D4
+    { notes: [],       dur: 300 },
+
+    // Final dramatic D minor chord
+    { notes: [50, 57, 62, 65, 69], dur: 2000 }, // D3 A3 D4 F4 A4
+  ];
+
+  // Schedule the sequence with setTimeout chain
+  let time = 300;
+  let currentBachNotes = [];
+
+  sequence.forEach((step) => {
+    const t = time;
+    setTimeout(() => {
+      // Release previous notes
+      currentBachNotes.forEach(n => noteOff(n));
+      currentBachNotes = [];
+      // Play new notes
+      step.notes.forEach(midi => {
+        noteOn(midi);
+        currentBachNotes.push(midi);
+      });
+    }, t);
+    time += step.dur;
+  });
+
+  // Final cleanup after sequence ends
+  setTimeout(() => {
+    currentBachNotes.forEach(n => noteOff(n));
+
+    // Restore previous stop settings
+    Object.keys(prevStops).forEach(k => { stops[k] = prevStops[k]; });
+    document.querySelectorAll('.stop-btn').forEach(b => {
+      b.classList.toggle('active', stops[b.dataset.stop]);
+    });
+
+    bachPlaying = false;
+    btn.disabled = false;
+    btn.textContent = 'Play Bach';
+  }, time + 100);
+}
+
+// ═══════════════════════════════════════════════════════
+// INIT
+// ═══════════════════════════════════════════════════════
+function init() {
+  buildKeyboard();
+  buildPipes();
+  setupPointerEvents();
+}
+
+window.addEventListener('DOMContentLoaded', init);
+window.addEventListener('resize', () => { buildKeyboard(); });
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

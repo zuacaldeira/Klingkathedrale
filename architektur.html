@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Architektur — Klangkathedrale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-rose: #D4725C;
+  --color-sage: #6B9080;
+  --color-amethyst: #8B7EC8;
+  --color-amber: #C8956E;
+  --color-steel: #7BA0B8;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-serif: 'EB Garamond', serif;
+}
+html { scroll-behavior: smooth; }
+body {
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  line-height: 1.8;
+}
+
+/* Navigation */
+.top-nav {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  padding: 1rem 2rem;
+  background: rgba(26,20,16,0.95);
+  backdrop-filter: blur(10px);
+  display: flex; justify-content: space-between; align-items: center;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+}
+.top-nav a {
+  color: rgba(245,240,232,0.6); text-decoration: none;
+  font-family: var(--font-body); font-size: 0.95rem;
+  transition: color 0.3s;
+}
+.top-nav a:hover { color: var(--color-gold); }
+.top-nav .logo { color: var(--color-gold); font-family: var(--font-display); letter-spacing: 0.1em; font-size: 1.1rem; }
+
+/* Main content */
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 6rem 2rem 4rem;
+}
+h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--color-gold);
+  font-weight: 400;
+  margin-bottom: 0.5rem;
+}
+.subtitle {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: 1.2rem;
+  color: rgba(245,240,232,0.5);
+  margin-bottom: 3rem;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--color-gold);
+  font-weight: 400;
+  margin: 3rem 0 1rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(201,168,76,0.15);
+}
+h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  color: var(--color-ivory);
+  font-weight: 400;
+  margin: 2rem 0 0.5rem;
+}
+p, li {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  color: rgba(245,240,232,0.7);
+  line-height: 1.8;
+  margin-bottom: 1rem;
+}
+ul, ol { padding-left: 1.5rem; }
+li { margin-bottom: 0.5rem; }
+
+/* Site map */
+.sitemap {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+.sitemap-card {
+  border: 1px solid rgba(201,168,76,0.15);
+  padding: 1.5rem;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: block;
+}
+.sitemap-card:hover {
+  border-color: var(--color-gold);
+  background: rgba(201,168,76,0.03);
+  transform: translateY(-2px);
+}
+.sitemap-card .card-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  margin-bottom: 0.3rem;
+}
+.sitemap-card .card-file {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: rgba(245,240,232,0.3);
+  margin-bottom: 0.5rem;
+}
+.sitemap-card .card-desc {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: rgba(245,240,232,0.5);
+  line-height: 1.6;
+}
+.sitemap-card .card-tech {
+  display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.75rem;
+}
+.tech-tag {
+  font-family: var(--font-serif);
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  border: 1px solid rgba(201,168,76,0.2);
+  padding: 0.15rem 0.5rem;
+  border-radius: 2px;
+}
+
+/* Color swatches */
+.color-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+.color-swatch {
+  padding: 1.5rem 1rem 1rem;
+  border: 1px solid rgba(255,255,255,0.05);
+}
+.color-swatch .swatch-name {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  color: var(--color-ivory);
+  margin-bottom: 0.25rem;
+}
+.color-swatch .swatch-hex {
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  opacity: 0.5;
+}
+
+/* Typography samples */
+.type-sample {
+  padding: 1.5rem;
+  border: 1px solid rgba(201,168,76,0.1);
+  margin: 0.75rem 0;
+}
+.type-sample .sample-name {
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.4);
+  font-family: var(--font-serif);
+  margin-bottom: 0.5rem;
+}
+
+/* Code blocks */
+code {
+  font-family: 'SF Mono', 'Fira Code', monospace;
+  font-size: 0.85rem;
+  background: rgba(201,168,76,0.08);
+  padding: 0.15rem 0.4rem;
+  border-radius: 2px;
+  color: var(--color-gold);
+}
+pre {
+  background: rgba(0,0,0,0.3);
+  border: 1px solid rgba(201,168,76,0.1);
+  padding: 1.5rem;
+  overflow-x: auto;
+  margin: 1rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+pre code {
+  background: none;
+  padding: 0;
+  color: rgba(245,240,232,0.7);
+}
+
+/* Table */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-family: var(--font-body);
+}
+th, td {
+  padding: 0.75rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+  font-size: 0.95rem;
+}
+th {
+  color: var(--color-gold);
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+td { color: rgba(245,240,232,0.6); }
+
+.footer {
+  text-align: center;
+  padding: 4rem 2rem 2rem;
+  border-top: 1px solid rgba(201,168,76,0.1);
+  margin-top: 4rem;
+}
+.footer p {
+  font-size: 0.85rem;
+  color: rgba(245,240,232,0.25);
+  text-align: center;
+}
+.footer a { color: var(--color-gold); text-decoration: none; }
+
+@media (max-width: 768px) {
+  main { padding: 5rem 1.25rem 3rem; }
+  .sitemap { grid-template-columns: 1fr; }
+  .color-grid { grid-template-columns: repeat(2, 1fr); }
+}
+</style>
+</head>
+<body>
+
+<nav class="top-nav">
+  <a href="klangkathedrale.html" class="logo">Klangkathedrale</a>
+  <a href="klangkathedrale.html">&larr; Zurück</a>
+</nav>
+
+<main>
+  <h1>Architektur</h1>
+  <p class="subtitle">Technische Dokumentation der Klangkathedrale</p>
+
+  <!-- ═══ OVERVIEW ═══ -->
+  <h2>Überblick</h2>
+  <p>
+    Die Klangkathedrale ist ein digitales Denkmal für Helmuth Rilling (1933–2026), den legendären
+    Bach-Dirigenten. Das Projekt besteht aus eigenständigen HTML-Dateien — jede ein eigener
+    Erfahrungsraum, verbunden durch eine gemeinsame Designsprache.
+  </p>
+  <p>
+    <strong>Architekturprinzipien:</strong> Keine Build-Tools. Keine Frameworks. Jede Seite ist
+    eine eigenständige HTML-Datei mit eingebettetem CSS und JavaScript. Bibliotheken werden über CDN
+    geladen. Das Projekt wird direkt von GitHub Pages bereitgestellt.
+  </p>
+
+  <!-- ═══ SITE MAP ═══ -->
+  <h2>Site Map</h2>
+  <div class="sitemap">
+    <a href="klangkathedrale.html" class="sitemap-card">
+      <div class="card-title">Klangkathedrale</div>
+      <div class="card-file">klangkathedrale.html</div>
+      <div class="card-desc">Die Hauptseite — Overture, Biografie, 172-CD-Visualisierung, Zeitreise, Weltkarte-Teaser, Einladung und Coda mit S.D.G.</div>
+      <div class="card-tech"><span class="tech-tag">Canvas</span><span class="tech-tag">Web Audio</span><span class="tech-tag">IntersectionObserver</span></div>
+    </a>
+    <a href="orgel.html" class="sitemap-card">
+      <div class="card-title">Die Orgel</div>
+      <div class="card-file">orgel.html</div>
+      <div class="card-desc">Interaktive 2-Oktaven-Kirchenorgel. Web Audio API Synthesizer mit 3 Registern und Auto-Play der Toccata BWV 565.</div>
+      <div class="card-tech"><span class="tech-tag">Web Audio API</span><span class="tech-tag">Touch Events</span></div>
+    </a>
+    <a href="kathedrale.html" class="sitemap-card">
+      <div class="card-title">Die Kathedrale</div>
+      <div class="card-file">kathedrale.html</div>
+      <div class="card-desc">Three.js 3D-Kathedrale mit gotischem Kirchenschiff, Glasfenstern für jede Lebensepoche, und Orgel am Altar.</div>
+      <div class="card-tech"><span class="tech-tag">Three.js</span><span class="tech-tag">WebGL</span><span class="tech-tag">WASD</span></div>
+    </a>
+    <a href="universum.html" class="sitemap-card">
+      <div class="card-title">Das Universum</div>
+      <div class="card-file">universum.html</div>
+      <div class="card-desc">172 CDs als Sternenkonstellation. Farbcodierte Partikel, Suchfunktion, Konstellationsmodus.</div>
+      <div class="card-tech"><span class="tech-tag">Three.js</span><span class="tech-tag">Raycaster</span><span class="tech-tag">Shaders</span></div>
+    </a>
+    <a href="fugenmaschine.html" class="sitemap-card">
+      <div class="card-title">Die Fugenmaschine</div>
+      <div class="card-file">fugenmaschine.html</div>
+      <div class="card-desc">Generative Kunst: 4 Fugenstimmen als Partikelströme. Interaktive Parameter, unendliche Variationen.</div>
+      <div class="card-tech"><span class="tech-tag">p5.js</span><span class="tech-tag">Canvas</span><span class="tech-tag">Generativ</span></div>
+    </a>
+    <a href="partitur.html" class="sitemap-card">
+      <div class="card-title">Die Partitur</div>
+      <div class="card-file">partitur.html</div>
+      <div class="card-desc">Animierte SVG-Notation — Bachs Noten entstehen vor den Augen. Audio-synchronisierte Wiedergabe.</div>
+      <div class="card-tech"><span class="tech-tag">SVG</span><span class="tech-tag">Web Audio</span><span class="tech-tag">Animation</span></div>
+    </a>
+    <a href="entdecke-bach.html" class="sitemap-card">
+      <div class="card-title">Entdecke Bach</div>
+      <div class="card-file">entdecke-bach.html</div>
+      <div class="card-desc">Persönliche Bach-Empfehlungen basierend auf Stimmung, Erfahrung und ästhetischer Vorliebe.</div>
+      <div class="card-tech"><span class="tech-tag">Empfehlungslogik</span><span class="tech-tag">Transitions</span></div>
+    </a>
+    <a href="weltkarte.html" class="sitemap-card">
+      <div class="card-title">Die Weltkarte</div>
+      <div class="card-file">weltkarte.html</div>
+      <div class="card-desc">SVG-Weltkarte mit 30+ Städten, animierten Flugpfaden und Zeitleisten-Scrubber 1954–2026.</div>
+      <div class="card-tech"><span class="tech-tag">SVG</span><span class="tech-tag">Animation</span><span class="tech-tag">Timeline</span></div>
+    </a>
+    <a href="infografik.html" class="sitemap-card">
+      <div class="card-title">Die Infografik</div>
+      <div class="card-file">infografik.html</div>
+      <div class="card-desc">Scroll-getriggerte Datenvisualisierung: Aufnahmeberg, Vergleich, Netzwerk, Preise, Vermächtnis.</div>
+      <div class="card-tech"><span class="tech-tag">SVG</span><span class="tech-tag">Canvas</span><span class="tech-tag">Scroll-Snap</span></div>
+    </a>
+    <a href="brief.html" class="sitemap-card">
+      <div class="card-title">Brief an die Zukunft</div>
+      <div class="card-file">brief.html</div>
+      <div class="card-desc">Digitales Gedicht in 7 Strophen — typografische Hommage mit einzigartigen Animationen pro Strophe.</div>
+      <div class="card-tech"><span class="tech-tag">Typography</span><span class="tech-tag">Scroll</span><span class="tech-tag">CSS</span></div>
+    </a>
+    <a href="stimmen.html" class="sitemap-card">
+      <div class="card-title">Stimmen</div>
+      <div class="card-file">stimmen.html</div>
+      <div class="card-desc">Digitales Gästebuch mit Kerzen-Metapher. Einträge in localStorage, Masonry-Layout.</div>
+      <div class="card-tech"><span class="tech-tag">localStorage</span><span class="tech-tag">Masonry</span><span class="tech-tag">SVG</span></div>
+    </a>
+    <a href="netzwerk.html" class="sitemap-card">
+      <div class="card-title">Das Netzwerk</div>
+      <div class="card-file">netzwerk.html</div>
+      <div class="card-desc">D3.js Force-Graph: Rillings pädagogischer Stammbaum — Schüler, Institutionen, Generationen.</div>
+      <div class="card-tech"><span class="tech-tag">D3.js</span><span class="tech-tag">Force Layout</span><span class="tech-tag">SVG</span></div>
+    </a>
+  </div>
+
+  <!-- ═══ DESIGN SYSTEM ═══ -->
+  <h2>Design System</h2>
+
+  <h3>Farbpalette</h3>
+  <div class="color-grid">
+    <div class="color-swatch" style="background:#C9A84C"><div class="swatch-name" style="color:#1A1410">Gold</div><div class="swatch-hex" style="color:#1A1410">#C9A84C</div></div>
+    <div class="color-swatch" style="background:#1A1410;border-color:rgba(201,168,76,0.2)"><div class="swatch-name">Ink</div><div class="swatch-hex">#1A1410</div></div>
+    <div class="color-swatch" style="background:#F5F0E8"><div class="swatch-name" style="color:#1A1410">Ivory</div><div class="swatch-hex" style="color:#1A1410">#F5F0E8</div></div>
+    <div class="color-swatch" style="background:#EDE6D6"><div class="swatch-name" style="color:#1A1410">Parchment</div><div class="swatch-hex" style="color:#1A1410">#EDE6D6</div></div>
+    <div class="color-swatch" style="background:#D4725C"><div class="swatch-name">Rose</div><div class="swatch-hex">#D4725C</div></div>
+    <div class="color-swatch" style="background:#6B9080"><div class="swatch-name">Sage</div><div class="swatch-hex">#6B9080</div></div>
+    <div class="color-swatch" style="background:#8B7EC8"><div class="swatch-name">Amethyst</div><div class="swatch-hex">#8B7EC8</div></div>
+    <div class="color-swatch" style="background:#C8956E"><div class="swatch-name">Amber</div><div class="swatch-hex">#C8956E</div></div>
+    <div class="color-swatch" style="background:#7BA0B8"><div class="swatch-name">Steel</div><div class="swatch-hex">#7BA0B8</div></div>
+  </div>
+
+  <h3>Typografie</h3>
+  <div class="type-sample">
+    <div class="sample-name">Bodoni Moda — Display / Überschriften</div>
+    <div style="font-family:'Bodoni Moda',serif;font-size:2rem;color:var(--color-gold)">Klangkathedrale</div>
+    <div style="font-family:'Bodoni Moda',serif;font-size:1.2rem;font-style:italic;color:var(--color-ivory);opacity:0.7">ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz 0123456789</div>
+  </div>
+  <div class="type-sample">
+    <div class="sample-name">Cormorant Garamond — Fließtext / Body</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-style:italic;color:rgba(245,240,232,0.7)">Musik muss die Menschen aufschrecken und tief in sie hineingehen.</div>
+  </div>
+  <div class="type-sample">
+    <div class="sample-name">EB Garamond — Serif Body / Details</div>
+    <div style="font-family:'EB Garamond',serif;font-size:1.1rem;color:rgba(245,240,232,0.6)">BWV 244 — Matthäus-Passion (1727) — Helmuth Rilling, Gächinger Kantorei</div>
+  </div>
+
+  <!-- ═══ TECH STACK ═══ -->
+  <h2>Technischer Stack</h2>
+  <table>
+    <thead>
+      <tr><th>Technologie</th><th>Version</th><th>Verwendung</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>HTML/CSS/JS</td><td>ES2020+</td><td>Alle Seiten</td></tr>
+      <tr><td>Three.js</td><td>r128</td><td>kathedrale.html, universum.html</td></tr>
+      <tr><td>p5.js</td><td>1.9.0</td><td>fugenmaschine.html</td></tr>
+      <tr><td>D3.js</td><td>v7</td><td>netzwerk.html, infografik.html</td></tr>
+      <tr><td>Web Audio API</td><td>Native</td><td>orgel.html, partitur.html, klangkathedrale.html</td></tr>
+      <tr><td>Google Fonts</td><td>CDN</td><td>Bodoni Moda, Cormorant Garamond, EB Garamond</td></tr>
+      <tr><td>Service Worker</td><td>Native</td><td>sw.js — Offline-Funktionalität</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Architekturentscheidungen</h3>
+  <ul>
+    <li><strong>Einzelne HTML-Dateien:</strong> Jede Seite ist unabhängig lauffähig. Kein Build-Schritt, keine Abhängigkeiten zwischen Seiten. Maximale Einfachheit für Wartung und Deployment.</li>
+    <li><strong>Kein Build-Tool:</strong> Reines HTML/CSS/JS. Bibliotheken über CDN. Sofort einsetzbar, kein npm, kein Webpack, kein Bundler.</li>
+    <li><strong>Inline alles:</strong> CSS und JS sind in jeder HTML-Datei eingebettet. Das erhöht die Dateigröße, aber eliminiert Abhängigkeiten.</li>
+    <li><strong>GitHub Pages:</strong> Statisches Hosting direkt aus dem <code>main</code>-Branch. Kein Server, keine Datenbank.</li>
+    <li><strong>localStorage:</strong> Für das Gästebuch (stimmen.html). Keine Backend-Infrastruktur nötig.</li>
+    <li><strong>PWA:</strong> Service Worker für Offline-Zugriff. Manifest für App-Installation.</li>
+  </ul>
+
+  <!-- ═══ FILE STRUCTURE ═══ -->
+  <h2>Dateistruktur</h2>
+  <pre><code>Klangkathedrale/
+├── index.html                → Redirect zu klangkathedrale.html
+├── klangkathedrale.html      → Hauptseite (Overture bis Coda)
+├── orgel.html                → Interaktive Kirchenorgel
+├── kathedrale.html           → 3D-Kathedrale (Three.js)
+├── universum.html            → Partikel-Universum (Three.js)
+├── fugenmaschine.html        → Generative Fugenkunst (p5.js)
+├── partitur.html             → Animierte Notation (SVG)
+├── entdecke-bach.html        → Bach-Empfehlungen
+├── weltkarte.html            → Interaktive Weltkarte (SVG)
+├── infografik.html           → Datenvisualisierung
+├── brief.html                → Digitales Gedicht
+├── stimmen.html              → Gästebuch / Kerzen
+├── netzwerk.html             → Schüler-Netzwerk (D3.js)
+├── architektur.html          → Diese Dokumentation
+├── manifest.json             → PWA Manifest
+├── sw.js                     → Service Worker
+└── klangkathedrale-prompts.md → Prompt-Bibliothek</code></pre>
+
+  <!-- ═══ CSS TOKENS ═══ -->
+  <h2>CSS Custom Properties</h2>
+  <pre><code>:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-rose: #D4725C;
+  --color-sage: #6B9080;
+  --color-amethyst: #8B7EC8;
+  --color-amber: #C8956E;
+  --color-steel: #7BA0B8;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-serif: 'EB Garamond', serif;
+}</code></pre>
+
+  <!-- ═══ ACCESSIBILITY ═══ -->
+  <h2>Barrierefreiheit</h2>
+  <ul>
+    <li>Semantische HTML-Struktur mit <code>aria-label</code> auf allen Sektionen</li>
+    <li><code>prefers-reduced-motion</code> respektiert — Animationen deaktiviert</li>
+    <li>Tastaturnavigation für alle interaktiven Elemente</li>
+    <li>Fokus-Indikatoren für Keyboard-Nutzer</li>
+    <li>Audio standardmäßig deaktiviert (Opt-in)</li>
+    <li>Ausreichender Farbkontrast (Gold auf Dunkel > 4.5:1)</li>
+  </ul>
+
+  <!-- ═══ PERFORMANCE ═══ -->
+  <h2>Performance</h2>
+  <ul>
+    <li><strong>Zielwert:</strong> Lighthouse 90+ auf allen Kategorien</li>
+    <li><strong>Lazy Loading:</strong> IntersectionObserver für scroll-getriggerte Elemente</li>
+    <li><strong>Font Loading:</strong> Google Fonts mit <code>display=swap</code>, <code>preconnect</code> zu Fonts-CDN</li>
+    <li><strong>3D-Seiten:</strong> 60fps-Ziel, reduzierte Partikelanzahl auf mobilen Geräten</li>
+    <li><strong>Service Worker:</strong> Network-first Strategie mit Cache-Fallback</li>
+  </ul>
+
+  <!-- ═══ DEPLOYMENT ═══ -->
+  <h2>Deployment</h2>
+  <ol>
+    <li>Repository: GitHub, <code>main</code> Branch</li>
+    <li>GitHub Pages: Settings → Pages → Source: Deploy from branch → <code>main</code> / <code>/ (root)</code></li>
+    <li><code>index.html</code> leitet automatisch zu <code>klangkathedrale.html</code> weiter</li>
+    <li>Service Worker registriert sich auf der Hauptseite für Offline-Support</li>
+    <li>Alle CDN-Ressourcen werden beim ersten Besuch gecached</li>
+  </ol>
+
+  <div class="footer">
+    <p style="font-family:var(--font-display);font-size:1.5rem;color:var(--color-gold);margin-bottom:1rem">S. D. G.</p>
+    <p><a href="klangkathedrale.html">Zurück zur Klangkathedrale</a></p>
+    <p style="margin-top:1rem">&copy; 2026 Klangkathedrale</p>
+  </div>
+</main>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

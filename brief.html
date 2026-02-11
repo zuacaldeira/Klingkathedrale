@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brief an die Zukunft — Helmuth Rilling</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-gold-dim: rgba(201, 168, 76, 0.3);
+  --color-gold-glow: rgba(201, 168, 76, 0.6);
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-serif: 'EB Garamond', serif;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-gold);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Back link */
+.back-link {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 100;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-gold-dim);
+  text-decoration: none;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  transition: color 0.4s ease;
+  mix-blend-mode: screen;
+}
+
+.back-link:hover {
+  color: var(--color-gold);
+}
+
+.back-link::before {
+  content: '\2190';
+  margin-right: 0.5em;
+}
+
+/* Scroll indicator */
+.scroll-indicator {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--color-gold-dim);
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  animation: pulseDown 2s ease-in-out infinite;
+  transition: opacity 0.6s ease;
+}
+
+.scroll-indicator.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes pulseDown {
+  0%, 100% { transform: translateX(-50%) translateY(0); opacity: 0.4; }
+  50% { transform: translateX(-50%) translateY(6px); opacity: 0.8; }
+}
+
+/* Stanza base */
+.stanza {
+  height: 100vh;
+  width: 100vw;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 2rem;
+}
+
+.stanza-number {
+  position: absolute;
+  top: 2rem;
+  right: 2.5rem;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: 0.8rem;
+  color: var(--color-gold-dim);
+  letter-spacing: 0.3em;
+}
+
+.stanza-title {
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1.2vw, 0.9rem);
+  letter-spacing: 0.4em;
+  text-transform: uppercase;
+  color: var(--color-gold-dim);
+  margin-bottom: 2.5rem;
+  opacity: 0;
+  transition: opacity 1s ease 0.3s;
+}
+
+.stanza.visible .stanza-title {
+  opacity: 1;
+}
+
+/* ==========================================
+   STANZA 1 — Der Anfang
+   ========================================== */
+#stanza-1 {
+  background: radial-gradient(ellipse at center, rgba(40, 35, 25, 1) 0%, var(--color-ink) 70%);
+}
+
+#stanza-1 .poem-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  line-height: 2;
+  text-align: center;
+  max-width: 50rem;
+  color: var(--color-gold);
+}
+
+#stanza-1 .poem-text .letter {
+  display: inline-block;
+  opacity: 0;
+  transform: translate(var(--scatter-x, 0px), var(--scatter-y, 0px)) rotate(var(--scatter-r, 0deg));
+  transition: all 1.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+#stanza-1 .poem-text .letter.space {
+  width: 0.35em;
+}
+
+#stanza-1.visible .poem-text .letter {
+  opacity: 1;
+  transform: translate(0, 0) rotate(0deg);
+}
+
+/* ==========================================
+   STANZA 2 — Die Berufung
+   ========================================== */
+#stanza-2 {
+  background: radial-gradient(ellipse at 30% 50%, rgba(45, 38, 25, 1) 0%, var(--color-ink) 70%);
+}
+
+#stanza-2 .poem-text {
+  font-family: var(--font-body);
+  font-style: italic;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  line-height: 2.2;
+  text-align: center;
+  max-width: 48rem;
+  color: var(--color-gold);
+}
+
+#stanza-2 .poem-text .word {
+  display: inline-block;
+  margin: 0 0.2em;
+  position: relative;
+}
+
+#stanza-2 .poem-text .word .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.08s ease, transform 0.15s ease;
+}
+
+#stanza-2 .poem-text .word .char.typed {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#stanza-2 .poem-text .word.ripple::after {
+  content: '';
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  width: 0;
+  height: 1px;
+  background: var(--color-gold);
+  transform: translateX(-50%);
+  animation: goldenRipple 1.2s ease-out forwards;
+}
+
+@keyframes goldenRipple {
+  0% { width: 0; opacity: 1; }
+  100% { width: 200%; opacity: 0; }
+}
+
+#stanza-2 .cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1.2em;
+  background: var(--color-gold);
+  margin-left: 2px;
+  vertical-align: text-bottom;
+  animation: blink 0.8s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ==========================================
+   STANZA 3 — Das Werk
+   ========================================== */
+#stanza-3 {
+  background: radial-gradient(ellipse at 70% 40%, rgba(45, 38, 25, 1) 0%, var(--color-ink) 70%);
+}
+
+#stanza-3 .staff-container {
+  position: relative;
+  width: min(90vw, 60rem);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+}
+
+#stanza-3 .staff-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 1.5s ease 0.5s;
+}
+
+#stanza-3.visible .staff-lines {
+  opacity: 0.15;
+}
+
+#stanza-3 .staff-lines line {
+  stroke: var(--color-gold);
+  stroke-width: 0.5;
+}
+
+#stanza-3 .poem-text {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 2vw, 1.5rem);
+  line-height: 2.4;
+  text-align: center;
+  max-width: 55rem;
+  color: var(--color-gold);
+}
+
+#stanza-3 .poem-text .line {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.8s ease, transform 0.8s ease;
+}
+
+#stanza-3.visible .poem-text .line {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+#stanza-3 .number-anim {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  color: var(--color-gold);
+  display: inline-block;
+}
+
+/* ==========================================
+   STANZA 4 — Die Lehre
+   ========================================== */
+#stanza-4 {
+  background: radial-gradient(ellipse at center, rgba(45, 38, 25, 1) 0%, var(--color-ink) 70%);
+}
+
+#stanza-4 .poem-text {
+  font-family: var(--font-body);
+  font-weight: 300;
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  line-height: 2.2;
+  text-align: center;
+  max-width: 50rem;
+  color: var(--color-gold);
+}
+
+#stanza-4 .poem-text .word {
+  display: inline-block;
+  margin: 0 0.15em;
+  transition: transform 1.8s cubic-bezier(0.23, 1, 0.32, 1),
+              opacity 1.2s ease;
+}
+
+#stanza-4.scatter .poem-text .word {
+  transform: translate(var(--scatter-x, 0), var(--scatter-y, 0)) scale(var(--scatter-s, 1));
+  opacity: var(--scatter-o, 0.4);
+}
+
+/* ==========================================
+   STANZA 5 — Die Welt
+   ========================================== */
+#stanza-5 {
+  background: radial-gradient(ellipse at center, rgba(40, 35, 25, 1) 0%, var(--color-ink) 70%);
+}
+
+#stanza-5 .center-text {
+  font-family: var(--font-body);
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+  line-height: 2.2;
+  text-align: center;
+  max-width: 36rem;
+  color: var(--color-gold);
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  transition: opacity 1.2s ease 0.5s;
+}
+
+#stanza-5.visible .center-text {
+  opacity: 1;
+}
+
+#stanza-5 .orbiting-cities {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+#stanza-5 .city {
+  position: absolute;
+  font-size: clamp(0.65rem, 1.1vw, 0.85rem);
+  letter-spacing: 0.15em;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  white-space: nowrap;
+}
+
+#stanza-5.visible .city {
+  opacity: 0.35;
+}
+
+.city-german { font-family: var(--font-display); color: var(--color-gold); }
+.city-english { font-family: var(--font-body); color: var(--color-gold); }
+.city-japanese { font-family: serif; color: var(--color-gold); }
+.city-hebrew { font-family: serif; color: var(--color-gold); direction: rtl; }
+.city-spanish { font-family: var(--font-serif); color: var(--color-gold); }
+
+/* ==========================================
+   STANZA 6 — Die Stille
+   ========================================== */
+#stanza-6 {
+  background: var(--color-ink);
+  transition: background 2s ease;
+}
+
+#stanza-6 .poem-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  line-height: 2.2;
+  text-align: center;
+  max-width: 48rem;
+  color: var(--color-gold);
+}
+
+#stanza-6 .poem-text .word {
+  display: inline-block;
+  margin: 0 0.15em;
+  transition: opacity 1.5s ease;
+}
+
+#stanza-6 .poem-text .word.dissolved {
+  opacity: 0;
+}
+
+#stanza-6 .poem-text .word.last-word {
+  transition: all 2s ease;
+  font-size: 1.2em;
+}
+
+/* ==========================================
+   STANZA 7 — S.D.G.
+   ========================================== */
+#stanza-7 {
+  background: var(--color-ink);
+}
+
+#stanza-7 .sdg {
+  font-family: var(--font-display);
+  font-weight: 900;
+  font-size: clamp(4rem, 12vw, 10rem);
+  letter-spacing: 0.3em;
+  color: var(--color-gold);
+  text-shadow: 0 0 40px rgba(201, 168, 76, 0.3),
+               0 0 80px rgba(201, 168, 76, 0.1);
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 2s ease, transform 2s ease, text-shadow 2s ease;
+}
+
+#stanza-7.visible .sdg {
+  opacity: 1;
+  transform: scale(1);
+  animation: sdgPulse 4s ease-in-out infinite 2s;
+}
+
+@keyframes sdgPulse {
+  0%, 100% {
+    text-shadow: 0 0 40px rgba(201, 168, 76, 0.3),
+                 0 0 80px rgba(201, 168, 76, 0.1);
+  }
+  50% {
+    text-shadow: 0 0 60px rgba(201, 168, 76, 0.5),
+                 0 0 120px rgba(201, 168, 76, 0.2),
+                 0 0 200px rgba(201, 168, 76, 0.08);
+  }
+}
+
+#stanza-7 .sdg-full {
+  font-family: var(--font-body);
+  font-size: clamp(0.8rem, 1.4vw, 1.1rem);
+  letter-spacing: 0.35em;
+  text-transform: uppercase;
+  color: var(--color-gold-dim);
+  margin-top: 2rem;
+  opacity: 0;
+  transition: opacity 2s ease 1.5s;
+}
+
+#stanza-7.visible .sdg-full {
+  opacity: 1;
+}
+
+#stanza-7 .memorial {
+  font-family: var(--font-display);
+  font-size: clamp(1rem, 2vw, 1.4rem);
+  letter-spacing: 0.2em;
+  color: var(--color-gold);
+  margin-top: 4rem;
+  opacity: 0;
+  transition: opacity 2.5s ease 3s;
+}
+
+#stanza-7.visible .memorial {
+  opacity: 1;
+}
+
+#stanza-7 .memorial-years {
+  font-weight: 300;
+  font-style: italic;
+  font-family: var(--font-body);
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.85em;
+  color: var(--color-gold-dim);
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold-dim), var(--color-gold));
+  z-index: 200;
+  width: 0%;
+  transition: width 0.3s ease;
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .stanza {
+    padding: 1.5rem;
+  }
+
+  .stanza-number {
+    top: 1rem;
+    right: 1.5rem;
+  }
+
+  .back-link {
+    top: 1rem;
+    left: 1rem;
+    font-size: 0.75rem;
+  }
+
+  #stanza-5 .city {
+    font-size: 0.6rem;
+  }
+
+  .stanza-title {
+    margin-bottom: 1.5rem;
+    letter-spacing: 0.25em;
+  }
+}
+
+@media (max-width: 480px) {
+  .stanza {
+    padding: 1rem;
+  }
+
+  #stanza-7 .sdg {
+    letter-spacing: 0.2em;
+  }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progressBar"></div>
+
+<a href="klangkathedrale.html" class="back-link">Klangkathedrale</a>
+
+<div class="scroll-indicator" id="scrollIndicator">Hinunterscrollen</div>
+
+<!-- STANZA 1 — Der Anfang -->
+<section class="stanza" id="stanza-1">
+  <span class="stanza-number">I</span>
+  <div class="stanza-title">Der Anfang</div>
+  <div class="poem-text" id="poem1">Ein Knabe stand in Stuttgart, still und klein,
+als Bachs Musik wie Licht durch Fenster brach.
+Die Orgel sprach, und er verstand: dies Sein,
+dies Klingen war der Ruf, dem er nun nach
+
+sein ganzes Leben folgen sollte, treu.
+Ein Ton genügte, und die Welt war neu.</div>
+</section>
+
+<!-- STANZA 2 — Die Berufung -->
+<section class="stanza" id="stanza-2">
+  <span class="stanza-number">II</span>
+  <div class="stanza-title">Die Berufung</div>
+  <div class="poem-text" id="poem2">Einundzwanzig Jahre jung, ein Feuer im Blick,
+gründete er, was keiner noch verstand:
+ein Chor aus Stimmen, ein lebendiges Stück
+Himmel, geformt von einer einzigen Hand.
+
+Gächinger Kantorei — der Name klang
+wie ein Versprechen, wie ein erster Gesang.</div>
+</section>
+
+<!-- STANZA 3 — Das Werk -->
+<section class="stanza" id="stanza-3">
+  <span class="stanza-number">III</span>
+  <div class="stanza-title">Das Werk</div>
+  <div class="staff-container">
+    <svg class="staff-lines" preserveAspectRatio="none" viewBox="0 0 1000 400">
+      <line x1="0" y1="80" x2="1000" y2="80"/>
+      <line x1="0" y1="140" x2="1000" y2="140"/>
+      <line x1="0" y1="200" x2="1000" y2="200"/>
+      <line x1="0" y1="260" x2="1000" y2="260"/>
+      <line x1="0" y1="320" x2="1000" y2="320"/>
+    </svg>
+    <div class="poem-text" id="poem3"><div class="line"><span class="number-anim" data-target="172">0</span> Kantaten, jede einzeln erweckt,</div>
+<div class="line">aus Notenstaub zu lebendigem Klang erhoben.</div>
+<div class="line">Mehr als <span class="number-anim" data-target="1000">0</span> Aufnahmen, die nichts verdeckt,</div>
+<div class="line">ein Lebenswerk, das Himmel und Erde verwoben.</div>
+<div class="line">&nbsp;</div>
+<div class="line">Er las in Bachs Partituren wie in heiliger Schrift,</div>
+<div class="line">und gab dem Wort zurück, was Zeit vergisst.</div></div>
+  </div>
+</section>
+
+<!-- STANZA 4 — Die Lehre -->
+<section class="stanza" id="stanza-4">
+  <span class="stanza-number">IV</span>
+  <div class="stanza-title">Die Lehre</div>
+  <div class="poem-text" id="poem4">Er lehrte nicht nur Noten, nicht nur Takt,
+er lehrte, wie man lauscht, wie man begreift,
+dass Musik ein heiliger Vertrag, ein Pakt
+ist zwischen Mensch und dem, was in uns reift.
+
+In mehr als dreißig Länder trug der Wind
+die Saat, die er gesät — nun Wälder sind.</div>
+</section>
+
+<!-- STANZA 5 — Die Welt -->
+<section class="stanza" id="stanza-5">
+  <span class="stanza-number">V</span>
+  <div class="stanza-title">Die Welt</div>
+
+  <div class="orbiting-cities" id="orbitingCities">
+    <span class="city city-german" style="--orbit-radius: 38%; --orbit-angle: 0deg;">Stuttgart</span>
+    <span class="city city-english" style="--orbit-radius: 42%; --orbit-angle: 35deg;">New York</span>
+    <span class="city city-japanese" style="--orbit-radius: 36%; --orbit-angle: 72deg;">東京</span>
+    <span class="city city-hebrew" style="--orbit-radius: 44%; --orbit-angle: 108deg;">ירושלים</span>
+    <span class="city city-spanish" style="--orbit-radius: 40%; --orbit-angle: 144deg;">Buenos Aires</span>
+    <span class="city city-english" style="--orbit-radius: 38%; --orbit-angle: 180deg;">London</span>
+    <span class="city city-german" style="--orbit-radius: 43%; --orbit-angle: 210deg;">Leipzig</span>
+    <span class="city city-english" style="--orbit-radius: 37%; --orbit-angle: 245deg;">Sydney</span>
+    <span class="city city-spanish" style="--orbit-radius: 41%; --orbit-angle: 280deg;">Santiago</span>
+    <span class="city city-japanese" style="--orbit-radius: 39%; --orbit-angle: 315deg;">大阪</span>
+    <span class="city city-german" style="--orbit-radius: 34%; --orbit-angle: 55deg;">Wien</span>
+    <span class="city city-english" style="--orbit-radius: 46%; --orbit-angle: 160deg;">Toronto</span>
+    <span class="city city-german" style="--orbit-radius: 35%; --orbit-angle: 265deg;">Zürich</span>
+    <span class="city city-spanish" style="--orbit-radius: 44%; --orbit-angle: 340deg;">Madrid</span>
+    <span class="city city-hebrew" style="--orbit-radius: 37%; --orbit-angle: 125deg;">תל אביב</span>
+    <span class="city city-english" style="--orbit-radius: 45%; --orbit-angle: 195deg;">Seoul</span>
+  </div>
+
+  <div class="center-text" id="poem5">Die Musik kennt keine Mauern, keinen Pass.
+Sie wandert über Meere, Berge, Zeit.
+Was er in einem Kirchensaal besaß,
+gehörte bald der ganzen Menschlichkeit.
+
+Von Stuttgart aus in alle Welt gesandt —
+ein Klang, den jede Seele hat erkannt.</div>
+</section>
+
+<!-- STANZA 6 — Die Stille -->
+<section class="stanza" id="stanza-6">
+  <span class="stanza-number">VI</span>
+  <div class="stanza-title">Die Stille</div>
+  <div class="poem-text" id="poem6">Nun schweigt der Meister. Legt den Taktstock hin.
+Die Hände ruhen, die so viel bewegt.
+Doch jeder Ton hat noch denselben Sinn,
+den er in jede stille Note legt.
+
+Es bleibt, was er uns gab: nicht Ruhm, nicht Macht —
+es bleibt die Musik, die uns wach gemacht.</div>
+</section>
+
+<!-- STANZA 7 — S.D.G. -->
+<section class="stanza" id="stanza-7">
+  <span class="stanza-number">VII</span>
+  <div class="stanza-title">S.D.G.</div>
+  <div class="sdg">S. D. G.</div>
+  <div class="sdg-full">Soli Deo Gloria</div>
+  <div class="memorial">
+    Helmuth Rilling
+    <span class="memorial-years">1933 &mdash; 2026</span>
+  </div>
+</section>
+
+<script>
+(function() {
+  'use strict';
+
+  // ---- Progress bar ----
+  const progressBar = document.getElementById('progressBar');
+  const scrollIndicator = document.getElementById('scrollIndicator');
+
+  function updateProgress() {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = progress + '%';
+
+    if (progress > 5) {
+      scrollIndicator.classList.add('hidden');
+    } else {
+      scrollIndicator.classList.remove('hidden');
+    }
+  }
+
+  window.addEventListener('scroll', updateProgress, { passive: true });
+
+  // ---- STANZA 1: Scattered letters assembling ----
+  function initStanza1() {
+    const container = document.getElementById('poem1');
+    const text = container.textContent;
+    container.textContent = '';
+
+    for (let i = 0; i < text.length; i++) {
+      const ch = text[i];
+      if (ch === '\n') {
+        container.appendChild(document.createElement('br'));
+        continue;
+      }
+      const span = document.createElement('span');
+      span.classList.add('letter');
+      if (ch === ' ') {
+        span.classList.add('space');
+        span.innerHTML = '&nbsp;';
+      } else {
+        span.textContent = ch;
+      }
+      // Random scatter positions
+      const sx = (Math.random() - 0.5) * 600;
+      const sy = (Math.random() - 0.5) * 400;
+      const sr = (Math.random() - 0.5) * 360;
+      span.style.setProperty('--scatter-x', sx + 'px');
+      span.style.setProperty('--scatter-y', sy + 'px');
+      span.style.setProperty('--scatter-r', sr + 'deg');
+      span.style.transitionDelay = (Math.random() * 1.2) + 's';
+      container.appendChild(span);
+    }
+  }
+
+  // ---- STANZA 2: Typewriter effect ----
+  function initStanza2() {
+    const container = document.getElementById('poem2');
+    const text = container.textContent;
+    container.textContent = '';
+
+    const words = text.split(/(\s+)/);
+    const wordSpans = [];
+
+    words.forEach(w => {
+      if (/^\s+$/.test(w)) {
+        if (w.includes('\n')) {
+          container.appendChild(document.createElement('br'));
+        } else {
+          const sp = document.createTextNode(' ');
+          container.appendChild(sp);
+        }
+        return;
+      }
+      const wordSpan = document.createElement('span');
+      wordSpan.classList.add('word');
+      const chars = [];
+      for (let i = 0; i < w.length; i++) {
+        const ch = document.createElement('span');
+        ch.classList.add('char');
+        ch.textContent = w[i];
+        wordSpan.appendChild(ch);
+        chars.push(ch);
+      }
+      container.appendChild(wordSpan);
+      wordSpans.push({ el: wordSpan, chars: chars });
+    });
+
+    // Add cursor
+    const cursor = document.createElement('span');
+    cursor.classList.add('cursor');
+    container.appendChild(cursor);
+
+    container._wordSpans = wordSpans;
+    container._cursor = cursor;
+    container._typed = false;
+  }
+
+  function typeStanza2() {
+    const container = document.getElementById('poem2');
+    if (container._typed) return;
+    container._typed = true;
+
+    const wordSpans = container._wordSpans;
+    let totalDelay = 0;
+    const charDelay = 35;
+
+    wordSpans.forEach((ws) => {
+      ws.chars.forEach((ch, ci) => {
+        const delay = totalDelay + ci * charDelay;
+        setTimeout(() => {
+          ch.classList.add('typed');
+        }, delay);
+      });
+      totalDelay += ws.chars.length * charDelay + 60;
+
+      // Golden ripple on word complete
+      const wordCompleteDelay = totalDelay;
+      setTimeout(() => {
+        ws.el.classList.add('ripple');
+      }, wordCompleteDelay);
+    });
+
+    // Hide cursor at end
+    setTimeout(() => {
+      container._cursor.style.opacity = '0';
+    }, totalDelay + 500);
+  }
+
+  // ---- STANZA 3: Counting numbers ----
+  function animateNumbers(section) {
+    const numbers = section.querySelectorAll('.number-anim');
+    numbers.forEach(num => {
+      if (num._animated) return;
+      num._animated = true;
+      const target = parseInt(num.dataset.target, 10);
+      const duration = 2500;
+      const start = performance.now();
+
+      function tick(now) {
+        const elapsed = now - start;
+        const progress = Math.min(elapsed / duration, 1);
+        // Ease out cubic
+        const eased = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(eased * target);
+        num.textContent = target > 999 ? current.toLocaleString('de-DE') + '+' : current;
+        if (progress < 1) {
+          requestAnimationFrame(tick);
+        } else {
+          num.textContent = target > 999 ? target.toLocaleString('de-DE') + '+' : target;
+        }
+      }
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function initStanza3() {
+    const container = document.getElementById('poem3');
+    const lines = container.querySelectorAll('.line');
+    lines.forEach((line, i) => {
+      line.style.transitionDelay = (i * 0.2) + 's';
+    });
+  }
+
+  // ---- STANZA 4: Words scattering outward ----
+  function initStanza4() {
+    const container = document.getElementById('poem4');
+    const text = container.textContent;
+    container.textContent = '';
+
+    const words = text.split(/(\s+)/);
+
+    words.forEach(w => {
+      if (/^\s+$/.test(w)) {
+        if (w.includes('\n')) {
+          container.appendChild(document.createElement('br'));
+        } else {
+          container.appendChild(document.createTextNode(' '));
+        }
+        return;
+      }
+      const span = document.createElement('span');
+      span.classList.add('word');
+      span.textContent = w;
+      // Scatter destinations
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 200;
+      const sx = Math.cos(angle) * dist;
+      const sy = Math.sin(angle) * dist;
+      const ss = 0.6 + Math.random() * 0.8;
+      const so = 0.15 + Math.random() * 0.35;
+      span.style.setProperty('--scatter-x', sx + 'px');
+      span.style.setProperty('--scatter-y', sy + 'px');
+      span.style.setProperty('--scatter-s', ss);
+      span.style.setProperty('--scatter-o', so);
+      container.appendChild(span);
+    });
+
+    container._hasScattered = false;
+  }
+
+  // ---- STANZA 5: Orbiting cities ----
+  let orbitAnimId = null;
+
+  function startOrbit() {
+    const cities = document.querySelectorAll('#stanza-5 .city');
+    const container = document.getElementById('orbitingCities');
+    const centerX = container.offsetWidth / 2;
+    const centerY = container.offsetHeight / 2;
+
+    let startTime = performance.now();
+
+    function animate(now) {
+      const elapsed = (now - startTime) / 1000;
+
+      cities.forEach((city, i) => {
+        const radiusPercent = parseFloat(city.style.getPropertyValue('--orbit-radius'));
+        const baseAngle = parseFloat(city.style.getPropertyValue('--orbit-angle'));
+        const radius = Math.min(centerX, centerY) * (radiusPercent / 50);
+        // Different speeds per city
+        const speed = 0.03 + (i % 5) * 0.008;
+        const angle = (baseAngle * Math.PI / 180) + elapsed * speed;
+
+        const x = centerX + Math.cos(angle) * radius - city.offsetWidth / 2;
+        const y = centerY + Math.sin(angle) * radius * 0.6 - city.offsetHeight / 2;
+
+        city.style.left = x + 'px';
+        city.style.top = y + 'px';
+      });
+
+      orbitAnimId = requestAnimationFrame(animate);
+    }
+
+    orbitAnimId = requestAnimationFrame(animate);
+  }
+
+  function stopOrbit() {
+    if (orbitAnimId) {
+      cancelAnimationFrame(orbitAnimId);
+      orbitAnimId = null;
+    }
+  }
+
+  // ---- STANZA 6: Dissolving words ----
+  function initStanza6() {
+    const container = document.getElementById('poem6');
+    const text = container.textContent;
+    container.textContent = '';
+
+    const words = text.split(/(\s+)/);
+
+    words.forEach(w => {
+      if (/^\s+$/.test(w)) {
+        if (w.includes('\n')) {
+          container.appendChild(document.createElement('br'));
+        } else {
+          container.appendChild(document.createTextNode(' '));
+        }
+        return;
+      }
+      const span = document.createElement('span');
+      span.classList.add('word');
+      span.textContent = w;
+      container.appendChild(span);
+    });
+
+    container._dissolved = false;
+  }
+
+  function dissolveStanza6() {
+    const container = document.getElementById('poem6');
+    if (container._dissolved) return;
+    container._dissolved = true;
+
+    const words = container.querySelectorAll('.word');
+    const totalWords = words.length;
+
+    // Find the word "Musik" (last instance) or "Musik," with punctuation
+    let lastMusikIdx = -1;
+    words.forEach((w, i) => {
+      if (w.textContent.replace(/[.,!?;:]/g, '').toLowerCase() === 'musik') {
+        lastMusikIdx = i;
+      }
+    });
+
+    // Create order: dissolve from outside in, leaving "Musik" last
+    const order = [];
+    for (let i = 0; i < totalWords; i++) {
+      if (i !== lastMusikIdx) order.push(i);
+    }
+    // Shuffle somewhat — dissolve roughly from edges
+    order.sort(() => Math.random() - 0.5);
+
+    order.forEach((idx, i) => {
+      setTimeout(() => {
+        words[idx].classList.add('dissolved');
+      }, 800 + i * 180);
+    });
+
+    // Mark last word
+    if (lastMusikIdx >= 0) {
+      setTimeout(() => {
+        words[lastMusikIdx].classList.add('last-word');
+      }, 800 + order.length * 180 + 500);
+    }
+
+    // Darken background
+    setTimeout(() => {
+      document.getElementById('stanza-6').style.background = '#0a0a08';
+    }, 800 + order.length * 100);
+  }
+
+  // ---- Initialize everything ----
+  initStanza1();
+  initStanza2();
+  initStanza3();
+  initStanza4();
+  initStanza6();
+
+  // ---- Intersection Observers ----
+  const observerOptions = {
+    root: null,
+    threshold: 0.4
+  };
+
+  const stanzaCallbacks = {
+    'stanza-1': (visible) => {
+      const el = document.getElementById('stanza-1');
+      if (visible) el.classList.add('visible');
+    },
+    'stanza-2': (visible) => {
+      const el = document.getElementById('stanza-2');
+      if (visible) {
+        el.classList.add('visible');
+        typeStanza2();
+      }
+    },
+    'stanza-3': (visible) => {
+      const el = document.getElementById('stanza-3');
+      if (visible) {
+        el.classList.add('visible');
+        animateNumbers(el);
+      }
+    },
+    'stanza-4': (visible) => {
+      const el = document.getElementById('stanza-4');
+      if (visible) {
+        el.classList.add('visible');
+        // First show text centered, then scatter after delay
+        setTimeout(() => {
+          el.classList.add('scatter');
+        }, 2500);
+      }
+    },
+    'stanza-5': (visible) => {
+      const el = document.getElementById('stanza-5');
+      if (visible) {
+        el.classList.add('visible');
+        startOrbit();
+      } else {
+        stopOrbit();
+      }
+    },
+    'stanza-6': (visible) => {
+      const el = document.getElementById('stanza-6');
+      if (visible) {
+        el.classList.add('visible');
+        setTimeout(() => dissolveStanza6(), 1500);
+      }
+    },
+    'stanza-7': (visible) => {
+      const el = document.getElementById('stanza-7');
+      if (visible) el.classList.add('visible');
+    }
+  };
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const id = entry.target.id;
+      if (stanzaCallbacks[id]) {
+        stanzaCallbacks[id](entry.isIntersecting);
+      }
+    });
+  }, observerOptions);
+
+  document.querySelectorAll('.stanza').forEach(stanza => {
+    observer.observe(stanza);
+  });
+
+})();
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

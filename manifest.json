@@ -1,0 +1,26 @@
+{
+  "name": "Klangkathedrale — Helmuth Rilling Memorial",
+  "short_name": "Klangkathedrale",
+  "description": "Ein digitales Denkmal für den großen Bach-Dirigenten Helmuth Rilling (1933–2026)",
+  "start_url": "/klangkathedrale.html",
+  "display": "standalone",
+  "background_color": "#1A1410",
+  "theme_color": "#C9A84C",
+  "orientation": "any",
+  "lang": "de",
+  "categories": ["music", "education", "arts"],
+  "icons": [
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'%3E%3Crect width='192' height='192' fill='%231A1410'/%3E%3Cpath d='M96 20 C96 20 60 60 60 110 C60 140 75 165 96 172 C117 165 132 140 132 110 C132 60 96 20 96 20Z' fill='none' stroke='%23C9A84C' stroke-width='3'/%3E%3Cpath d='M88 70 C88 70 88 130 88 130 M88 90 C78 85 72 90 72 97 C72 104 78 109 88 104 M88 110 C78 105 72 110 72 117 C72 124 78 129 88 124 M104 60 L104 120 M104 80 C114 75 120 80 120 87 C120 94 114 99 104 94 M104 100 C114 95 120 100 120 107 C120 114 114 119 104 114' fill='none' stroke='%23C9A84C' stroke-width='2.5' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "192x192",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%231A1410'/%3E%3Cpath d='M256 50 C256 50 160 150 160 290 C160 370 200 440 256 460 C312 440 352 370 352 290 C352 150 256 50 256 50Z' fill='none' stroke='%23C9A84C' stroke-width='6'/%3E%3Cpath d='M234 180 C234 180 234 350 234 350 M234 230 C210 218 198 228 198 245 C198 262 210 275 234 265 M234 290 C210 278 198 288 198 305 C198 322 210 335 234 325 M278 160 L278 330 M278 210 C302 198 314 208 314 225 C314 242 302 255 278 245 M278 270 C302 258 314 268 314 285 C314 302 302 315 278 305' fill='none' stroke='%23C9A84C' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

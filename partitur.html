@@ -1,0 +1,1454 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bachs Feder — Partitur | Klangkathedrale</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=EB+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --color-gold: #C9A84C;
+  --color-gold-bright: #E0C068;
+  --color-gold-dim: #A08030;
+  --color-ink: #1A1410;
+  --color-ink-deep: #0E0C08;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-sepia: #8B7355;
+  --color-sepia-light: #B8A080;
+  --color-manuscript: #1E1A14;
+  --color-staff: #4A3F30;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-serif: 'EB Garamond', serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-ink-deep);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Background texture */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse at 30% 20%, rgba(201,168,76,0.04) 0%, transparent 60%),
+    radial-gradient(ellipse at 70% 80%, rgba(201,168,76,0.03) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ---- Navigation ---- */
+.nav-back {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-gold);
+  text-decoration: none;
+  font-family: var(--font-serif);
+  font-size: 0.95rem;
+  letter-spacing: 0.05em;
+  opacity: 0.7;
+  transition: opacity 0.3s;
+}
+.nav-back:hover { opacity: 1; }
+.nav-back svg { width: 18px; height: 18px; }
+
+/* ---- Header ---- */
+.header {
+  text-align: center;
+  padding: 5rem 2rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+.header h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  color: var(--color-gold);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  margin-bottom: 0.3rem;
+}
+.header .subtitle {
+  font-family: var(--font-serif);
+  font-size: clamp(1rem, 2.5vw, 1.3rem);
+  color: var(--color-sepia-light);
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+.header .dedication {
+  margin-top: 1rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-sepia);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* ---- Piece Selector ---- */
+.piece-selector {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding: 1rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+.piece-btn {
+  background: transparent;
+  border: 1px solid var(--color-staff);
+  color: var(--color-sepia-light);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s;
+  border-radius: 2px;
+  letter-spacing: 0.03em;
+}
+.piece-btn:hover {
+  border-color: var(--color-gold-dim);
+  color: var(--color-gold);
+}
+.piece-btn.active {
+  background: rgba(201,168,76,0.12);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+/* ---- Controls ---- */
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 1rem 2rem;
+  flex-wrap: wrap;
+  position: relative;
+  z-index: 1;
+}
+
+.btn-replay {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  background: rgba(201,168,76,0.15);
+  border: 1px solid var(--color-gold-dim);
+  color: var(--color-gold);
+  font-family: var(--font-serif);
+  font-size: 0.9rem;
+  padding: 0.5rem 1.2rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.btn-replay:hover {
+  background: rgba(201,168,76,0.25);
+  border-color: var(--color-gold);
+}
+.btn-replay svg { width: 16px; height: 16px; }
+
+.tempo-control {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-sepia-light);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+}
+.tempo-control input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 3px;
+  background: var(--color-staff);
+  border-radius: 2px;
+  outline: none;
+}
+.tempo-control input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  cursor: pointer;
+}
+.tempo-control input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--color-gold);
+  cursor: pointer;
+  border: none;
+}
+
+.btn-toggle-edu {
+  background: transparent;
+  border: 1px solid var(--color-staff);
+  color: var(--color-sepia);
+  font-family: var(--font-serif);
+  font-size: 0.8rem;
+  padding: 0.4rem 0.8rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+.btn-toggle-edu:hover, .btn-toggle-edu.active {
+  border-color: var(--color-gold-dim);
+  color: var(--color-gold);
+}
+
+/* ---- Score Container ---- */
+.score-container {
+  position: relative;
+  z-index: 1;
+  max-width: 1100px;
+  margin: 1rem auto;
+  padding: 0 1rem;
+}
+
+.score-frame {
+  position: relative;
+  background: linear-gradient(135deg, rgba(30,26,20,0.95), rgba(20,17,12,0.98));
+  border: 1px solid rgba(201,168,76,0.2);
+  border-radius: 4px;
+  padding: 1.5rem;
+  box-shadow:
+    0 0 40px rgba(0,0,0,0.5),
+    inset 0 0 60px rgba(0,0,0,0.3),
+    0 0 80px rgba(201,168,76,0.03);
+  overflow-x: auto;
+}
+
+/* Glass reflection effect */
+.score-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(255,255,255,0.02) 0%,
+    transparent 40%,
+    transparent 60%,
+    rgba(255,255,255,0.01) 100%
+  );
+  pointer-events: none;
+  border-radius: 4px;
+  z-index: 2;
+}
+
+.score-svg {
+  display: block;
+  width: 100%;
+  min-width: 800px;
+  height: auto;
+}
+
+/* Note hover effect */
+.note-group { cursor: pointer; }
+.note-group:hover .note-head {
+  fill: var(--color-gold-bright) !important;
+  filter: drop-shadow(0 0 6px rgba(201,168,76,0.5));
+}
+
+/* Ink animation */
+@keyframes inkFlow {
+  0% { opacity: 0; transform: scale(0.3); }
+  40% { opacity: 0.7; transform: scale(1.1); }
+  100% { opacity: 1; transform: scale(1); }
+}
+@keyframes stemDraw {
+  0% { stroke-dashoffset: 40; }
+  100% { stroke-dashoffset: 0; }
+}
+@keyframes barSweep {
+  0% { stroke-dashoffset: 80; }
+  100% { stroke-dashoffset: 0; }
+}
+
+.note-group {
+  opacity: 0;
+  transform-origin: center;
+}
+.note-group.visible {
+  animation: inkFlow 0.6s ease-out forwards;
+}
+.note-group.visible .note-stem {
+  stroke-dasharray: 40;
+  stroke-dashoffset: 40;
+  animation: stemDraw 0.5s ease-out 0.2s forwards;
+}
+.bar-line {
+  stroke-dasharray: 80;
+  stroke-dashoffset: 80;
+  opacity: 0;
+}
+.bar-line.visible {
+  opacity: 1;
+  animation: barSweep 0.4s ease-out forwards;
+}
+
+/* ---- Educational Panel ---- */
+.edu-panel {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 1;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.5s ease, opacity 0.3s;
+  opacity: 0;
+}
+.edu-panel.open {
+  max-height: 400px;
+  opacity: 1;
+  padding-bottom: 1rem;
+}
+
+.edu-inner {
+  background: rgba(30,26,20,0.8);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 4px;
+  padding: 1.2rem 1.5rem;
+  margin-top: 1rem;
+}
+
+.edu-harmony {
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  color: var(--color-gold);
+  margin-bottom: 0.8rem;
+}
+.edu-harmony .label {
+  font-size: 0.8rem;
+  color: var(--color-sepia);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  display: block;
+  margin-bottom: 0.2rem;
+}
+
+.edu-fact {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: var(--color-sepia-light);
+  line-height: 1.6;
+  font-style: italic;
+}
+.edu-fact strong {
+  color: var(--color-gold);
+  font-style: normal;
+  font-weight: 400;
+}
+
+/* ---- Progress Bar ---- */
+.progress-bar {
+  max-width: 1100px;
+  margin: 0.5rem auto;
+  padding: 0 2.5rem;
+  position: relative;
+  z-index: 1;
+}
+.progress-track {
+  width: 100%;
+  height: 2px;
+  background: var(--color-staff);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  background: var(--color-gold);
+  width: 0%;
+  transition: width 0.3s;
+  border-radius: 1px;
+}
+
+/* ---- Footer ---- */
+.footer-partitur {
+  text-align: center;
+  padding: 3rem 2rem;
+  position: relative;
+  z-index: 1;
+}
+.footer-partitur p {
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  color: var(--color-sepia);
+  font-style: italic;
+}
+
+/* ---- Mobile ---- */
+@media (max-width: 768px) {
+  .header { padding: 4rem 1rem 1.5rem; }
+  .piece-selector { gap: 0.3rem; }
+  .piece-btn { font-size: 0.75rem; padding: 0.4rem 0.8rem; }
+  .controls { gap: 0.8rem; }
+  .score-frame { padding: 1rem 0.5rem; }
+  .nav-back { top: 1rem; left: 1rem; font-size: 0.85rem; }
+  .edu-inner { padding: 1rem; }
+}
+@media (max-width: 480px) {
+  .piece-btn { font-size: 0.7rem; padding: 0.35rem 0.6rem; }
+  .header h1 { letter-spacing: 0.04em; }
+}
+</style>
+</head>
+<body>
+
+<!-- Navigation -->
+<a href="klangkathedrale.html" class="nav-back">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+    <path d="M19 12H5M5 12l6-6M5 12l6 6"/>
+  </svg>
+  Klangkathedrale
+</a>
+
+<!-- Header -->
+<header class="header">
+  <h1>Bachs Feder</h1>
+  <p class="subtitle">Die Partitur, lebendig geschrieben</p>
+  <p class="dedication">Im Gedenken an Helmuth Rilling (1933&ndash;2026)</p>
+</header>
+
+<!-- Piece Selector -->
+<div class="piece-selector">
+  <button class="piece-btn active" data-piece="air" title="BWV 1068">Air auf der G-Saite</button>
+  <button class="piece-btn" data-piece="jesu" title="BWV 147">Jesu, meine Freude</button>
+  <button class="piece-btn" data-piece="bmass" title="BWV 232">h-Moll-Messe</button>
+</div>
+
+<!-- Controls -->
+<div class="controls">
+  <button class="btn-replay" id="btnReplay">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M3 13c0 4.97 4.03 9 9 9s9-4.03 9-9-4.03-9-9-9c-2.12 0-4.07.74-5.6 1.97"/>
+      <path d="M7 5V1L3 5h4z" fill="currentColor" stroke="none"/>
+      <path d="M12 8c-1.2 0-2.3.5-3.1 1.3"/>
+    </svg>
+    Wiederholen
+  </button>
+  <div class="tempo-control">
+    <span>Tempo:</span>
+    <input type="range" id="tempoSlider" min="0.3" max="2" step="0.1" value="1">
+    <span id="tempoValue">1.0x</span>
+  </div>
+  <button class="btn-toggle-edu" id="btnEdu">Analyse</button>
+</div>
+
+<!-- Progress -->
+<div class="progress-bar">
+  <div class="progress-track">
+    <div class="progress-fill" id="progressFill"></div>
+  </div>
+</div>
+
+<!-- Score -->
+<div class="score-container">
+  <div class="score-frame">
+    <svg id="scoreSvg" class="score-svg" viewBox="0 0 1060 280" xmlns="http://www.w3.org/2000/svg">
+      <!-- Will be populated by JS -->
+    </svg>
+  </div>
+</div>
+
+<!-- Educational Panel -->
+<div class="edu-panel" id="eduPanel">
+  <div class="edu-inner">
+    <div class="edu-harmony" id="eduHarmony">
+      <span class="label">Harmonie</span>
+      <span id="harmonyText">D-Dur, Tonika</span>
+    </div>
+    <div class="edu-fact" id="eduFact">
+      <strong>Wussten Sie?</strong> Helmuth Rilling nahm die Orchestersuite Nr. 3 in D-Dur (BWV 1068) mehrfach auf. Sein Ansatz betonte stets die vokale Qualit&auml;t der Melodielinie &mdash; er nannte sie &bdquo;gesungene Instrumentalmusik&ldquo;.
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<footer class="footer-partitur">
+  <p>&bdquo;Die Musik Bachs ist wie eine Kathedrale aus Klang.&ldquo; &mdash; Helmuth Rilling</p>
+</footer>
+
+<script>
+// ============================================================
+// BACHS FEDER — Interactive Animated Score Viewer
+// ============================================================
+
+(() => {
+'use strict';
+
+// ---- Constants ----
+const STAFF_Y_TREBLE = 60;    // top line of treble staff
+const STAFF_Y_BASS = 170;     // top line of bass staff
+const LINE_SPACING = 10;      // distance between staff lines
+const STAFF_LEFT = 80;
+const STAFF_RIGHT = 1040;
+const STAFF_WIDTH = STAFF_RIGHT - STAFF_LEFT;
+const NOTE_GOLD = '#C9A84C';
+const NOTE_GOLD_LIGHT = '#D4B65E';
+const STAFF_COLOR = '#4A3F30';
+const CLEF_COLOR = '#8B7355';
+
+// ---- Pitch to Y mapping ----
+// Middle C (C4) sits on the ledger line between staves
+// Treble: lines E4 G4 B4 D5 F5 (bottom to top)
+// Bass:   lines G2 B2 D3 F3 A3 (bottom to top)
+const TREBLE_BOTTOM = STAFF_Y_TREBLE + 4 * LINE_SPACING; // E4 line
+const BASS_BOTTOM = STAFF_Y_BASS + 4 * LINE_SPACING;     // G2 line
+
+// Note name to semitone (C=0)
+const NOTE_SEMI = { C:0, D:2, E:4, F:5, G:7, A:9, B:11 };
+
+function pitchToY(noteStr) {
+  // noteStr like "D5", "F#4", "Bb3"
+  const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
+  if (!match) return STAFF_Y_TREBLE + 20;
+  const [, letter, acc, octStr] = match;
+  const oct = parseInt(octStr);
+  // Calculate position based on note name and octave
+  // Each staff position = LINE_SPACING/2 = 5px
+  // Reference: B4 = treble middle line = STAFF_Y_TREBLE + 2*LINE_SPACING
+  const noteOrder = { C:0, D:1, E:2, F:3, G:4, A:5, B:6 };
+  const refOct = 4, refNote = 2; // E4 = bottom line of treble
+  const refY = TREBLE_BOTTOM;
+  const stepsFromRef = (oct - refOct) * 7 + (noteOrder[letter] - refNote);
+  return refY - stepsFromRef * (LINE_SPACING / 2);
+}
+
+function pitchToFreq(noteStr) {
+  const match = noteStr.match(/^([A-G])(#|b)?(\d)$/);
+  if (!match) return 440;
+  const [, letter, acc, octStr] = match;
+  const oct = parseInt(octStr);
+  let semi = NOTE_SEMI[letter];
+  if (acc === '#') semi++;
+  if (acc === 'b') semi--;
+  // A4 = 440Hz = semitone 9, octave 4
+  const semiFromA4 = (oct - 4) * 12 + (semi - 9);
+  return 440 * Math.pow(2, semiFromA4 / 12);
+}
+
+// ---- Piece Data ----
+// Each note: { pitch, duration (beats), clef: 't'|'b', beat position }
+// Duration: 4=whole, 2=half, 1=quarter, 0.5=eighth
+
+const PIECES = {
+  air: {
+    title: 'Air auf der G-Saite',
+    bwv: 'BWV 1068',
+    key: 'D-Dur',
+    timeSignature: '4/4',
+    tempo: 56,
+    // Simplified Air on the G String melody (transposed to concert pitch, treble)
+    // Plus bass line
+    notes: [
+      // Measure 1
+      { pitch:'F#5', dur:1, clef:'t', beat:0 },
+      { pitch:'E5', dur:0.5, clef:'t', beat:1 },
+      { pitch:'D5', dur:0.5, clef:'t', beat:1.5 },
+      { pitch:'D5', dur:0.5, clef:'t', beat:2 },
+      { pitch:'C#5', dur:0.5, clef:'t', beat:2.5 },
+      { pitch:'D5', dur:0.5, clef:'t', beat:3 },
+      { pitch:'E5', dur:0.5, clef:'t', beat:3.5 },
+      // Bass M1
+      { pitch:'D3', dur:1, clef:'b', beat:0 },
+      { pitch:'F#3', dur:1, clef:'b', beat:1 },
+      { pitch:'A3', dur:1, clef:'b', beat:2 },
+      { pitch:'A2', dur:1, clef:'b', beat:3 },
+
+      // Measure 2
+      { pitch:'C#5', dur:1, clef:'t', beat:4 },
+      { pitch:'D5', dur:0.5, clef:'t', beat:5 },
+      { pitch:'E5', dur:0.5, clef:'t', beat:5.5 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:6 },
+      { pitch:'B4', dur:0.5, clef:'t', beat:6.5 },
+      { pitch:'C#5', dur:0.5, clef:'t', beat:7 },
+      { pitch:'D5', dur:0.5, clef:'t', beat:7.5 },
+      // Bass M2
+      { pitch:'A2', dur:1, clef:'b', beat:4 },
+      { pitch:'A3', dur:1, clef:'b', beat:5 },
+      { pitch:'F#3', dur:1, clef:'b', beat:6 },
+      { pitch:'D3', dur:1, clef:'b', beat:7 },
+
+      // Measure 3
+      { pitch:'B4', dur:0.5, clef:'t', beat:8 },
+      { pitch:'G4', dur:0.5, clef:'t', beat:8.5 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:9 },
+      { pitch:'B4', dur:0.5, clef:'t', beat:9.5 },
+      { pitch:'C#5', dur:0.5, clef:'t', beat:10 },
+      { pitch:'D5', dur:0.5, clef:'t', beat:10.5 },
+      { pitch:'E5', dur:1, clef:'t', beat:11 },
+      // Bass M3
+      { pitch:'G3', dur:1, clef:'b', beat:8 },
+      { pitch:'G2', dur:1, clef:'b', beat:9 },
+      { pitch:'E3', dur:1, clef:'b', beat:10 },
+      { pitch:'A2', dur:1, clef:'b', beat:11 },
+
+      // Measure 4
+      { pitch:'D5', dur:1.5, clef:'t', beat:12 },
+      { pitch:'C#5', dur:0.5, clef:'t', beat:13.5 },
+      { pitch:'B4', dur:0.5, clef:'t', beat:14 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:14.5 },
+      { pitch:'G4', dur:0.5, clef:'t', beat:15 },
+      { pitch:'F#4', dur:0.5, clef:'t', beat:15.5 },
+      // Bass M4
+      { pitch:'D3', dur:1, clef:'b', beat:12 },
+      { pitch:'D2', dur:1, clef:'b', beat:13 },
+      { pitch:'G2', dur:1, clef:'b', beat:14 },
+      { pitch:'A2', dur:1, clef:'b', beat:15 },
+
+      // Measure 5
+      { pitch:'E4', dur:0.5, clef:'t', beat:16 },
+      { pitch:'F#4', dur:0.5, clef:'t', beat:16.5 },
+      { pitch:'G4', dur:0.5, clef:'t', beat:17 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:17.5 },
+      { pitch:'B4', dur:0.5, clef:'t', beat:18 },
+      { pitch:'C#5', dur:0.5, clef:'t', beat:18.5 },
+      { pitch:'D5', dur:1, clef:'t', beat:19 },
+      // Bass M5
+      { pitch:'D3', dur:1, clef:'b', beat:16 },
+      { pitch:'B2', dur:1, clef:'b', beat:17 },
+      { pitch:'G2', dur:1, clef:'b', beat:18 },
+      { pitch:'F#2', dur:1, clef:'b', beat:19 },
+
+      // Measure 6
+      { pitch:'C#5', dur:0.5, clef:'t', beat:20 },
+      { pitch:'B4', dur:0.5, clef:'t', beat:20.5 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:21 },
+      { pitch:'G4', dur:0.5, clef:'t', beat:21.5 },
+      { pitch:'F#4', dur:1, clef:'t', beat:22 },
+      { pitch:'E4', dur:0.5, clef:'t', beat:23 },
+      { pitch:'D4', dur:0.5, clef:'t', beat:23.5 },
+      // Bass M6
+      { pitch:'E3', dur:1, clef:'b', beat:20 },
+      { pitch:'C#3', dur:1, clef:'b', beat:21 },
+      { pitch:'D3', dur:1, clef:'b', beat:22 },
+      { pitch:'A2', dur:1, clef:'b', beat:23 },
+
+      // Measure 7
+      { pitch:'G4', dur:1, clef:'t', beat:24 },
+      { pitch:'F#4', dur:0.5, clef:'t', beat:25 },
+      { pitch:'E4', dur:0.5, clef:'t', beat:25.5 },
+      { pitch:'F#4', dur:0.5, clef:'t', beat:26 },
+      { pitch:'G4', dur:0.5, clef:'t', beat:26.5 },
+      { pitch:'A4', dur:1, clef:'t', beat:27 },
+      // Bass M7
+      { pitch:'B2', dur:1, clef:'b', beat:24 },
+      { pitch:'C#3', dur:1, clef:'b', beat:25 },
+      { pitch:'D3', dur:1, clef:'b', beat:26 },
+      { pitch:'D2', dur:1, clef:'b', beat:27 },
+
+      // Measure 8
+      { pitch:'F#4', dur:1.5, clef:'t', beat:28 },
+      { pitch:'E4', dur:0.5, clef:'t', beat:29.5 },
+      { pitch:'D4', dur:2, clef:'t', beat:30 },
+      // Bass M8
+      { pitch:'G2', dur:1, clef:'b', beat:28 },
+      { pitch:'A2', dur:1, clef:'b', beat:29 },
+      { pitch:'D2', dur:2, clef:'b', beat:30 },
+    ],
+    measures: 8,
+    harmonies: [
+      { beat:0, text:'D-Dur, Tonika' },
+      { beat:4, text:'A-Dur, Dominante' },
+      { beat:8, text:'G-Dur, Subdominante' },
+      { beat:12, text:'D-Dur, Tonika' },
+      { beat:16, text:'D-Dur, Tonika' },
+      { beat:20, text:'A-Dur, Dominante' },
+      { beat:24, text:'G-Dur, Subdominante' },
+      { beat:28, text:'D-Dur, Tonika (Schluss)' },
+    ],
+    facts: [
+      '<strong>Wussten Sie?</strong> Helmuth Rilling nahm die Orchestersuite Nr. 3 in D-Dur (BWV 1068) mehrfach auf. Sein Ansatz betonte stets die vokale Qualit\u00e4t der Melodielinie \u2014 er nannte sie \u201egesungene Instrumentalmusik\u201c.',
+      '<strong>Wussten Sie?</strong> Der Name \u201eAir auf der G-Saite\u201c stammt von August Wilhelmjs Bearbeitung f\u00fcr Violine (1871), die das St\u00fcck auf einer einzigen Saite spielbar machte.',
+      '<strong>Wussten Sie?</strong> Rilling betonte, dass Bachs Air keine blo\u00dfe \u201esch\u00f6ne Melodie\u201c sei, sondern ein meisterhaftes Zusammenspiel von vier unabh\u00e4ngigen Stimmen.',
+    ],
+  },
+
+  jesu: {
+    title: 'Jesu, meine Freude',
+    bwv: 'BWV 147',
+    key: 'G-Dur',
+    timeSignature: '3/4',
+    tempo: 72,
+    notes: [
+      // Measure 1 (pickup + m1)
+      { pitch:'B4', dur:1, clef:'t', beat:0 },
+      { pitch:'A4', dur:1, clef:'t', beat:1 },
+      { pitch:'G4', dur:1, clef:'t', beat:2 },
+      { pitch:'G3', dur:1, clef:'b', beat:0 },
+      { pitch:'D3', dur:1, clef:'b', beat:1 },
+      { pitch:'E3', dur:1, clef:'b', beat:2 },
+
+      // Measure 2
+      { pitch:'F#4', dur:1.5, clef:'t', beat:3 },
+      { pitch:'E4', dur:0.5, clef:'t', beat:4.5 },
+      { pitch:'F#4', dur:1, clef:'t', beat:5 },
+      { pitch:'D3', dur:1, clef:'b', beat:3 },
+      { pitch:'A2', dur:1, clef:'b', beat:4 },
+      { pitch:'D3', dur:1, clef:'b', beat:5 },
+
+      // Measure 3
+      { pitch:'G4', dur:2, clef:'t', beat:6 },
+      { pitch:'A4', dur:1, clef:'t', beat:8 },
+      { pitch:'B2', dur:1, clef:'b', beat:6 },
+      { pitch:'G2', dur:1, clef:'b', beat:7 },
+      { pitch:'D3', dur:1, clef:'b', beat:8 },
+
+      // Measure 4
+      { pitch:'B4', dur:1, clef:'t', beat:9 },
+      { pitch:'A4', dur:1, clef:'t', beat:10 },
+      { pitch:'G4', dur:1, clef:'t', beat:11 },
+      { pitch:'G3', dur:1, clef:'b', beat:9 },
+      { pitch:'D3', dur:1, clef:'b', beat:10 },
+      { pitch:'E3', dur:1, clef:'b', beat:11 },
+
+      // Measure 5
+      { pitch:'C5', dur:1, clef:'t', beat:12 },
+      { pitch:'B4', dur:1, clef:'t', beat:13 },
+      { pitch:'A4', dur:1, clef:'t', beat:14 },
+      { pitch:'E3', dur:1, clef:'b', beat:12 },
+      { pitch:'F#3', dur:1, clef:'b', beat:13 },
+      { pitch:'D3', dur:1, clef:'b', beat:14 },
+
+      // Measure 6
+      { pitch:'B4', dur:1.5, clef:'t', beat:15 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:16.5 },
+      { pitch:'A4', dur:1, clef:'t', beat:17 },
+      { pitch:'G2', dur:1, clef:'b', beat:15 },
+      { pitch:'D3', dur:1, clef:'b', beat:16 },
+      { pitch:'D2', dur:1, clef:'b', beat:17 },
+
+      // Measure 7
+      { pitch:'G4', dur:2, clef:'t', beat:18 },
+      { pitch:'B4', dur:1, clef:'t', beat:20 },
+      { pitch:'G2', dur:1, clef:'b', beat:18 },
+      { pitch:'B2', dur:1, clef:'b', beat:19 },
+      { pitch:'G3', dur:1, clef:'b', beat:20 },
+
+      // Measure 8
+      { pitch:'D5', dur:1, clef:'t', beat:21 },
+      { pitch:'C5', dur:1, clef:'t', beat:22 },
+      { pitch:'B4', dur:1, clef:'t', beat:23 },
+      { pitch:'B2', dur:1, clef:'b', beat:21 },
+      { pitch:'A2', dur:1, clef:'b', beat:22 },
+      { pitch:'G2', dur:1, clef:'b', beat:23 },
+    ],
+    measures: 8,
+    harmonies: [
+      { beat:0, text:'G-Dur, Tonika' },
+      { beat:3, text:'D-Dur, Dominante' },
+      { beat:6, text:'G-Dur, Tonika' },
+      { beat:9, text:'G-Dur, Tonika' },
+      { beat:12, text:'C-Dur, Subdominante' },
+      { beat:15, text:'G-Dur, Tonika' },
+      { beat:18, text:'G-Dur, Tonika' },
+      { beat:21, text:'G-Dur, Tonika' },
+    ],
+    facts: [
+      '<strong>Wussten Sie?</strong> Rilling f\u00fchrte die Bach-Kantaten \u00fcber 25 Jahre hinweg komplett auf und nahm alle 200 geistlichen Kantaten auf \u2014 eine beispiellose Leistung.',
+      '<strong>Wussten Sie?</strong> Der Choral \u201eJesu, bleibet meine Freude\u201c bildet den Schlusschoral der Kantate BWV 147 und wurde durch Myra Hess\u2019 Klavierbearbeitung weltber\u00fchmt.',
+      '<strong>Wussten Sie?</strong> Rilling betonte die tief pers\u00f6nliche Fr\u00f6mmigkeit dieses Chorals als Ausdruck von Bachs eigenem Glauben.',
+    ],
+  },
+
+  bmass: {
+    title: 'h-Moll-Messe',
+    bwv: 'BWV 232',
+    key: 'h-Moll',
+    timeSignature: '4/4',
+    tempo: 52,
+    notes: [
+      // Kyrie eleison opening — solemn, minor
+      // Measure 1
+      { pitch:'B4', dur:2, clef:'t', beat:0 },
+      { pitch:'A4', dur:1, clef:'t', beat:2 },
+      { pitch:'G4', dur:1, clef:'t', beat:3 },
+      { pitch:'B2', dur:2, clef:'b', beat:0 },
+      { pitch:'B2', dur:2, clef:'b', beat:2 },
+
+      // Measure 2
+      { pitch:'F#4', dur:1, clef:'t', beat:4 },
+      { pitch:'G4', dur:1, clef:'t', beat:5 },
+      { pitch:'A4', dur:1, clef:'t', beat:6 },
+      { pitch:'B4', dur:1, clef:'t', beat:7 },
+      { pitch:'D3', dur:1, clef:'b', beat:4 },
+      { pitch:'E3', dur:1, clef:'b', beat:5 },
+      { pitch:'F#3', dur:1, clef:'b', beat:6 },
+      { pitch:'G3', dur:1, clef:'b', beat:7 },
+
+      // Measure 3
+      { pitch:'C5', dur:1.5, clef:'t', beat:8 },
+      { pitch:'B4', dur:0.5, clef:'t', beat:9.5 },
+      { pitch:'A4', dur:1, clef:'t', beat:10 },
+      { pitch:'G4', dur:1, clef:'t', beat:11 },
+      { pitch:'A3', dur:1, clef:'b', beat:8 },
+      { pitch:'E3', dur:1, clef:'b', beat:9 },
+      { pitch:'F#3', dur:1, clef:'b', beat:10 },
+      { pitch:'E3', dur:1, clef:'b', beat:11 },
+
+      // Measure 4
+      { pitch:'F#4', dur:2, clef:'t', beat:12 },
+      { pitch:'E4', dur:1, clef:'t', beat:14 },
+      { pitch:'D4', dur:1, clef:'t', beat:15 },
+      { pitch:'D3', dur:2, clef:'b', beat:12 },
+      { pitch:'C#3', dur:1, clef:'b', beat:14 },
+      { pitch:'B2', dur:1, clef:'b', beat:15 },
+
+      // Measure 5
+      { pitch:'E4', dur:1, clef:'t', beat:16 },
+      { pitch:'F#4', dur:1, clef:'t', beat:17 },
+      { pitch:'G4', dur:1, clef:'t', beat:18 },
+      { pitch:'A4', dur:1, clef:'t', beat:19 },
+      { pitch:'A2', dur:1, clef:'b', beat:16 },
+      { pitch:'D3', dur:1, clef:'b', beat:17 },
+      { pitch:'E3', dur:1, clef:'b', beat:18 },
+      { pitch:'C#3', dur:1, clef:'b', beat:19 },
+
+      // Measure 6
+      { pitch:'B4', dur:1.5, clef:'t', beat:20 },
+      { pitch:'A4', dur:0.5, clef:'t', beat:21.5 },
+      { pitch:'G4', dur:0.5, clef:'t', beat:22 },
+      { pitch:'F#4', dur:0.5, clef:'t', beat:22.5 },
+      { pitch:'E4', dur:1, clef:'t', beat:23 },
+      { pitch:'D3', dur:1, clef:'b', beat:20 },
+      { pitch:'F#3', dur:1, clef:'b', beat:21 },
+      { pitch:'G3', dur:1, clef:'b', beat:22 },
+      { pitch:'A2', dur:1, clef:'b', beat:23 },
+
+      // Measure 7
+      { pitch:'D4', dur:1, clef:'t', beat:24 },
+      { pitch:'F#4', dur:1, clef:'t', beat:25 },
+      { pitch:'A4', dur:1, clef:'t', beat:26 },
+      { pitch:'F#4', dur:1, clef:'t', beat:27 },
+      { pitch:'B2', dur:1, clef:'b', beat:24 },
+      { pitch:'D3', dur:1, clef:'b', beat:25 },
+      { pitch:'F#3', dur:1, clef:'b', beat:26 },
+      { pitch:'D3', dur:1, clef:'b', beat:27 },
+
+      // Measure 8
+      { pitch:'B4', dur:2, clef:'t', beat:28 },
+      { pitch:'A4', dur:1, clef:'t', beat:30 },
+      { pitch:'B4', dur:1, clef:'t', beat:31 },
+      { pitch:'B2', dur:2, clef:'b', beat:28 },
+      { pitch:'F#2', dur:1, clef:'b', beat:30 },
+      { pitch:'B2', dur:1, clef:'b', beat:31 },
+    ],
+    measures: 8,
+    harmonies: [
+      { beat:0, text:'h-Moll, Tonika' },
+      { beat:4, text:'D-Dur, Tonikaparallele' },
+      { beat:8, text:'a-Moll, Subdominante' },
+      { beat:12, text:'D-Dur, Tonikaparallele' },
+      { beat:16, text:'A-Dur, Dominantparallele' },
+      { beat:20, text:'h-Moll, Tonika' },
+      { beat:24, text:'h-Moll, Tonika' },
+      { beat:28, text:'h-Moll, Tonika (Schluss)' },
+    ],
+    facts: [
+      '<strong>Wussten Sie?</strong> Helmuth Rilling nannte die h-Moll-Messe \u201edas gr\u00f6\u00dfte Kunstwerk, das je geschaffen wurde\u201c. Er widmete ihr \u00fcber 50 Jahre des Studiums.',
+      '<strong>Wussten Sie?</strong> Bach vollendete die h-Moll-Messe erst im letzten Lebensjahr 1749. Sie war nie f\u00fcr eine einzige Auff\u00fchrung bestimmt.',
+      '<strong>Wussten Sie?</strong> Rillings Einspielung der h-Moll-Messe mit dem Bach-Collegium Stuttgart gilt als eine der ma\u00dfgeblichen Interpretationen des 20. Jahrhunderts.',
+    ],
+  }
+};
+
+// ---- State ----
+let currentPiece = 'air';
+let isPlaying = false;
+let animationTimer = null;
+let tempoMultiplier = 1.0;
+let audioCtx = null;
+let reverbBuffer = null;
+let noteIndex = 0;
+let eduOpen = false;
+let sortedNotes = [];
+let noteElements = [];
+let barElements = [];
+
+// ---- DOM refs ----
+const svg = document.getElementById('scoreSvg');
+const progressFill = document.getElementById('progressFill');
+const tempoSlider = document.getElementById('tempoSlider');
+const tempoValue = document.getElementById('tempoValue');
+const eduPanel = document.getElementById('eduPanel');
+const harmonyText = document.getElementById('harmonyText');
+const eduFact = document.getElementById('eduFact');
+const btnReplay = document.getElementById('btnReplay');
+const btnEdu = document.getElementById('btnEdu');
+
+// ---- Audio ----
+function initAudio() {
+  if (audioCtx) return;
+  audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  createReverb();
+}
+
+function createReverb() {
+  // Procedural cathedral impulse response
+  const sampleRate = audioCtx.sampleRate;
+  const length = sampleRate * 3; // 3 second reverb tail
+  const impulse = audioCtx.createBuffer(2, length, sampleRate);
+  for (let ch = 0; ch < 2; ch++) {
+    const data = impulse.getChannelData(ch);
+    for (let i = 0; i < length; i++) {
+      // Exponential decay with diffusion
+      const t = i / sampleRate;
+      const decay = Math.exp(-t * 2.2);
+      const diffusion = (Math.random() * 2 - 1);
+      // Early reflections
+      const early = (i < sampleRate * 0.08) ? 0.4 : 0;
+      data[i] = (diffusion * decay + early * (Math.random() * 2 - 1)) * 0.35;
+    }
+  }
+  reverbBuffer = impulse;
+}
+
+function playNote(freq, duration, velocity = 0.15) {
+  if (!audioCtx) return;
+  if (audioCtx.state === 'suspended') audioCtx.resume();
+
+  const now = audioCtx.currentTime;
+  const dur = Math.min(duration, 4);
+
+  // Sine oscillator
+  const osc1 = audioCtx.createOscillator();
+  osc1.type = 'sine';
+  osc1.frequency.setValueAtTime(freq, now);
+
+  // Triangle oscillator (warmth)
+  const osc2 = audioCtx.createOscillator();
+  osc2.type = 'triangle';
+  osc2.frequency.setValueAtTime(freq, now);
+
+  // Gain envelope
+  const gainNode = audioCtx.createGain();
+  gainNode.gain.setValueAtTime(0, now);
+  gainNode.gain.linearRampToValueAtTime(velocity, now + 0.05);
+  gainNode.gain.setValueAtTime(velocity, now + dur * 0.6);
+  gainNode.gain.exponentialRampToValueAtTime(0.001, now + dur + 0.5);
+
+  // Mix oscillators
+  const mix = audioCtx.createGain();
+  mix.gain.setValueAtTime(1, now);
+
+  const osc1Gain = audioCtx.createGain();
+  osc1Gain.gain.setValueAtTime(0.6, now);
+  const osc2Gain = audioCtx.createGain();
+  osc2Gain.gain.setValueAtTime(0.4, now);
+
+  osc1.connect(osc1Gain);
+  osc2.connect(osc2Gain);
+  osc1Gain.connect(mix);
+  osc2Gain.connect(mix);
+  mix.connect(gainNode);
+
+  // Dry path
+  const dryGain = audioCtx.createGain();
+  dryGain.gain.setValueAtTime(0.7, now);
+  gainNode.connect(dryGain);
+  dryGain.connect(audioCtx.destination);
+
+  // Reverb path
+  if (reverbBuffer) {
+    const convolver = audioCtx.createConvolver();
+    convolver.buffer = reverbBuffer;
+    const wetGain = audioCtx.createGain();
+    wetGain.gain.setValueAtTime(0.3, now);
+    gainNode.connect(convolver);
+    convolver.connect(wetGain);
+    wetGain.connect(audioCtx.destination);
+  }
+
+  osc1.start(now);
+  osc2.start(now);
+  osc1.stop(now + dur + 1);
+  osc2.stop(now + dur + 1);
+}
+
+// ---- SVG Drawing ----
+function createSVGElement(tag, attrs) {
+  const el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+  for (const [k, v] of Object.entries(attrs)) {
+    el.setAttribute(k, v);
+  }
+  return el;
+}
+
+function drawStaff() {
+  // Clear
+  svg.innerHTML = '';
+
+  const piece = PIECES[currentPiece];
+
+  // Background subtle texture
+  const bg = createSVGElement('rect', {
+    x: 0, y: 0, width: 1060, height: 280,
+    fill: 'transparent'
+  });
+  svg.appendChild(bg);
+
+  // Treble staff lines
+  for (let i = 0; i < 5; i++) {
+    const y = STAFF_Y_TREBLE + i * LINE_SPACING;
+    // Slight organic waviness
+    const wave = `M ${STAFF_LEFT} ${y} Q ${STAFF_LEFT + STAFF_WIDTH*0.25} ${y + 0.3} ${STAFF_LEFT + STAFF_WIDTH*0.5} ${y - 0.2} Q ${STAFF_LEFT + STAFF_WIDTH*0.75} ${y + 0.4} ${STAFF_RIGHT} ${y}`;
+    const line = createSVGElement('path', {
+      d: wave,
+      stroke: STAFF_COLOR,
+      'stroke-width': '0.8',
+      fill: 'none',
+      opacity: '0.7'
+    });
+    svg.appendChild(line);
+  }
+
+  // Bass staff lines
+  for (let i = 0; i < 5; i++) {
+    const y = STAFF_Y_BASS + i * LINE_SPACING;
+    const wave = `M ${STAFF_LEFT} ${y} Q ${STAFF_LEFT + STAFF_WIDTH*0.25} ${y - 0.3} ${STAFF_LEFT + STAFF_WIDTH*0.5} ${y + 0.2} Q ${STAFF_LEFT + STAFF_WIDTH*0.75} ${y - 0.3} ${STAFF_RIGHT} ${y}`;
+    const line = createSVGElement('path', {
+      d: wave,
+      stroke: STAFF_COLOR,
+      'stroke-width': '0.8',
+      fill: 'none',
+      opacity: '0.7'
+    });
+    svg.appendChild(line);
+  }
+
+  // Brace (connecting treble and bass)
+  const braceTop = STAFF_Y_TREBLE;
+  const braceBottom = STAFF_Y_BASS + 4 * LINE_SPACING;
+  const braceMid = (braceTop + braceBottom) / 2;
+  const brace = createSVGElement('path', {
+    d: `M ${STAFF_LEFT - 5} ${braceTop} C ${STAFF_LEFT - 20} ${braceTop + 30} ${STAFF_LEFT - 25} ${braceMid - 20} ${STAFF_LEFT - 8} ${braceMid} C ${STAFF_LEFT - 25} ${braceMid + 20} ${STAFF_LEFT - 20} ${braceBottom - 30} ${STAFF_LEFT - 5} ${braceBottom}`,
+    stroke: CLEF_COLOR,
+    'stroke-width': '2',
+    fill: 'none',
+    opacity: '0.6'
+  });
+  svg.appendChild(brace);
+
+  // Treble clef (simplified decorative path)
+  const trebleClef = createSVGElement('text', {
+    x: STAFF_LEFT + 5,
+    y: STAFF_Y_TREBLE + 35,
+    'font-size': '52',
+    fill: CLEF_COLOR,
+    opacity: '0.7',
+    'font-family': 'serif',
+    style: 'user-select:none'
+  });
+  trebleClef.textContent = '\u{1D11E}';
+  svg.appendChild(trebleClef);
+
+  // Bass clef
+  const bassClef = createSVGElement('text', {
+    x: STAFF_LEFT + 5,
+    y: STAFF_Y_BASS + 28,
+    'font-size': '38',
+    fill: CLEF_COLOR,
+    opacity: '0.7',
+    'font-family': 'serif',
+    style: 'user-select:none'
+  });
+  bassClef.textContent = '\u{1D122}';
+  svg.appendChild(bassClef);
+
+  // Time signature
+  const ts = piece.timeSignature.split('/');
+  const tsX = STAFF_LEFT + 40;
+  // Treble
+  const tsTop1 = createSVGElement('text', {
+    x: tsX, y: STAFF_Y_TREBLE + 17,
+    'font-size': '18', fill: CLEF_COLOR, opacity: '0.6',
+    'font-family': 'var(--font-serif)', 'text-anchor': 'middle',
+    'font-weight': '600'
+  });
+  tsTop1.textContent = ts[0];
+  svg.appendChild(tsTop1);
+  const tsBot1 = createSVGElement('text', {
+    x: tsX, y: STAFF_Y_TREBLE + 37,
+    'font-size': '18', fill: CLEF_COLOR, opacity: '0.6',
+    'font-family': 'var(--font-serif)', 'text-anchor': 'middle',
+    'font-weight': '600'
+  });
+  tsBot1.textContent = ts[1];
+  svg.appendChild(tsBot1);
+  // Bass
+  const tsTop2 = createSVGElement('text', {
+    x: tsX, y: STAFF_Y_BASS + 17,
+    'font-size': '18', fill: CLEF_COLOR, opacity: '0.6',
+    'font-family': 'var(--font-serif)', 'text-anchor': 'middle',
+    'font-weight': '600'
+  });
+  tsTop2.textContent = ts[0];
+  svg.appendChild(tsTop2);
+  const tsBot2 = createSVGElement('text', {
+    x: tsX, y: STAFF_Y_BASS + 37,
+    'font-size': '18', fill: CLEF_COLOR, opacity: '0.6',
+    'font-family': 'var(--font-serif)', 'text-anchor': 'middle',
+    'font-weight': '600'
+  });
+  tsBot2.textContent = ts[1];
+  svg.appendChild(tsBot2);
+
+  // Key signature indicator
+  const keyText = createSVGElement('text', {
+    x: STAFF_LEFT + 55, y: STAFF_Y_TREBLE - 10,
+    'font-size': '11', fill: NOTE_GOLD, opacity: '0.4',
+    'font-family': 'var(--font-serif)', 'font-style': 'italic'
+  });
+  keyText.textContent = piece.key;
+  svg.appendChild(keyText);
+
+  // Draw bar lines and notes
+  drawBarLines(piece);
+  drawNotes(piece);
+}
+
+function drawBarLines(piece) {
+  barElements = [];
+  const beatsPerMeasure = parseInt(piece.timeSignature.split('/')[0]);
+  const totalBeats = piece.measures * beatsPerMeasure;
+  const noteAreaLeft = STAFF_LEFT + 60;
+  const noteAreaWidth = STAFF_RIGHT - noteAreaLeft - 10;
+
+  for (let m = 1; m <= piece.measures; m++) {
+    const beat = m * beatsPerMeasure;
+    const x = noteAreaLeft + (beat / totalBeats) * noteAreaWidth;
+
+    // Bar line spanning both staves
+    const barLine = createSVGElement('line', {
+      x1: x, y1: STAFF_Y_TREBLE,
+      x2: x, y2: STAFF_Y_BASS + 4 * LINE_SPACING,
+      stroke: STAFF_COLOR,
+      'stroke-width': m === piece.measures ? '2' : '0.8',
+      class: 'bar-line',
+      opacity: '0'
+    });
+    svg.appendChild(barLine);
+    barElements.push({ el: barLine, beat: beat });
+  }
+
+  // Initial bar line
+  const initBar = createSVGElement('line', {
+    x1: STAFF_LEFT + 58, y1: STAFF_Y_TREBLE,
+    x2: STAFF_LEFT + 58, y2: STAFF_Y_BASS + 4 * LINE_SPACING,
+    stroke: STAFF_COLOR,
+    'stroke-width': '1.2',
+    opacity: '0.5'
+  });
+  svg.appendChild(initBar);
+}
+
+function drawNotes(piece) {
+  noteElements = [];
+  const beatsPerMeasure = parseInt(piece.timeSignature.split('/')[0]);
+  const totalBeats = piece.measures * beatsPerMeasure;
+  const noteAreaLeft = STAFF_LEFT + 60;
+  const noteAreaWidth = STAFF_RIGHT - noteAreaLeft - 10;
+
+  // Sort notes by beat, then by clef (treble first)
+  sortedNotes = [...piece.notes].sort((a, b) => {
+    if (a.beat !== b.beat) return a.beat - b.beat;
+    return a.clef === 't' ? -1 : 1;
+  });
+
+  sortedNotes.forEach((note, idx) => {
+    const x = noteAreaLeft + (note.beat / totalBeats) * noteAreaWidth;
+    const y = pitchToY(note.pitch);
+
+    const group = createSVGElement('g', {
+      class: 'note-group',
+      'data-idx': idx,
+      'data-pitch': note.pitch,
+      'data-freq': pitchToFreq(note.pitch),
+      'data-dur': note.dur,
+      'data-beat': note.beat
+    });
+
+    // Ledger lines if needed
+    const trebleBottom = STAFF_Y_TREBLE + 4 * LINE_SPACING;
+    const trebleTop = STAFF_Y_TREBLE;
+    const bassBottom = STAFF_Y_BASS + 4 * LINE_SPACING;
+    const bassTop = STAFF_Y_BASS;
+    const middleC_Y = trebleBottom + LINE_SPACING; // C4
+
+    if (note.clef === 't') {
+      // Below treble staff
+      if (y > trebleBottom) {
+        for (let ly = trebleBottom + LINE_SPACING; ly <= y + 2; ly += LINE_SPACING) {
+          const ledger = createSVGElement('line', {
+            x1: x - 8, y1: ly, x2: x + 8, y2: ly,
+            stroke: STAFF_COLOR, 'stroke-width': '0.7', opacity: '0.5'
+          });
+          group.appendChild(ledger);
+        }
+      }
+      // Above treble staff
+      if (y < trebleTop) {
+        for (let ly = trebleTop - LINE_SPACING; ly >= y - 2; ly -= LINE_SPACING) {
+          const ledger = createSVGElement('line', {
+            x1: x - 8, y1: ly, x2: x + 8, y2: ly,
+            stroke: STAFF_COLOR, 'stroke-width': '0.7', opacity: '0.5'
+          });
+          group.appendChild(ledger);
+        }
+      }
+    }
+
+    // Note head — ellipse with slight rotation for hand-drawn feel
+    const isHalf = note.dur >= 2;
+    const isWhole = note.dur >= 4;
+    const noteHead = createSVGElement('ellipse', {
+      cx: x, cy: y,
+      rx: isWhole ? 6 : 5,
+      ry: isWhole ? 4 : 3.5,
+      fill: isHalf || isWhole ? 'none' : NOTE_GOLD,
+      stroke: NOTE_GOLD,
+      'stroke-width': isHalf ? '1.2' : (isWhole ? '1.2' : '0'),
+      transform: `rotate(-8, ${x}, ${y})`,
+      class: 'note-head'
+    });
+    group.appendChild(noteHead);
+
+    // Stem (not for whole notes)
+    if (!isWhole) {
+      const stemUp = y > (note.clef === 't' ? STAFF_Y_TREBLE + 2 * LINE_SPACING : STAFF_Y_BASS + 2 * LINE_SPACING);
+      const stemX = stemUp ? x + 4.5 : x - 4.5;
+      const stemY1 = y + (stemUp ? -1 : 1);
+      const stemY2 = y + (stemUp ? -28 : 28);
+      const stem = createSVGElement('line', {
+        x1: stemX, y1: stemY1,
+        x2: stemX, y2: stemY2,
+        stroke: NOTE_GOLD,
+        'stroke-width': '1',
+        class: 'note-stem',
+        opacity: '0.85'
+      });
+      group.appendChild(stem);
+
+      // Flag for eighth notes
+      if (note.dur <= 0.5) {
+        const flagDir = stemUp ? 1 : -1;
+        const fx = stemX;
+        const fy = stemY2;
+        const flag = createSVGElement('path', {
+          d: stemUp
+            ? `M ${fx} ${fy} C ${fx + 6} ${fy + 8} ${fx + 4} ${fy + 14} ${fx + 1} ${fy + 18}`
+            : `M ${fx} ${fy} C ${fx - 6} ${fy - 8} ${fx - 4} ${fy - 14} ${fx - 1} ${fy - 18}`,
+          stroke: NOTE_GOLD,
+          'stroke-width': '1',
+          fill: 'none',
+          opacity: '0.8',
+          class: 'note-stem'
+        });
+        group.appendChild(flag);
+      }
+    }
+
+    // Dot for dotted notes
+    if (note.dur === 1.5 || note.dur === 0.75) {
+      const dot = createSVGElement('circle', {
+        cx: x + 8, cy: y, r: 1.5,
+        fill: NOTE_GOLD, opacity: '0.8'
+      });
+      group.appendChild(dot);
+    }
+
+    // Hover interaction
+    group.addEventListener('mouseenter', () => {
+      initAudio();
+      const freq = pitchToFreq(note.pitch);
+      playNote(freq, 0.8, 0.12);
+    });
+
+    svg.appendChild(group);
+    noteElements.push({ el: group, note: note, idx: idx });
+  });
+}
+
+// ---- Animation ----
+function startAnimation() {
+  initAudio();
+  stopAnimation();
+  isPlaying = true;
+
+  // Reset all notes and bars
+  noteElements.forEach(n => n.el.classList.remove('visible'));
+  barElements.forEach(b => b.el.classList.remove('visible'));
+  progressFill.style.width = '0%';
+
+  const piece = PIECES[currentPiece];
+  const beatsPerMeasure = parseInt(piece.timeSignature.split('/')[0]);
+  const totalBeats = piece.measures * beatsPerMeasure;
+  // Target ~30 seconds for full animation
+  const msPerBeat = (30000 / totalBeats) / tempoMultiplier;
+
+  // Group notes by approximate beat for simultaneous reveal
+  let currentBeatGroup = -1;
+  let beatGroups = [];
+
+  sortedNotes.forEach((note, idx) => {
+    const beat = note.beat;
+    if (beatGroups.length === 0 || Math.abs(beat - beatGroups[beatGroups.length - 1].beat) > 0.05) {
+      beatGroups.push({ beat: beat, indices: [idx] });
+    } else {
+      beatGroups[beatGroups.length - 1].indices.push(idx);
+    }
+  });
+
+  let groupIdx = 0;
+  let factIdx = 0;
+
+  function animateNext() {
+    if (groupIdx >= beatGroups.length) {
+      isPlaying = false;
+      progressFill.style.width = '100%';
+      return;
+    }
+
+    const group = beatGroups[groupIdx];
+    const progress = group.beat / totalBeats;
+    progressFill.style.width = (progress * 100) + '%';
+
+    // Show bar lines up to this beat
+    barElements.forEach(b => {
+      if (b.beat <= group.beat + beatsPerMeasure && !b.el.classList.contains('visible')) {
+        b.el.classList.add('visible');
+      }
+    });
+
+    // Show notes in this beat group
+    group.indices.forEach(idx => {
+      const ne = noteElements[idx];
+      if (ne) {
+        ne.el.classList.add('visible');
+        // Play audio
+        const freq = pitchToFreq(ne.note.pitch);
+        const dur = ne.note.dur * (msPerBeat / 1000);
+        const vel = ne.note.clef === 't' ? 0.12 : 0.08;
+        playNote(freq, dur, vel);
+      }
+    });
+
+    // Update educational panel
+    if (eduOpen) {
+      updateEdu(group.beat);
+    }
+
+    groupIdx++;
+
+    // Calculate delay to next group
+    if (groupIdx < beatGroups.length) {
+      const nextBeat = beatGroups[groupIdx].beat;
+      const beatDiff = nextBeat - group.beat;
+      const delay = beatDiff * msPerBeat;
+      animationTimer = setTimeout(animateNext, Math.max(delay, 50));
+    } else {
+      // Final delay
+      animationTimer = setTimeout(() => {
+        isPlaying = false;
+        progressFill.style.width = '100%';
+      }, 500);
+    }
+  }
+
+  // Small initial delay
+  animationTimer = setTimeout(animateNext, 400);
+}
+
+function stopAnimation() {
+  if (animationTimer) {
+    clearTimeout(animationTimer);
+    animationTimer = null;
+  }
+  isPlaying = false;
+}
+
+function updateEdu(currentBeat) {
+  const piece = PIECES[currentPiece];
+
+  // Find current harmony
+  let harmony = piece.harmonies[0];
+  for (const h of piece.harmonies) {
+    if (h.beat <= currentBeat) harmony = h;
+    else break;
+  }
+  harmonyText.textContent = harmony.text;
+
+  // Rotate facts based on measure
+  const beatsPerMeasure = parseInt(piece.timeSignature.split('/')[0]);
+  const measure = Math.floor(currentBeat / beatsPerMeasure);
+  const factIndex = Math.floor(measure / 3) % piece.facts.length;
+  eduFact.innerHTML = piece.facts[factIndex];
+}
+
+// ---- Event Handlers ----
+document.querySelectorAll('.piece-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.piece-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPiece = btn.dataset.piece;
+    stopAnimation();
+    drawStaff();
+    // Update edu panel
+    const piece = PIECES[currentPiece];
+    harmonyText.textContent = piece.harmonies[0].text;
+    eduFact.innerHTML = piece.facts[0];
+    // Auto-play on piece change
+    setTimeout(() => startAnimation(), 300);
+  });
+});
+
+btnReplay.addEventListener('click', () => {
+  startAnimation();
+});
+
+tempoSlider.addEventListener('input', () => {
+  tempoMultiplier = parseFloat(tempoSlider.value);
+  tempoValue.textContent = tempoMultiplier.toFixed(1) + 'x';
+});
+
+btnEdu.addEventListener('click', () => {
+  eduOpen = !eduOpen;
+  btnEdu.classList.toggle('active', eduOpen);
+  eduPanel.classList.toggle('open', eduOpen);
+});
+
+// ---- Initialize ----
+drawStaff();
+const piece = PIECES[currentPiece];
+harmonyText.textContent = piece.harmonies[0].text;
+eduFact.innerHTML = piece.facts[0];
+
+// Auto-play after a brief delay
+setTimeout(() => startAnimation(), 800);
+
+})();
+</script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

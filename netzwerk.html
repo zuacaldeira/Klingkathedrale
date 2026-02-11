@@ -1,0 +1,1689 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rillings Erben — Klangkathedrale</title>
+<meta name="description" content="Rillings pädagogisches Netzwerk — Ein interaktiver Stammbaum seiner Dirigenten-Schüler">
+<meta name="theme-color" content="#C9A84C">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;0,6..96,900;1,6..96,400;1,6..96,700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=EB+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<link rel="manifest" href="manifest.json">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-rose: #D4725C;
+  --color-sage: #6B9080;
+  --color-amethyst: #8B7EC8;
+  --color-amber: #C8956E;
+  --color-steel: #7BA0B8;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+  --font-serif: 'EB Garamond', serif;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  line-height: 1.7;
+  overflow: hidden;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══ HEADER ═══ */
+header {
+  padding: 1rem 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(to bottom, rgba(26,20,16,0.98), rgba(26,20,16,0.85));
+  border-bottom: 1px solid rgba(201,168,76,0.15);
+  flex-shrink: 0;
+  z-index: 100;
+}
+
+.back-link {
+  color: rgba(245,240,232,0.6);
+  text-decoration: none;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  letter-spacing: 0.05em;
+  transition: color 0.3s;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.back-link:hover { color: var(--color-gold); }
+.back-link .arrow {
+  font-size: 1.2rem;
+  transition: transform 0.3s;
+}
+.back-link:hover .arrow { transform: translateX(-3px); }
+
+.page-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 2.5vw, 1.8rem);
+  color: var(--color-gold);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-align: center;
+  flex: 1;
+}
+.page-subtitle {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.4);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  display: block;
+  margin-top: 0.15rem;
+}
+
+.header-spacer { width: 140px; }
+
+/* ═══ CONTROLS BAR ═══ */
+.controls-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.7rem 1.5rem;
+  background: rgba(26,20,16,0.95);
+  border-bottom: 1px solid rgba(201,168,76,0.1);
+  flex-shrink: 0;
+  z-index: 90;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.search-container {
+  position: relative;
+  flex: 0 1 260px;
+  min-width: 180px;
+}
+.search-container input {
+  width: 100%;
+  background: rgba(201,168,76,0.06);
+  border: 1px solid rgba(201,168,76,0.2);
+  color: var(--color-ivory);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  padding: 0.45rem 0.8rem 0.45rem 2.2rem;
+  border-radius: 2px;
+  outline: none;
+  transition: border-color 0.3s;
+}
+.search-container input::placeholder {
+  color: rgba(245,240,232,0.3);
+  font-style: italic;
+}
+.search-container input:focus {
+  border-color: var(--color-gold);
+}
+.search-icon {
+  position: absolute;
+  left: 0.7rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: rgba(201,168,76,0.4);
+  font-size: 0.9rem;
+  pointer-events: none;
+}
+
+.divider-v {
+  width: 1px;
+  height: 24px;
+  background: rgba(201,168,76,0.15);
+}
+
+.filter-group {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.filter-label {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: rgba(245,240,232,0.35);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  margin-right: 0.3rem;
+}
+
+.filter-btn, .mode-btn {
+  background: rgba(201,168,76,0.06);
+  border: 1px solid rgba(201,168,76,0.2);
+  color: rgba(245,240,232,0.5);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  padding: 0.3rem 0.7rem;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.25s ease;
+  white-space: nowrap;
+}
+.filter-btn:hover, .mode-btn:hover {
+  border-color: rgba(201,168,76,0.5);
+  color: rgba(245,240,232,0.8);
+}
+.filter-btn.active {
+  background: rgba(201,168,76,0.18);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+.mode-btn.active {
+  background: rgba(201,168,76,0.18);
+  border-color: var(--color-gold);
+  color: var(--color-gold);
+}
+
+/* ═══ GRAPH CONTAINER ═══ */
+.graph-container {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+}
+
+svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* Background cathedral glow */
+.graph-container::before {
+  content: '';
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 60%;
+  height: 60%;
+  background: radial-gradient(ellipse at center, rgba(201,168,76,0.04) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ═══ NODE STYLES (SVG) ═══ */
+.node-person { cursor: pointer; }
+.node-person circle {
+  stroke-width: 2;
+  transition: stroke-width 0.2s;
+}
+.node-person:hover circle {
+  stroke-width: 3.5;
+  filter: brightness(1.2);
+}
+
+.node-institution { cursor: pointer; }
+.node-institution rect {
+  stroke-width: 1.5;
+  rx: 3;
+  ry: 3;
+}
+.node-institution:hover rect {
+  stroke-width: 2.5;
+  filter: brightness(1.2);
+}
+
+.node-label {
+  font-family: 'Cormorant Garamond', serif;
+  fill: rgba(245,240,232,0.7);
+  pointer-events: none;
+  text-anchor: middle;
+}
+
+.link {
+  stroke-linecap: round;
+}
+
+/* Rilling pulse animation */
+@keyframes pulse-glow {
+  0%, 100% { r: 28; opacity: 1; }
+  50% { r: 32; opacity: 0.85; }
+}
+.rilling-pulse {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+@keyframes pulse-ring {
+  0% { r: 30; opacity: 0.4; }
+  100% { r: 55; opacity: 0; }
+}
+.rilling-ring {
+  animation: pulse-ring 3s ease-out infinite;
+}
+
+/* ═══ DETAIL CARD ═══ */
+.detail-card {
+  position: absolute;
+  z-index: 200;
+  background: rgba(26,20,16,0.97);
+  border: 1px solid rgba(201,168,76,0.3);
+  border-radius: 3px;
+  padding: 1.4rem 1.6rem;
+  max-width: 340px;
+  min-width: 260px;
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.3s, transform 0.3s;
+  box-shadow: 0 12px 40px rgba(0,0,0,0.5);
+}
+.detail-card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.detail-card .card-close {
+  position: absolute;
+  top: 0.6rem;
+  right: 0.8rem;
+  background: none;
+  border: none;
+  color: rgba(245,240,232,0.4);
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+.detail-card .card-close:hover { color: var(--color-gold); }
+.detail-card .card-name {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--color-gold);
+  margin-bottom: 0.2rem;
+  padding-right: 1.5rem;
+}
+.detail-card .card-position {
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  color: rgba(245,240,232,0.7);
+  font-style: italic;
+  margin-bottom: 0.6rem;
+}
+.detail-card .card-divider {
+  width: 40px;
+  height: 1px;
+  background: rgba(201,168,76,0.3);
+  margin: 0.6rem 0;
+}
+.detail-card .card-bio {
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: rgba(245,240,232,0.6);
+  line-height: 1.6;
+  margin-bottom: 0.5rem;
+}
+.detail-card .card-connection {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--color-amber);
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.detail-card .card-institution {
+  font-family: var(--font-body);
+  font-size: 0.82rem;
+  color: var(--color-sage);
+  margin-top: 0.2rem;
+}
+
+/* ═══ LEGEND ═══ */
+.legend {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 1.2rem;
+  z-index: 80;
+  background: rgba(26,20,16,0.9);
+  border: 1px solid rgba(201,168,76,0.15);
+  border-radius: 3px;
+  padding: 0.8rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+}
+.legend-title {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  color: var(--color-gold);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.3rem;
+  color: rgba(245,240,232,0.55);
+}
+.legend-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.legend-rect {
+  width: 14px;
+  height: 9px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ═══ TOOLTIP ═══ */
+.tooltip {
+  position: absolute;
+  z-index: 150;
+  background: rgba(26,20,16,0.95);
+  border: 1px solid rgba(201,168,76,0.25);
+  border-radius: 2px;
+  padding: 0.4rem 0.7rem;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  color: var(--color-ivory);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+  white-space: nowrap;
+}
+.tooltip.visible { opacity: 1; }
+
+/* ═══ NODE COUNT BADGE ═══ */
+.node-count {
+  position: absolute;
+  bottom: 1.2rem;
+  right: 1.2rem;
+  z-index: 80;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: rgba(245,240,232,0.3);
+  letter-spacing: 0.1em;
+}
+
+/* ═══ MOBILE ═══ */
+@media (max-width: 768px) {
+  header { padding: 0.8rem 1rem; }
+  .page-title { font-size: 1rem; letter-spacing: 0.08em; }
+  .page-subtitle { font-size: 0.65rem; }
+  .header-spacer { width: 60px; }
+  .back-link { font-size: 0.85rem; }
+
+  .controls-bar {
+    padding: 0.5rem 0.8rem;
+    gap: 0.5rem;
+  }
+  .search-container { flex: 1 1 100%; min-width: unset; }
+  .divider-v { display: none; }
+  .filter-label { display: none; }
+
+  .legend {
+    bottom: 0.6rem;
+    left: 0.6rem;
+    padding: 0.5rem 0.7rem;
+    font-size: 0.7rem;
+  }
+
+  .detail-card {
+    left: 5% !important;
+    right: 5% !important;
+    top: auto !important;
+    bottom: 60px !important;
+    max-width: none;
+    min-width: unset;
+  }
+
+  .node-count { bottom: 0.6rem; right: 0.6rem; font-size: 0.7rem; }
+}
+
+@media (max-width: 480px) {
+  .filter-btn, .mode-btn {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ HEADER ═══ -->
+<header>
+  <a href="klangkathedrale.html" class="back-link">
+    <span class="arrow">&#8592;</span> Klangkathedrale
+  </a>
+  <div class="page-title">
+    Rillings Erben
+    <span class="page-subtitle">Das p&auml;dagogische Netzwerk</span>
+  </div>
+  <div class="header-spacer"></div>
+</header>
+
+<!-- ═══ CONTROLS ═══ -->
+<div class="controls-bar">
+  <div class="search-container">
+    <span class="search-icon">&#9906;</span>
+    <input type="text" id="search-input" placeholder="Dirigent suchen..." autocomplete="off">
+  </div>
+
+  <div class="divider-v"></div>
+
+  <div class="filter-group">
+    <span class="filter-label">Institution</span>
+    <button class="filter-btn active" data-filter="all">Alle</button>
+    <button class="filter-btn" data-filter="stuttgart">Stuttgart</button>
+    <button class="filter-btn" data-filter="frankfurt">Frankfurt</button>
+    <button class="filter-btn" data-filter="oregon">Oregon</button>
+  </div>
+
+  <div class="divider-v"></div>
+
+  <div class="filter-group">
+    <span class="filter-label">Ansicht</span>
+    <button class="mode-btn active" data-mode="force" title="Kraft-Simulation">Netzwerk</button>
+    <button class="mode-btn" data-mode="geography" title="Geographische Anordnung">Geographie</button>
+    <button class="mode-btn" data-mode="timeline" title="Zeitliche Anordnung">Chronologie</button>
+  </div>
+</div>
+
+<!-- ═══ GRAPH ═══ -->
+<div class="graph-container" id="graph-container">
+  <svg id="network-svg"></svg>
+
+  <!-- Tooltip -->
+  <div class="tooltip" id="tooltip"></div>
+
+  <!-- Detail Card -->
+  <div class="detail-card" id="detail-card">
+    <button class="card-close" id="card-close">&times;</button>
+    <div class="card-name" id="card-name"></div>
+    <div class="card-position" id="card-position"></div>
+    <div class="card-divider"></div>
+    <div class="card-bio" id="card-bio"></div>
+    <div class="card-connection" id="card-connection"></div>
+    <div class="card-institution" id="card-institution"></div>
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-title">Legende</div>
+    <div class="legend-item"><span class="legend-circle" style="background:#C9A84C;"></span> Helmuth Rilling</div>
+    <div class="legend-item"><span class="legend-circle" style="background:#D4725C;"></span> Direkte Sch&uuml;ler</div>
+    <div class="legend-item"><span class="legend-circle" style="background:#7BA0B8;"></span> Zweite Generation</div>
+    <div class="legend-item"><span class="legend-rect" style="background:rgba(107,144,128,0.5); border:1px solid #6B9080;"></span> Institutionen</div>
+  </div>
+
+  <!-- Node count -->
+  <div class="node-count" id="node-count"></div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════════
+// DATA: Rillings pädagogisches Netzwerk
+// ═══════════════════════════════════════════════
+
+const nodes = [
+  // ─── RILLING (Zentrum) ───
+  {
+    id: "rilling",
+    name: "Helmuth Rilling",
+    type: "person",
+    tier: 0,
+    position: "Gr\u00fcnder & Leiter, Internationale Bachakademie Stuttgart",
+    city: "Stuttgart",
+    country: "Deutschland",
+    geoX: 0.50, geoY: 0.45,
+    yearStart: 1954,
+    institutions: ["stuttgart", "frankfurt", "oregon"],
+    bio: "Einer der bedeutendsten Bach-Interpreten des 20. Jahrhunderts. Gr\u00fcnder der G\u00e4chinger Kantorei (1954), des Bach-Collegium Stuttgart (1965) und der Internationalen Bachakademie Stuttgart (1981). Leitete das Oregon Bach Festival von 1970 bis 2013.",
+    connection: ""
+  },
+
+  // ─── DIREKTE SCHÜLER (Tier 1) ───
+  {
+    id: "rademann",
+    name: "Hans-Christoph Rademann",
+    type: "person",
+    tier: 1,
+    position: "Leiter, Dresdner Kammerchor; ehem. RIAS Kammerchor",
+    city: "Dresden",
+    country: "Deutschland",
+    geoX: 0.55, geoY: 0.40,
+    yearStart: 1985,
+    institutions: ["stuttgart"],
+    bio: "Einer der f\u00fchrenden Chordirigenten Deutschlands. Leitet den Dresdner Kammerchor seit 1985 und brachte Heinrich-Sch\u00fctz-Gesamtaufnahmen heraus. Studierte bei Rilling an der Bachakademie.",
+    connection: "Studium an der Bachakademie Stuttgart, sp\u00e4ter Meisterkurse bei Rilling"
+  },
+  {
+    id: "manasi",
+    name: "Matthias Manasi",
+    type: "person",
+    tier: 1,
+    position: "Chefdirigent, Orchestra Sinfonica di Roma",
+    city: "Rom",
+    country: "Italien",
+    geoX: 0.52, geoY: 0.60,
+    yearStart: 1990,
+    institutions: ["stuttgart", "frankfurt"],
+    bio: "International t\u00e4tiger Dirigent mit Schwerpunkt auf sinfonischem Repertoire. Studierte bei Rilling in Stuttgart und Frankfurt. Chefdirigent der Orchestra Sinfonica di Roma.",
+    connection: "Dirigierstudium bei Rilling in Stuttgart und Frankfurt"
+  },
+  {
+    id: "friedrich",
+    name: "Eberhard Friedrich",
+    type: "person",
+    tier: 1,
+    position: "Chordirektor, Bayreuther Festspiele",
+    city: "Bayreuth",
+    country: "Deutschland",
+    geoX: 0.52, geoY: 0.42,
+    yearStart: 1982,
+    institutions: ["stuttgart"],
+    bio: "Seit 2000 Chordirektor der Bayreuther Festspiele. Pr\u00e4gte den Klang des Festspielchores ma\u00dfgeblich. Lernte sein Handwerk unter Rillings Leitung.",
+    connection: "Assistent bei der G\u00e4chinger Kantorei, sp\u00e4ter Bachakademie-Stipendiat"
+  },
+  {
+    id: "bernius",
+    name: "Frieder Bernius",
+    type: "person",
+    tier: 1,
+    position: "Gr\u00fcnder, Kammerchor Stuttgart",
+    city: "Stuttgart",
+    country: "Deutschland",
+    geoX: 0.49, geoY: 0.45,
+    yearStart: 1974,
+    institutions: ["stuttgart"],
+    bio: "Gr\u00fcndete 1968 den Kammerchor Stuttgart. Bedeutender Interpret fr\u00fchromantischer Chormusik. Sein Weg wurde durch Rillings Stuttgarter Chorkultur gepr\u00e4gt.",
+    connection: "Studium in Stuttgart, inspiriert von Rillings Chor-Philosophie"
+  },
+  {
+    id: "dijkstra",
+    name: "Peter Dijkstra",
+    type: "person",
+    tier: 1,
+    position: "Chefdirigent, Nederlands Kamerkoor; ehem. Chor des BR",
+    city: "M\u00fcnchen / Utrecht",
+    country: "Deutschland / Niederlande",
+    geoX: 0.47, geoY: 0.42,
+    yearStart: 1998,
+    institutions: ["stuttgart"],
+    bio: "Niederl\u00e4ndischer Dirigent, der den Chor des Bayerischen Rundfunks von 2005 bis 2016 leitete. Bachakademie-Absolvent, bekannt f\u00fcr transparenten Chorklang.",
+    connection: "Stipendiat der Internationalen Bachakademie Stuttgart"
+  },
+  {
+    id: "beringer",
+    name: "Karl-Friedrich Beringer",
+    type: "person",
+    tier: 1,
+    position: "Leiter, Windsbacher Knabenchor",
+    city: "Windsbach",
+    country: "Deutschland",
+    geoX: 0.51, geoY: 0.43,
+    yearStart: 1978,
+    institutions: ["stuttgart"],
+    bio: "Leitete den Windsbacher Knabenchor von 1978 bis 2011 und machte ihn zu einem der f\u00fchrenden Knabench\u00f6re Deutschlands. Rillings Einfluss pr\u00e4gte seinen Bach-Stil.",
+    connection: "Bachakademie-Kurse und enger Austausch mit Rilling"
+  },
+  {
+    id: "suzuki",
+    name: "Masaaki Suzuki",
+    type: "person",
+    tier: 1,
+    position: "Gr\u00fcnder, Bach Collegium Japan",
+    city: "Tokio / New Haven",
+    country: "Japan / USA",
+    geoX: 0.88, geoY: 0.38,
+    yearStart: 1977,
+    institutions: ["stuttgart", "frankfurt"],
+    bio: "Gr\u00fcndete 1990 das Bach Collegium Japan. Vollendete eine gefeierte Gesamtaufnahme der Bach-Kantaten. Studierte Cembalo und Kirchenmusik in Deutschland, beeinflusst von Rilling.",
+    connection: "Studium an der Hochschule Frankfurt, Meisterkurse bei Rilling"
+  },
+  {
+    id: "hengelbrock",
+    name: "Thomas Hengelbrock",
+    type: "person",
+    tier: 1,
+    position: "ehem. Chefdirigent, NDR Elbphilharmonie Orchester",
+    city: "Hamburg / Freiburg",
+    country: "Deutschland",
+    geoX: 0.48, geoY: 0.39,
+    yearStart: 1980,
+    institutions: ["frankfurt"],
+    bio: "Gr\u00fcndete die Balthasar-Neumann-Ensembles. Von 2011 bis 2018 Chefdirigent des NDR Elbphilharmonie Orchesters. Verbindet historische Auff\u00fchrungspraxis mit moderner Orchesterkultur.",
+    connection: "Studium an der Hochschule f\u00fcr Musik Frankfurt"
+  },
+  {
+    id: "gardiner_j",
+    name: "Helmut M\u00fcller-Br\u00fchl",
+    type: "person",
+    tier: 1,
+    position: "Leiter, K\u00f6lner Kammerorchester",
+    city: "K\u00f6ln",
+    country: "Deutschland",
+    geoX: 0.46, geoY: 0.42,
+    yearStart: 1970,
+    institutions: ["stuttgart"],
+    bio: "Leitete das K\u00f6lner Kammerorchester \u00fcber Jahrzehnte und spielte zahlreiche Bach-Aufnahmen f\u00fcr Naxos ein. Von Rillings analytischem Bach-Zugang beeinflusst.",
+    connection: "Fr\u00fcher Kontakt \u00fcber Stuttgarter Bach-Kreise"
+  },
+  {
+    id: "nelson",
+    name: "John Nelson",
+    type: "person",
+    tier: 1,
+    position: "Dirigent, Ensemble Orchestral de Paris; Soli Deo Gloria",
+    city: "Paris / Chicago",
+    country: "Frankreich / USA",
+    geoX: 0.22, geoY: 0.42,
+    yearStart: 1976,
+    institutions: ["oregon"],
+    bio: "Amerikanischer Dirigent mit Schwerpunkt auf franz\u00f6sischer und sakraler Musik. Seine Berlioz-Aufnahmen sind referenzw\u00fcrdig. Langjahrige Verbindung zum Oregon Bach Festival.",
+    connection: "Gastdirigent und Dozent beim Oregon Bach Festival"
+  },
+  {
+    id: "slatkin",
+    name: "Matthew Halls",
+    type: "person",
+    tier: 1,
+    position: "K\u00fcnstlerischer Leiter, Oregon Bach Festival (2013\u20132017)",
+    city: "Portland / Oxford",
+    country: "USA / Gro\u00dfbritannien",
+    geoX: 0.12, geoY: 0.38,
+    yearStart: 2000,
+    institutions: ["oregon"],
+    bio: "Britischer Dirigent und Cembalist. Wurde 2013 als Rillings Nachfolger am Oregon Bach Festival berufen. Spezialist f\u00fcr Barockmusik.",
+    connection: "Nachfolger Rillings als K\u00fcnstlerischer Leiter des Oregon Bach Festival"
+  },
+  {
+    id: "lutz",
+    name: "Rudolf Lutz",
+    type: "person",
+    tier: 1,
+    position: "K\u00fcnstlerischer Leiter, J.S. Bach-Stiftung St. Gallen",
+    city: "St. Gallen",
+    country: "Schweiz",
+    geoX: 0.48, geoY: 0.48,
+    yearStart: 1988,
+    institutions: ["stuttgart"],
+    bio: "Leitet das ambitionierte Projekt, alle Bach-Kantaten aufzuf\u00fchren und auf Video zu dokumentieren. Organist und Dirigent, gepr\u00e4gt von der Bachakademie-Tradition.",
+    connection: "Bachakademie-Absolvent, Rillings Bach-Philosophie als Fundament"
+  },
+  {
+    id: "winnen",
+    name: "J\u00f6rg-Hannes Hahn",
+    type: "person",
+    tier: 1,
+    position: "Kirchenmusikdirektor, Marktkirche Hannover",
+    city: "Hannover",
+    country: "Deutschland",
+    geoX: 0.49, geoY: 0.40,
+    yearStart: 1992,
+    institutions: ["stuttgart", "frankfurt"],
+    bio: "Bedeutender Kirchenmusiker, der regelm\u00e4\u00dfig gro\u00dfe Oratorien auff\u00fchrt. Studierte sowohl in Stuttgart als auch in Frankfurt bei Rilling.",
+    connection: "Kirchenmusikstudium in Stuttgart, Dirigierklasse Frankfurt"
+  },
+  {
+    id: "chen",
+    name: "Tsung Yeh",
+    type: "person",
+    tier: 1,
+    position: "ehem. Music Director, South Bend Symphony",
+    city: "South Bend, Indiana",
+    country: "USA",
+    geoX: 0.20, geoY: 0.40,
+    yearStart: 1986,
+    institutions: ["oregon"],
+    bio: "In Taiwan geborener Dirigent, der mehrere US-amerikanische Orchester leitete. Fellow des Oregon Bach Festival, wo er unter Rillings Mentorship reifte.",
+    connection: "Oregon Bach Festival Conducting Fellow"
+  },
+  {
+    id: "risto",
+    name: "Risto Joost",
+    type: "person",
+    tier: 1,
+    position: "Chefdirigent, Estnische Nationaloper",
+    city: "Tallinn",
+    country: "Estland",
+    geoX: 0.60, geoY: 0.32,
+    yearStart: 2002,
+    institutions: ["stuttgart"],
+    bio: "Estnischer Dirigent, bekannt f\u00fcr die Verbindung baltischer Chortradition mit der deutschen Bach-Pflege. Bachakademie-Stipendiat.",
+    connection: "Stipendiat der Internationalen Bachakademie Stuttgart"
+  },
+  {
+    id: "lacerda",
+    name: "Naomi Munakata",
+    type: "person",
+    tier: 1,
+    position: "Gr\u00fcnderin, Coral Paulistano \u2020",
+    city: "S\u00e3o Paulo",
+    country: "Brasilien",
+    geoX: 0.32, geoY: 0.78,
+    yearStart: 1994,
+    institutions: ["stuttgart"],
+    bio: "Brasilianische Chordirigentin, die die Bach-Pflege in S\u00fcdamerika entscheidend vorantrieb. Gr\u00fcndete den Coral Paulistano. Bachakademie-Absolventin.",
+    connection: "Bachakademie-Meisterkurse, brachte Rillings Methode nach Brasilien"
+  },
+  {
+    id: "scheibner",
+    name: "Alexander Scheibner",
+    type: "person",
+    tier: 1,
+    position: "Kirchenmusikdirektor, Esslingen",
+    city: "Esslingen",
+    country: "Deutschland",
+    geoX: 0.50, geoY: 0.46,
+    yearStart: 1996,
+    institutions: ["stuttgart"],
+    bio: "Kirchenmusiker in der Region Stuttgart, der Rillings Erbe in der liturgischen Praxis weitertr\u00e4gt. Absolvent der Bachakademie.",
+    connection: "Bachakademie-Studium, Assistent bei G\u00e4chinger Kantorei"
+  },
+
+  // ─── ZWEITE GENERATION (Tier 2) ───
+  {
+    id: "johannsen",
+    name: "Kay Johannsen",
+    type: "person",
+    tier: 2,
+    position: "Stiftskantor, Stiftskirche Stuttgart",
+    city: "Stuttgart",
+    country: "Deutschland",
+    geoX: 0.50, geoY: 0.46,
+    yearStart: 2005,
+    institutions: ["stuttgart"],
+    bio: "Stiftskantor in Stuttgart, f\u00fchrt die Bach-Tradition in der liturgischen Praxis fort. Studierte bei Sch\u00fclern Rillings.",
+    connection: "Gepr\u00e4gt durch die Stuttgarter Bachakademie-Tradition"
+  },
+  {
+    id: "patkovic",
+    name: "Yuval Weinberg",
+    type: "person",
+    tier: 2,
+    position: "Leiter, Berliner Vokalconsort; Chorleiter, Israelische Oper",
+    city: "Berlin / Tel Aviv",
+    country: "Deutschland / Israel",
+    geoX: 0.55, geoY: 0.52,
+    yearStart: 2010,
+    institutions: ["stuttgart"],
+    bio: "Israelisch-deutscher Dirigent, der den Berliner Vokalconsort gr\u00fcndete. Studierte bei Rademann und vertritt die dritte Generation der Rilling-Schule.",
+    connection: "Sch\u00fcler von Rademann (zweite Generation)"
+  },
+  {
+    id: "yamada",
+    name: "Masato Suzuki",
+    type: "person",
+    tier: 2,
+    position: "Dirigent, Bach Collegium Japan (Nachfolge)",
+    city: "Tokio",
+    country: "Japan",
+    geoX: 0.90, geoY: 0.40,
+    yearStart: 2012,
+    institutions: ["stuttgart"],
+    bio: "Sohn von Masaaki Suzuki, der in die Leitung des Bach Collegium Japan hineinw\u00e4chst. Repr\u00e4sentiert die Weitergabe der Rilling-Tradition nach Ostasien.",
+    connection: "Sch\u00fcler seines Vaters Masaaki Suzuki (zweite Generation)"
+  },
+  {
+    id: "kluger",
+    name: "Ekaterina Kofanova",
+    type: "person",
+    tier: 2,
+    position: "Dirigentin, Moskauer Bach-Ensemble",
+    city: "Moskau",
+    country: "Russland",
+    geoX: 0.65, geoY: 0.35,
+    yearStart: 2008,
+    institutions: ["stuttgart"],
+    bio: "Russische Dirigentin, die Bach-Auff\u00fchrungen in Moskau etablierte. Studierte bei Bachakademie-Absolventen und bringt Rillings Tradition nach Osteuropa.",
+    connection: "Bachakademie-Meisterkurse, zweite Generation"
+  },
+
+  // ─── INSTITUTIONEN ───
+  {
+    id: "inst_bachakademie",
+    name: "Internationale Bachakademie Stuttgart",
+    type: "institution",
+    tier: 0,
+    city: "Stuttgart",
+    country: "Deutschland",
+    geoX: 0.50, geoY: 0.45,
+    yearStart: 1981,
+    institutions: ["stuttgart"],
+    bio: "1981 von Rilling gegr\u00fcndet. Zentrum f\u00fcr die Auff\u00fchrung und Erforschung von Bachs Musik. Ausbildungsst\u00e4tte f\u00fcr Dirigenten aus aller Welt.",
+    connection: ""
+  },
+  {
+    id: "inst_oregon",
+    name: "Oregon Bach Festival",
+    type: "institution",
+    tier: 0,
+    city: "Eugene, Oregon",
+    country: "USA",
+    geoX: 0.10, geoY: 0.38,
+    yearStart: 1970,
+    institutions: ["oregon"],
+    bio: "1970 von Royce Saltzman gegr\u00fcndet, mit Rilling als K\u00fcnstlerischem Leiter bis 2013. Eines der wichtigsten Bach-Festivals Nordamerikas mit bedeutendem Conducting Fellowship.",
+    connection: ""
+  },
+  {
+    id: "inst_frankfurt",
+    name: "Hochschule f\u00fcr Musik Frankfurt",
+    type: "institution",
+    tier: 0,
+    city: "Frankfurt am Main",
+    country: "Deutschland",
+    geoX: 0.48, geoY: 0.43,
+    yearStart: 1965,
+    institutions: ["frankfurt"],
+    bio: "Rilling unterrichtete hier Dirigieren und pr\u00e4gte Generationen von Studenten. Die Frankfurter Dirigierklasse war eine der renommiertesten in Deutschland.",
+    connection: ""
+  },
+  {
+    id: "inst_gaechinger",
+    name: "G\u00e4chinger Kantorei",
+    type: "institution",
+    tier: 0,
+    city: "Stuttgart",
+    country: "Deutschland",
+    geoX: 0.50, geoY: 0.44,
+    yearStart: 1954,
+    institutions: ["stuttgart"],
+    bio: "1954 von Rilling in der Gechinger Dorfkirche gegr\u00fcndet. Wurde unter seiner Leitung zu einem der f\u00fchrenden Kammerch\u00f6re Europas. Heute Teil der Bachakademie.",
+    connection: ""
+  },
+  {
+    id: "inst_bachcollegium",
+    name: "Bach-Collegium Stuttgart",
+    type: "institution",
+    tier: 0,
+    city: "Stuttgart",
+    country: "Deutschland",
+    geoX: 0.51, geoY: 0.45,
+    yearStart: 1965,
+    institutions: ["stuttgart"],
+    bio: "1965 von Rilling gegr\u00fcndet als Orchester der G\u00e4chinger Kantorei. Spielte die legend\u00e4ren Gesamtaufnahmen der Bach-Kantaten ein (H\u00e4nssler Verlag).",
+    connection: ""
+  }
+];
+
+const links = [
+  // Rilling -> Institutions
+  { source: "rilling", target: "inst_bachakademie", type: "founded", weight: 5 },
+  { source: "rilling", target: "inst_oregon", type: "led", weight: 4 },
+  { source: "rilling", target: "inst_frankfurt", type: "taught", weight: 4 },
+  { source: "rilling", target: "inst_gaechinger", type: "founded", weight: 5 },
+  { source: "rilling", target: "inst_bachcollegium", type: "founded", weight: 5 },
+
+  // Rilling -> Direct students
+  { source: "rilling", target: "rademann", type: "teacher", weight: 3 },
+  { source: "rilling", target: "manasi", type: "teacher", weight: 3 },
+  { source: "rilling", target: "friedrich", type: "teacher", weight: 3 },
+  { source: "rilling", target: "bernius", type: "influence", weight: 2 },
+  { source: "rilling", target: "dijkstra", type: "teacher", weight: 3 },
+  { source: "rilling", target: "beringer", type: "teacher", weight: 2 },
+  { source: "rilling", target: "suzuki", type: "teacher", weight: 3 },
+  { source: "rilling", target: "hengelbrock", type: "teacher", weight: 3 },
+  { source: "rilling", target: "gardiner_j", type: "influence", weight: 2 },
+  { source: "rilling", target: "nelson", type: "colleague", weight: 2 },
+  { source: "rilling", target: "slatkin", type: "successor", weight: 3 },
+  { source: "rilling", target: "lutz", type: "teacher", weight: 3 },
+  { source: "rilling", target: "winnen", type: "teacher", weight: 3 },
+  { source: "rilling", target: "chen", type: "teacher", weight: 3 },
+  { source: "rilling", target: "risto", type: "teacher", weight: 3 },
+  { source: "rilling", target: "lacerda", type: "teacher", weight: 3 },
+  { source: "rilling", target: "scheibner", type: "teacher", weight: 3 },
+
+  // Students -> Institutions
+  { source: "inst_bachakademie", target: "rademann", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "dijkstra", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "lutz", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "risto", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "lacerda", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "scheibner", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "beringer", type: "studied", weight: 2 },
+  { source: "inst_bachakademie", target: "winnen", type: "studied", weight: 2 },
+  { source: "inst_frankfurt", target: "manasi", type: "studied", weight: 2 },
+  { source: "inst_frankfurt", target: "suzuki", type: "studied", weight: 2 },
+  { source: "inst_frankfurt", target: "hengelbrock", type: "studied", weight: 2 },
+  { source: "inst_frankfurt", target: "winnen", type: "studied", weight: 2 },
+  { source: "inst_oregon", target: "nelson", type: "studied", weight: 2 },
+  { source: "inst_oregon", target: "slatkin", type: "studied", weight: 2 },
+  { source: "inst_oregon", target: "chen", type: "studied", weight: 2 },
+  { source: "inst_gaechinger", target: "friedrich", type: "member", weight: 2 },
+  { source: "inst_gaechinger", target: "bernius", type: "influence", weight: 1 },
+  { source: "inst_gaechinger", target: "scheibner", type: "member", weight: 2 },
+
+  // Second generation
+  { source: "rademann", target: "patkovic", type: "teacher", weight: 2 },
+  { source: "suzuki", target: "yamada", type: "teacher", weight: 2 },
+  { source: "inst_bachakademie", target: "johannsen", type: "influence", weight: 1 },
+  { source: "inst_bachakademie", target: "kluger", type: "studied", weight: 1 },
+  { source: "bernius", target: "johannsen", type: "influence", weight: 1 }
+];
+
+
+// ═══════════════════════════════════════════════
+// D3 FORCE NETWORK
+// ═══════════════════════════════════════════════
+
+const container = document.getElementById('graph-container');
+const svg = d3.select('#network-svg');
+const tooltip = document.getElementById('tooltip');
+const detailCard = document.getElementById('detail-card');
+const searchInput = document.getElementById('search-input');
+const nodeCountEl = document.getElementById('node-count');
+
+let width = container.clientWidth;
+let height = container.clientHeight;
+
+// Color scales
+const tierColors = {
+  0: '#C9A84C',  // gold - Rilling
+  1: '#D4725C',  // rose - direct students
+  2: '#7BA0B8'   // steel - second generation
+};
+
+const tierSizes = { 0: 28, 1: 12, 2: 8 };
+const institutionColor = '#6B9080';
+
+// Link type colors and widths
+function linkColor(d) {
+  const types = {
+    founded: 'rgba(201,168,76,0.4)',
+    led: 'rgba(201,168,76,0.3)',
+    taught: 'rgba(201,168,76,0.25)',
+    teacher: 'rgba(212,114,92,0.35)',
+    influence: 'rgba(139,126,200,0.25)',
+    colleague: 'rgba(200,149,110,0.25)',
+    successor: 'rgba(201,168,76,0.35)',
+    studied: 'rgba(107,144,128,0.25)',
+    member: 'rgba(107,144,128,0.3)'
+  };
+  return types[d.type] || 'rgba(245,240,232,0.1)';
+}
+
+function linkWidth(d) {
+  return Math.max(1, d.weight * 0.8);
+}
+
+// State
+let currentFilter = 'all';
+let currentMode = 'force';
+let selectedNode = null;
+let highlightedNodes = new Set();
+let highlightedLinks = new Set();
+
+// ─── SVG setup ───
+const defs = svg.append('defs');
+
+// Gold glow filter
+const glow = defs.append('filter').attr('id', 'glow');
+glow.append('feGaussianBlur').attr('stdDeviation', '4').attr('result', 'coloredBlur');
+const glowMerge = glow.append('feMerge');
+glowMerge.append('feMergeNode').attr('in', 'coloredBlur');
+glowMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+// Highlight glow
+const hlGlow = defs.append('filter').attr('id', 'highlight-glow');
+hlGlow.append('feGaussianBlur').attr('stdDeviation', '3').attr('result', 'coloredBlur');
+const hlMerge = hlGlow.append('feMerge');
+hlMerge.append('feMergeNode').attr('in', 'coloredBlur');
+hlMerge.append('feMergeNode').attr('in', 'SourceGraphic');
+
+// Main group (zoom/pan target)
+const g = svg.append('g').attr('class', 'main-group');
+
+// Zoom behavior
+const zoom = d3.zoom()
+  .scaleExtent([0.3, 5])
+  .on('zoom', (event) => {
+    g.attr('transform', event.transform);
+  });
+
+svg.call(zoom);
+
+// Touch-friendly: prevent default on double-tap
+svg.on('dblclick.zoom', null);
+
+// ─── Force simulation ───
+const simulation = d3.forceSimulation(nodes)
+  .force('link', d3.forceLink(links).id(d => d.id).distance(d => {
+    if (d.source.id === 'rilling' || d.target.id === 'rilling') return 160;
+    if (d.source.type === 'institution' || d.target.type === 'institution') return 100;
+    return 120;
+  }).strength(d => d.weight * 0.15))
+  .force('charge', d3.forceManyBody().strength(d => {
+    if (d.id === 'rilling') return -800;
+    if (d.type === 'institution') return -400;
+    if (d.tier === 1) return -300;
+    return -200;
+  }))
+  .force('center', d3.forceCenter(width / 2, height / 2))
+  .force('collision', d3.forceCollide().radius(d => {
+    if (d.id === 'rilling') return 60;
+    if (d.type === 'institution') return 45;
+    return tierSizes[d.tier] + 15;
+  }))
+  .force('x', d3.forceX(width / 2).strength(0.04))
+  .force('y', d3.forceY(height / 2).strength(0.04))
+  .alphaDecay(0.02)
+  .velocityDecay(0.4);
+
+// ─── Draw links ───
+const linkGroup = g.append('g').attr('class', 'links');
+const linkElements = linkGroup.selectAll('line')
+  .data(links)
+  .join('line')
+  .attr('class', 'link')
+  .attr('stroke', d => linkColor(d))
+  .attr('stroke-width', d => linkWidth(d));
+
+// ─── Draw nodes ───
+const nodeGroup = g.append('g').attr('class', 'nodes');
+
+const nodeElements = nodeGroup.selectAll('g')
+  .data(nodes)
+  .join('g')
+  .attr('class', d => d.type === 'institution' ? 'node-institution' : 'node-person')
+  .call(d3.drag()
+    .on('start', dragstarted)
+    .on('drag', dragged)
+    .on('end', dragended)
+  );
+
+// Institution nodes (rectangles)
+nodeElements.filter(d => d.type === 'institution')
+  .append('rect')
+  .attr('width', 30)
+  .attr('height', 18)
+  .attr('x', -15)
+  .attr('y', -9)
+  .attr('fill', 'rgba(107,144,128,0.15)')
+  .attr('stroke', institutionColor)
+  .attr('stroke-width', 1.5)
+  .attr('rx', 3);
+
+// Person nodes (circles) - non-Rilling
+nodeElements.filter(d => d.type === 'person' && d.id !== 'rilling')
+  .append('circle')
+  .attr('r', d => tierSizes[d.tier])
+  .attr('fill', d => {
+    const c = tierColors[d.tier];
+    return d.tier === 1 ? `${c}CC` : `${c}AA`;
+  })
+  .attr('stroke', d => tierColors[d.tier])
+  .attr('stroke-width', 2);
+
+// Rilling node (special)
+const rillingNode = nodeElements.filter(d => d.id === 'rilling');
+
+// Pulse ring
+rillingNode.append('circle')
+  .attr('class', 'rilling-ring')
+  .attr('r', 30)
+  .attr('fill', 'none')
+  .attr('stroke', '#C9A84C')
+  .attr('stroke-width', 1);
+
+// Main circle
+rillingNode.append('circle')
+  .attr('class', 'rilling-pulse')
+  .attr('r', 28)
+  .attr('fill', 'rgba(201,168,76,0.25)')
+  .attr('stroke', '#C9A84C')
+  .attr('stroke-width', 3)
+  .attr('filter', 'url(#glow)');
+
+// Inner glow
+rillingNode.append('circle')
+  .attr('r', 14)
+  .attr('fill', 'rgba(201,168,76,0.15)')
+  .attr('stroke', 'none');
+
+// Rilling cross (Bach symbol nod)
+rillingNode.append('text')
+  .attr('text-anchor', 'middle')
+  .attr('dominant-baseline', 'central')
+  .attr('fill', '#C9A84C')
+  .attr('font-family', 'serif')
+  .attr('font-size', '16px')
+  .attr('font-weight', 'bold')
+  .text('\u2720');
+
+// Labels
+const labelElements = nodeElements.append('text')
+  .attr('class', 'node-label')
+  .attr('dy', d => {
+    if (d.id === 'rilling') return 44;
+    if (d.type === 'institution') return 24;
+    return tierSizes[d.tier] + 14;
+  })
+  .attr('font-size', d => {
+    if (d.id === 'rilling') return '13px';
+    if (d.type === 'institution') return '9px';
+    if (d.tier === 1) return '10.5px';
+    return '9px';
+  })
+  .attr('font-weight', d => d.id === 'rilling' ? '600' : '400')
+  .attr('fill', d => {
+    if (d.id === 'rilling') return '#C9A84C';
+    if (d.type === 'institution') return 'rgba(107,144,128,0.8)';
+    return 'rgba(245,240,232,0.65)';
+  })
+  .text(d => {
+    if (d.type === 'institution') {
+      // Abbreviate institution names
+      const abbrevs = {
+        'inst_bachakademie': 'Bachakademie',
+        'inst_oregon': 'Oregon Bach Fest.',
+        'inst_frankfurt': 'HfM Frankfurt',
+        'inst_gaechinger': 'G\u00e4chinger Kant.',
+        'inst_bachcollegium': 'Bach-Collegium St.'
+      };
+      return abbrevs[d.id] || d.name;
+    }
+    // Shorten person names: last name only if tier 2
+    if (d.tier === 2) return d.name.split(' ').pop();
+    return d.name;
+  });
+
+// ─── Tick ───
+simulation.on('tick', () => {
+  linkElements
+    .attr('x1', d => d.source.x)
+    .attr('y1', d => d.source.y)
+    .attr('x2', d => d.target.x)
+    .attr('y2', d => d.target.y);
+
+  nodeElements
+    .attr('transform', d => `translate(${d.x},${d.y})`);
+});
+
+// Update count
+nodeCountEl.textContent = `${nodes.filter(n => n.type === 'person').length} Dirigenten \u00b7 ${nodes.filter(n => n.type === 'institution').length} Institutionen`;
+
+// ─── Drag behavior ───
+function dragstarted(event, d) {
+  if (!event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+function dragged(event, d) {
+  d.fx = event.x;
+  d.fy = event.y;
+}
+function dragended(event, d) {
+  if (!event.active) simulation.alphaTarget(0);
+  if (currentMode === 'force') {
+    d.fx = null;
+    d.fy = null;
+  }
+}
+
+// ═══════════════════════════════════════════════
+// INTERACTIONS
+// ═══════════════════════════════════════════════
+
+// ─── Hover: highlight connections ───
+nodeElements
+  .on('mouseenter', function(event, d) {
+    if (selectedNode) return;
+    highlightConnections(d);
+    showTooltip(event, d);
+  })
+  .on('mousemove', function(event) {
+    moveTooltip(event);
+  })
+  .on('mouseleave', function() {
+    if (selectedNode) return;
+    clearHighlight();
+    hideTooltip();
+  });
+
+// ─── Click: detail card ───
+nodeElements.on('click', function(event, d) {
+  event.stopPropagation();
+  if (selectedNode === d.id) {
+    closeDetailCard();
+    return;
+  }
+  selectedNode = d.id;
+  highlightConnections(d);
+  showDetailCard(d, event);
+  hideTooltip();
+});
+
+// Click background to deselect
+svg.on('click', function() {
+  closeDetailCard();
+  clearHighlight();
+});
+
+document.getElementById('card-close').addEventListener('click', function(e) {
+  e.stopPropagation();
+  closeDetailCard();
+  clearHighlight();
+});
+
+function highlightConnections(d) {
+  highlightedNodes.clear();
+  highlightedLinks.clear();
+  highlightedNodes.add(d.id);
+
+  links.forEach(l => {
+    const sid = typeof l.source === 'object' ? l.source.id : l.source;
+    const tid = typeof l.target === 'object' ? l.target.id : l.target;
+    if (sid === d.id || tid === d.id) {
+      highlightedLinks.add(l);
+      highlightedNodes.add(sid);
+      highlightedNodes.add(tid);
+    }
+  });
+
+  // Dim non-connected elements
+  nodeElements.transition().duration(200)
+    .style('opacity', n => highlightedNodes.has(n.id) ? 1 : 0.15);
+
+  linkElements.transition().duration(200)
+    .style('opacity', l => highlightedLinks.has(l) ? 1 : 0.05)
+    .attr('stroke-width', l => highlightedLinks.has(l) ? linkWidth(l) * 2 : linkWidth(l));
+
+  labelElements.transition().duration(200)
+    .style('opacity', n => highlightedNodes.has(n.id) ? 1 : 0.08);
+}
+
+function clearHighlight() {
+  selectedNode = null;
+  highlightedNodes.clear();
+  highlightedLinks.clear();
+
+  nodeElements.transition().duration(300)
+    .style('opacity', d => isNodeVisible(d) ? 1 : 0.12);
+
+  linkElements.transition().duration(300)
+    .style('opacity', l => isLinkVisible(l) ? 1 : 0.05)
+    .attr('stroke-width', d => linkWidth(d));
+
+  labelElements.transition().duration(300)
+    .style('opacity', d => isNodeVisible(d) ? 1 : 0.08);
+}
+
+function showTooltip(event, d) {
+  tooltip.textContent = d.name;
+  tooltip.classList.add('visible');
+  moveTooltip(event);
+}
+function moveTooltip(event) {
+  const rect = container.getBoundingClientRect();
+  let x = event.clientX - rect.left + 14;
+  let y = event.clientY - rect.top - 10;
+  // Keep in bounds
+  if (x + 200 > rect.width) x = event.clientX - rect.left - 160;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top = y + 'px';
+}
+function hideTooltip() {
+  tooltip.classList.remove('visible');
+}
+
+function showDetailCard(d, event) {
+  document.getElementById('card-name').textContent = d.name;
+  document.getElementById('card-position').textContent = d.position || '';
+
+  const bioEl = document.getElementById('card-bio');
+  bioEl.textContent = d.bio || '';
+
+  const connEl = document.getElementById('card-connection');
+  if (d.connection) {
+    connEl.innerHTML = '<span style="color:var(--color-gold);">\u2736</span> ' + d.connection;
+    connEl.style.display = 'flex';
+  } else {
+    connEl.style.display = 'none';
+  }
+
+  const instEl = document.getElementById('card-institution');
+  if (d.institutions && d.institutions.length > 0) {
+    const instNames = {
+      stuttgart: 'Stuttgart',
+      frankfurt: 'Frankfurt',
+      oregon: 'Oregon'
+    };
+    instEl.textContent = '\u266B ' + d.institutions.map(i => instNames[i] || i).join(', ');
+    instEl.style.display = 'block';
+  } else {
+    instEl.style.display = 'none';
+  }
+
+  // Position card
+  const rect = container.getBoundingClientRect();
+  let cardX = event.clientX - rect.left + 20;
+  let cardY = event.clientY - rect.top - 30;
+
+  // Keep in viewport
+  if (cardX + 350 > rect.width) cardX = event.clientX - rect.left - 360;
+  if (cardY + 250 > rect.height) cardY = rect.height - 260;
+  if (cardY < 10) cardY = 10;
+  if (cardX < 10) cardX = 10;
+
+  // On mobile, use fixed bottom position
+  if (rect.width < 768) {
+    detailCard.style.left = '';
+    detailCard.style.right = '';
+    detailCard.style.top = '';
+    detailCard.style.bottom = '';
+  } else {
+    detailCard.style.left = cardX + 'px';
+    detailCard.style.top = cardY + 'px';
+    detailCard.style.right = 'auto';
+    detailCard.style.bottom = 'auto';
+  }
+
+  detailCard.classList.add('visible');
+}
+
+function closeDetailCard() {
+  detailCard.classList.remove('visible');
+  selectedNode = null;
+}
+
+
+// ═══════════════════════════════════════════════
+// SEARCH
+// ═══════════════════════════════════════════════
+
+searchInput.addEventListener('input', function() {
+  const query = this.value.toLowerCase().trim();
+  if (!query) {
+    applyFilter();
+    return;
+  }
+
+  nodeElements.transition().duration(200)
+    .style('opacity', d => {
+      const match = d.name.toLowerCase().includes(query) ||
+                    (d.city && d.city.toLowerCase().includes(query)) ||
+                    (d.position && d.position.toLowerCase().includes(query));
+      return match ? 1 : 0.08;
+    });
+
+  labelElements.transition().duration(200)
+    .style('opacity', d => {
+      const match = d.name.toLowerCase().includes(query) ||
+                    (d.city && d.city.toLowerCase().includes(query)) ||
+                    (d.position && d.position.toLowerCase().includes(query));
+      return match ? 1 : 0.05;
+    });
+
+  linkElements.transition().duration(200)
+    .style('opacity', 0.04);
+});
+
+
+// ═══════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentFilter = this.dataset.filter;
+    searchInput.value = '';
+    applyFilter();
+  });
+});
+
+function isNodeVisible(d) {
+  if (currentFilter === 'all') return true;
+  if (d.id === 'rilling') return true;
+  if (d.institutions && d.institutions.includes(currentFilter)) return true;
+  return false;
+}
+
+function isLinkVisible(l) {
+  const sid = typeof l.source === 'object' ? l.source.id : l.source;
+  const tid = typeof l.target === 'object' ? l.target.id : l.target;
+  const sNode = nodes.find(n => n.id === sid);
+  const tNode = nodes.find(n => n.id === tid);
+  return isNodeVisible(sNode) && isNodeVisible(tNode);
+}
+
+function applyFilter() {
+  nodeElements.transition().duration(400)
+    .style('opacity', d => isNodeVisible(d) ? 1 : 0.08);
+
+  labelElements.transition().duration(400)
+    .style('opacity', d => isNodeVisible(d) ? 1 : 0.05);
+
+  linkElements.transition().duration(400)
+    .style('opacity', l => isLinkVisible(l) ? 1 : 0.03);
+}
+
+
+// ═══════════════════════════════════════════════
+// VIEW MODES
+// ═══════════════════════════════════════════════
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    currentMode = this.dataset.mode;
+    applyMode();
+  });
+});
+
+function applyMode() {
+  switch (currentMode) {
+    case 'force':
+      applyForceMode();
+      break;
+    case 'geography':
+      applyGeographyMode();
+      break;
+    case 'timeline':
+      applyTimelineMode();
+      break;
+  }
+}
+
+function applyForceMode() {
+  // Remove timeline markers if present
+  g.selectAll('.year-marker').remove();
+
+  // Release fixed positions
+  nodes.forEach(d => {
+    d.fx = null;
+    d.fy = null;
+  });
+
+  simulation
+    .force('center', d3.forceCenter(width / 2, height / 2))
+    .force('x', d3.forceX(width / 2).strength(0.04))
+    .force('y', d3.forceY(height / 2).strength(0.04))
+    .force('charge', d3.forceManyBody().strength(d => {
+      if (d.id === 'rilling') return -800;
+      if (d.type === 'institution') return -400;
+      if (d.tier === 1) return -300;
+      return -200;
+    }))
+    .alpha(0.8)
+    .restart();
+}
+
+function applyGeographyMode() {
+  // Remove timeline markers if present
+  g.selectAll('.year-marker').remove();
+
+  const padding = 80;
+  const availW = width - padding * 2;
+  const availH = height - padding * 2;
+
+  nodes.forEach(d => {
+    d.fx = padding + (d.geoX || 0.5) * availW;
+    d.fy = padding + (d.geoY || 0.5) * availH;
+  });
+
+  simulation
+    .force('charge', d3.forceManyBody().strength(-20))
+    .alpha(0.5)
+    .restart();
+}
+
+function applyTimelineMode() {
+  const padding = 100;
+  const availW = width - padding * 2;
+  const availH = height - padding * 2;
+
+  // Find year range
+  const years = nodes.filter(n => n.yearStart).map(n => n.yearStart);
+  const minYear = Math.min(...years);
+  const maxYear = Math.max(...years);
+  const yearRange = maxYear - minYear || 1;
+
+  // Arrange by tier vertically, year horizontally
+  const tierY = {
+    0: height * 0.2,
+    1: height * 0.5,
+    2: height * 0.78
+  };
+
+  // Count nodes per tier for vertical spread
+  const tierCounts = {};
+  nodes.forEach(d => {
+    const t = d.tier || 0;
+    tierCounts[t] = (tierCounts[t] || 0) + 1;
+  });
+  const tierIndices = {};
+
+  nodes.forEach(d => {
+    const t = d.tier || 0;
+    const yearNorm = d.yearStart ? (d.yearStart - minYear) / yearRange : 0.5;
+    d.fx = padding + yearNorm * availW;
+
+    if (!tierIndices[t]) tierIndices[t] = 0;
+    const idx = tierIndices[t]++;
+    const count = tierCounts[t];
+    const spread = d.type === 'institution' ? 30 : 20;
+    d.fy = tierY[t] + (idx - count / 2) * spread;
+  });
+
+  simulation
+    .force('charge', d3.forceManyBody().strength(-30))
+    .alpha(0.5)
+    .restart();
+
+  // Draw year axis markers (temporary)
+  g.selectAll('.year-marker').remove();
+  const yearStep = 5;
+  for (let y = Math.ceil(minYear / yearStep) * yearStep; y <= maxYear; y += yearStep) {
+    const xPos = padding + ((y - minYear) / yearRange) * availW;
+    g.append('text')
+      .attr('class', 'year-marker')
+      .attr('x', xPos)
+      .attr('y', height - 30)
+      .attr('text-anchor', 'middle')
+      .attr('fill', 'rgba(201,168,76,0.3)')
+      .attr('font-family', 'Cormorant Garamond, serif')
+      .attr('font-size', '11px')
+      .text(y);
+
+    g.append('line')
+      .attr('class', 'year-marker')
+      .attr('x1', xPos).attr('y1', 40)
+      .attr('x2', xPos).attr('y2', height - 40)
+      .attr('stroke', 'rgba(201,168,76,0.06)')
+      .attr('stroke-width', 1)
+      .attr('stroke-dasharray', '4 6');
+  }
+
+  // Tier labels
+  const tierLabels = { 0: 'Rilling & Institutionen', 1: 'Direkte Sch\u00fcler', 2: 'Zweite Generation' };
+  Object.entries(tierLabels).forEach(([t, label]) => {
+    g.append('text')
+      .attr('class', 'year-marker')
+      .attr('x', 30)
+      .attr('y', tierY[t])
+      .attr('text-anchor', 'start')
+      .attr('fill', 'rgba(201,168,76,0.25)')
+      .attr('font-family', 'Bodoni Moda, serif')
+      .attr('font-size', '10px')
+      .attr('letter-spacing', '0.1em')
+      .text(label.toUpperCase());
+  });
+}
+
+
+// ═══════════════════════════════════════════════
+// RESIZE
+// ═══════════════════════════════════════════════
+
+function onResize() {
+  width = container.clientWidth;
+  height = container.clientHeight;
+  svg.attr('width', width).attr('height', height);
+
+  if (currentMode === 'force') {
+    simulation.force('center', d3.forceCenter(width / 2, height / 2));
+    simulation.force('x', d3.forceX(width / 2).strength(0.04));
+    simulation.force('y', d3.forceY(height / 2).strength(0.04));
+    simulation.alpha(0.3).restart();
+  } else {
+    applyMode();
+  }
+}
+
+window.addEventListener('resize', debounce(onResize, 200));
+onResize();
+
+function debounce(fn, ms) {
+  let timer;
+  return function(...args) {
+    clearTimeout(timer);
+    timer = setTimeout(() => fn.apply(this, args), ms);
+  };
+}
+
+// ─── Initial zoom to fit ───
+setTimeout(() => {
+  // Fit graph in view
+  const bounds = g.node().getBBox();
+  if (bounds.width > 0 && bounds.height > 0) {
+    const fullWidth = width;
+    const fullHeight = height;
+    const bWidth = bounds.width;
+    const bHeight = bounds.height;
+    const scale = 0.85 / Math.max(bWidth / fullWidth, bHeight / fullHeight);
+    const tx = (fullWidth - scale * (bounds.x * 2 + bWidth)) / 2;
+    const ty = (fullHeight - scale * (bounds.y * 2 + bHeight)) / 2;
+
+    svg.transition().duration(1000)
+      .call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(scale));
+  }
+}, 2500);
+
+// ─── Keyboard: Escape to close ───
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    closeDetailCard();
+    clearHighlight();
+    searchInput.value = '';
+    applyFilter();
+  }
+});
+
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

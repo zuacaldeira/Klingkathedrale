@@ -1,0 +1,1375 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Helmuth Rilling — Infografik seines Vermächtnisses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..900;1,6..96,400..900&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+:root {
+  --color-gold: #C9A84C;
+  --color-ink: #1A1410;
+  --color-ivory: #F5F0E8;
+  --color-parchment: #EDE6D6;
+  --color-rose: #D4725C;
+  --color-sage: #6B9080;
+  --color-amethyst: #8B7EC8;
+  --color-amber: #C8956E;
+  --color-steel: #7BA0B8;
+  --font-display: 'Bodoni Moda', serif;
+  --font-body: 'Cormorant Garamond', serif;
+}
+
+*, *::before, *::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-snap-type: y mandatory;
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--color-ink);
+  color: var(--color-ivory);
+  overflow-x: hidden;
+}
+
+/* Back link */
+.back-link {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 1000;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--color-gold);
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  opacity: 0.8;
+  transition: opacity 0.3s;
+}
+.back-link:hover { opacity: 1; }
+.back-link svg {
+  width: 20px;
+  height: 20px;
+  fill: none;
+  stroke: var(--color-gold);
+  stroke-width: 2;
+}
+
+/* Section navigation dots */
+.nav-dots {
+  position: fixed;
+  right: 1.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.nav-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1.5px solid var(--color-gold);
+  background: transparent;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative;
+}
+.nav-dot.active {
+  background: var(--color-gold);
+  transform: scale(1.3);
+}
+.nav-dot-label {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  white-space: nowrap;
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: var(--color-gold);
+  opacity: 0;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+.nav-dot:hover .nav-dot-label {
+  opacity: 1;
+}
+
+/* Sections */
+section {
+  width: 100%;
+  min-height: 100vh;
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 2rem;
+  overflow: hidden;
+}
+
+.section-number {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--color-gold);
+  opacity: 0.6;
+  margin-bottom: 0.5rem;
+}
+
+.section-title {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 400;
+  color: var(--color-ivory);
+  margin-bottom: 0.3rem;
+  text-align: center;
+}
+
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 2vw, 1.3rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--color-gold);
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+/* ======================== */
+/* SECTION 1: DER BERG      */
+/* ======================== */
+#der-berg {
+  background: linear-gradient(180deg, var(--color-ink) 0%, #1e1a15 100%);
+}
+
+.berg-container {
+  width: 100%;
+  max-width: 1000px;
+  position: relative;
+}
+
+#berg-svg {
+  width: 100%;
+  height: auto;
+}
+
+.berg-legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem 2rem;
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.berg-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.berg-legend-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+}
+
+.berg-annotation {
+  position: absolute;
+  right: 5%;
+  top: 18%;
+  background: rgba(26, 20, 16, 0.9);
+  border: 1px solid var(--color-gold);
+  border-radius: 4px;
+  padding: 0.7rem 1rem;
+  font-family: var(--font-body);
+  font-size: clamp(0.75rem, 1.2vw, 0.95rem);
+  color: var(--color-gold);
+  max-width: 220px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 1s ease;
+  pointer-events: none;
+}
+.berg-annotation.visible { opacity: 1; }
+
+/* ========================== */
+/* SECTION 2: DER VERGLEICH   */
+/* ========================== */
+#der-vergleich {
+  background: linear-gradient(180deg, #1e1a15 0%, var(--color-ink) 100%);
+}
+
+.vergleich-container {
+  width: 100%;
+  max-width: 800px;
+}
+
+.bar-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  gap: 1rem;
+}
+
+.bar-label {
+  font-family: var(--font-body);
+  font-size: clamp(0.85rem, 1.5vw, 1.1rem);
+  min-width: 160px;
+  text-align: right;
+  color: var(--color-ivory);
+}
+
+.bar-track {
+  flex: 1;
+  height: 36px;
+  background: rgba(245, 240, 232, 0.05);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.bar-fill {
+  height: 100%;
+  border-radius: 4px;
+  width: 0%;
+  transition: width 1.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 10px;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
+}
+
+.bar-fill.gold {
+  background: linear-gradient(90deg, var(--color-gold), #ddbf6a);
+}
+.bar-fill.gray {
+  background: rgba(245, 240, 232, 0.25);
+  color: var(--color-ivory);
+}
+
+.bar-fill.animated {
+  width: var(--target-width);
+}
+
+.vergleich-annotation {
+  text-align: center;
+  margin-top: 2rem;
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.8vw, 1.3rem);
+  font-style: italic;
+  color: var(--color-gold);
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 1s ease 1.5s;
+}
+.vergleich-annotation.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ========================== */
+/* SECTION 3: DAS NETZWERK    */
+/* ========================== */
+#das-netzwerk {
+  background: radial-gradient(ellipse at center, #252018 0%, var(--color-ink) 70%);
+}
+
+#netzwerk-svg {
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+}
+
+.netzwerk-node {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.netzwerk-tooltip {
+  position: fixed;
+  background: rgba(26, 20, 16, 0.95);
+  border: 1px solid var(--color-gold);
+  border-radius: 6px;
+  padding: 0.6rem 1rem;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  color: var(--color-ivory);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.2s;
+  z-index: 100;
+  max-width: 260px;
+}
+.netzwerk-tooltip.visible { opacity: 1; }
+.netzwerk-tooltip .tooltip-title {
+  font-weight: 600;
+  color: var(--color-gold);
+  margin-bottom: 0.2rem;
+}
+
+/* ========================== */
+/* SECTION 4: DIE PREISE      */
+/* ========================== */
+#die-preise {
+  background: linear-gradient(180deg, var(--color-ink) 0%, #1e1a15 100%);
+}
+
+.preise-container {
+  width: 100%;
+  max-width: 1000px;
+  position: relative;
+}
+
+.timeline-line {
+  position: absolute;
+  top: 50%;
+  left: 5%;
+  right: 5%;
+  height: 2px;
+  background: rgba(201, 168, 76, 0.3);
+  transform: translateY(-50%);
+}
+
+.timeline-line-fill {
+  height: 100%;
+  background: var(--color-gold);
+  width: 0%;
+  transition: width 2s ease;
+}
+
+.timeline-dots {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 5%;
+  position: relative;
+  min-height: 300px;
+}
+
+.timeline-dot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+  opacity: 0;
+  transform: scale(0.5);
+  transition: all 0.6s ease;
+}
+
+.timeline-dot.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.timeline-medal {
+  width: clamp(36px, 5vw, 52px);
+  height: clamp(36px, 5vw, 52px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 35%, #ddbf6a, var(--color-gold), #a88a3a);
+  border: 2px solid #ddbf6a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(201, 168, 76, 0.3);
+  transition: box-shadow 0.3s, transform 0.3s;
+  position: relative;
+  z-index: 2;
+}
+
+.timeline-medal:hover {
+  box-shadow: 0 0 30px rgba(201, 168, 76, 0.6);
+  transform: scale(1.15);
+}
+
+.timeline-medal svg {
+  width: 55%;
+  height: 55%;
+  fill: var(--color-ink);
+}
+
+.timeline-year {
+  font-family: var(--font-display);
+  font-size: clamp(0.7rem, 1vw, 0.9rem);
+  color: var(--color-gold);
+  margin-top: 0.6rem;
+  font-weight: 600;
+}
+
+.timeline-name {
+  font-family: var(--font-body);
+  font-size: clamp(0.6rem, 0.9vw, 0.8rem);
+  color: var(--color-ivory);
+  text-align: center;
+  max-width: 90px;
+  margin-top: 0.3rem;
+  line-height: 1.2;
+}
+
+.timeline-detail {
+  position: absolute;
+  bottom: calc(100% + 15px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(26, 20, 16, 0.95);
+  border: 1px solid var(--color-gold);
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: var(--color-ivory);
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s;
+  z-index: 10;
+}
+
+.timeline-dot:hover .timeline-detail {
+  opacity: 1;
+}
+
+/* ========================== */
+/* SECTION 5: DAS ERBE        */
+/* ========================== */
+#das-erbe {
+  background: radial-gradient(ellipse at center, #1e1a15 0%, var(--color-ink) 60%);
+}
+
+#erbe-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.erbe-text {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 600px;
+}
+
+.erbe-quote {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 2.5vw, 1.8rem);
+  font-style: italic;
+  color: var(--color-gold);
+  line-height: 1.6;
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 1.5s ease;
+}
+.erbe-quote.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.erbe-names {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.erbe-name {
+  position: absolute;
+  font-family: var(--font-body);
+  font-size: clamp(0.65rem, 1vw, 0.85rem);
+  color: var(--color-ivory);
+  opacity: 0;
+  transition: opacity 1.5s ease;
+  white-space: nowrap;
+}
+.erbe-name.visible { opacity: 0.7; }
+
+/* ========================== */
+/* RESPONSIVE                 */
+/* ========================== */
+@media (max-width: 768px) {
+  .nav-dots { right: 0.7rem; }
+  .nav-dot { width: 8px; height: 8px; }
+  section { padding: 1.5rem 1rem; }
+  .bar-label { min-width: 100px; font-size: 0.8rem; }
+  .bar-track { height: 28px; }
+  .bar-fill { font-size: 0.7rem; padding-right: 6px; }
+  .berg-annotation { right: 2%; top: 10%; max-width: 170px; font-size: 0.7rem; padding: 0.5rem; }
+  .timeline-dots { flex-wrap: wrap; gap: 1.5rem; justify-content: center; }
+  .timeline-line { display: none; }
+  .timeline-detail { white-space: normal; min-width: 150px; }
+}
+
+@media (max-width: 480px) {
+  .bar-row { flex-direction: column; align-items: flex-start; gap: 0.3rem; }
+  .bar-label { text-align: left; min-width: unset; }
+  .bar-track { width: 100%; }
+}
+</style>
+</head>
+<body>
+
+<!-- Back link -->
+<a href="klangkathedrale.html" class="back-link">
+  <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+  Klangkathedrale
+</a>
+
+<!-- Navigation dots -->
+<nav class="nav-dots" aria-label="Sektionsnavigation">
+  <div class="nav-dot active" data-target="der-berg"><span class="nav-dot-label">Der Berg</span></div>
+  <div class="nav-dot" data-target="der-vergleich"><span class="nav-dot-label">Der Vergleich</span></div>
+  <div class="nav-dot" data-target="das-netzwerk"><span class="nav-dot-label">Das Netzwerk</span></div>
+  <div class="nav-dot" data-target="die-preise"><span class="nav-dot-label">Die Preise</span></div>
+  <div class="nav-dot" data-target="das-erbe"><span class="nav-dot-label">Das Erbe</span></div>
+</nav>
+
+<!-- Tooltip for network -->
+<div class="netzwerk-tooltip" id="netzwerk-tooltip">
+  <div class="tooltip-title"></div>
+  <div class="tooltip-desc"></div>
+</div>
+
+<!-- ============================= -->
+<!-- SECTION 1: DER BERG           -->
+<!-- ============================= -->
+<section id="der-berg">
+  <div class="section-number">I</div>
+  <h2 class="section-title">Der Berg</h2>
+  <p class="section-subtitle">Kumulative Aufnahmen 1970 -- 2000</p>
+  <div class="berg-container">
+    <svg id="berg-svg" viewBox="0 0 1000 500" preserveAspectRatio="xMidYMid meet">
+      <defs>
+        <linearGradient id="grad-cantatas" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#C9A84C" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#C9A84C" stop-opacity="0.5"/>
+        </linearGradient>
+        <linearGradient id="grad-passions" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#D4725C" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#D4725C" stop-opacity="0.5"/>
+        </linearGradient>
+        <linearGradient id="grad-masses" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#6B9080" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#6B9080" stop-opacity="0.5"/>
+        </linearGradient>
+        <linearGradient id="grad-instrumental" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#8B7EC8" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#8B7EC8" stop-opacity="0.5"/>
+        </linearGradient>
+        <linearGradient id="grad-organ" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stop-color="#7BA0B8" stop-opacity="0.9"/>
+          <stop offset="100%" stop-color="#7BA0B8" stop-opacity="0.5"/>
+        </linearGradient>
+      </defs>
+      <!-- Axes -->
+      <line x1="80" y1="430" x2="960" y2="430" stroke="rgba(245,240,232,0.2)" stroke-width="1"/>
+      <line x1="80" y1="430" x2="80" y2="40" stroke="rgba(245,240,232,0.2)" stroke-width="1"/>
+      <!-- Y-axis labels -->
+      <text x="70" y="435" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="end">0</text>
+      <text x="70" y="335" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="end">40</text>
+      <text x="70" y="235" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="end">80</text>
+      <text x="70" y="135" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="end">120</text>
+      <text x="70" y="55" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="end">172</text>
+      <!-- Grid lines -->
+      <line x1="80" y1="330" x2="960" y2="330" stroke="rgba(245,240,232,0.06)" stroke-width="1"/>
+      <line x1="80" y1="230" x2="960" y2="230" stroke="rgba(245,240,232,0.06)" stroke-width="1"/>
+      <line x1="80" y1="130" x2="960" y2="130" stroke="rgba(245,240,232,0.06)" stroke-width="1"/>
+      <!-- X-axis labels -->
+      <text x="80" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">1970</text>
+      <text x="227" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">1975</text>
+      <text x="373" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">1980</text>
+      <text x="520" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">1985</text>
+      <text x="667" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">1990</text>
+      <text x="813" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">1995</text>
+      <text x="960" y="455" fill="rgba(245,240,232,0.5)" font-family="Cormorant Garamond, serif" font-size="12" text-anchor="middle">2000</text>
+      <!-- Area layers will be drawn by JS -->
+      <g id="berg-layers"></g>
+    </svg>
+    <div class="berg-annotation" id="berg-annotation">
+      <strong>172 CDs</strong><br>Das vollständige Werk Bachs
+    </div>
+    <div class="berg-legend">
+      <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#C9A84C"></div>Kantaten</div>
+      <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#D4725C"></div>Passionen</div>
+      <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#6B9080"></div>Messen</div>
+      <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#8B7EC8"></div>Instrumentalwerke</div>
+      <div class="berg-legend-item"><div class="berg-legend-swatch" style="background:#7BA0B8"></div>Orgelwerke</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 2: DER VERGLEICH      -->
+<!-- ============================= -->
+<section id="der-vergleich">
+  <div class="section-number">II</div>
+  <h2 class="section-title">Der Vergleich</h2>
+  <p class="section-subtitle">Bach-Gesamteinspielungen im Vergleich</p>
+  <div class="vergleich-container">
+    <div class="bar-row">
+      <div class="bar-label"><strong>Helmuth Rilling</strong></div>
+      <div class="bar-track">
+        <div class="bar-fill gold" style="--target-width: 100%;" data-value="172">172 CDs</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Ton Koopman</div>
+      <div class="bar-track">
+        <div class="bar-fill gray" style="--target-width: 39%;" data-value="67">67 CDs</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Harnoncourt / Leonhardt</div>
+      <div class="bar-track">
+        <div class="bar-fill gray" style="--target-width: 34.9%;" data-value="60">60 CDs</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">Masaaki Suzuki</div>
+      <div class="bar-track">
+        <div class="bar-fill gray" style="--target-width: 32%;" data-value="55">55 CDs</div>
+      </div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">John Eliot Gardiner</div>
+      <div class="bar-track">
+        <div class="bar-fill gray" style="--target-width: 23.3%;" data-value="40">~40 CDs</div>
+      </div>
+    </div>
+    <div class="vergleich-annotation" id="vergleich-annotation">
+      &laquo; Als Einziger hat er <em>alle</em> Werke Bachs eingespielt &raquo;
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 3: DAS NETZWERK       -->
+<!-- ============================= -->
+<section id="das-netzwerk">
+  <div class="section-number">III</div>
+  <h2 class="section-title">Das Netzwerk</h2>
+  <p class="section-subtitle">Ensembles, Institutionen und Schüler</p>
+  <svg id="netzwerk-svg" viewBox="0 0 900 700" preserveAspectRatio="xMidYMid meet">
+    <!-- Links and nodes drawn by JS -->
+    <g id="netzwerk-links"></g>
+    <g id="netzwerk-nodes"></g>
+  </svg>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 4: DIE PREISE         -->
+<!-- ============================= -->
+<section id="die-preise">
+  <div class="section-number">IV</div>
+  <h2 class="section-title">Die Preise</h2>
+  <p class="section-subtitle">Auszeichnungen und Ehrungen</p>
+  <div class="preise-container">
+    <div class="timeline-line"><div class="timeline-line-fill" id="timeline-fill"></div></div>
+    <div class="timeline-dots" id="timeline-dots">
+      <!-- Dots generated by JS -->
+    </div>
+  </div>
+</section>
+
+<!-- ============================= -->
+<!-- SECTION 5: DAS ERBE           -->
+<!-- ============================= -->
+<section id="das-erbe">
+  <div class="section-number">V</div>
+  <canvas id="erbe-canvas"></canvas>
+  <div class="erbe-names" id="erbe-names"></div>
+  <div class="erbe-text">
+    <h2 class="section-title" style="margin-bottom: 0.5rem;">Das Erbe</h2>
+    <p class="erbe-quote" id="erbe-quote">
+      &laquo; Die Wellen seiner Arbeit werden nie aufhören. &raquo;
+    </p>
+  </div>
+</section>
+
+<script>
+// ================================================
+// UTILITIES
+// ================================================
+function lerp(a, b, t) { return a + (b - a) * t; }
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function getSectionProgress(sectionEl) {
+  const rect = sectionEl.getBoundingClientRect();
+  const vh = window.innerHeight;
+  // 0 when section top hits viewport bottom, 1 when section top hits viewport top
+  const progress = 1 - (rect.top / vh);
+  return clamp(progress, 0, 1);
+}
+
+// ================================================
+// NAV DOTS
+// ================================================
+const sections = document.querySelectorAll('section');
+const navDots = document.querySelectorAll('.nav-dot');
+
+navDots.forEach(dot => {
+  dot.addEventListener('click', () => {
+    const target = document.getElementById(dot.dataset.target);
+    if (target) target.scrollIntoView({ behavior: 'smooth' });
+  });
+});
+
+function updateNavDots() {
+  let currentIdx = 0;
+  sections.forEach((sec, i) => {
+    const rect = sec.getBoundingClientRect();
+    if (rect.top <= window.innerHeight * 0.5) currentIdx = i;
+  });
+  navDots.forEach((dot, i) => {
+    dot.classList.toggle('active', i === currentIdx);
+  });
+}
+
+// ================================================
+// SECTION 1: DER BERG — Stacked area chart
+// ================================================
+const bergData = {
+  years: [1970, 1973, 1976, 1979, 1982, 1985, 1988, 1991, 1994, 1997, 2000],
+  categories: [
+    { name: 'organ',        values: [0, 2, 5, 8, 11, 14, 16, 18, 20, 22, 24],   grad: 'url(#grad-organ)' },
+    { name: 'instrumental', values: [0, 1, 4, 7, 11, 15, 19, 22, 25, 28, 30],   grad: 'url(#grad-instrumental)' },
+    { name: 'masses',       values: [0, 1, 2, 4, 5, 7, 9, 11, 13, 15, 18],      grad: 'url(#grad-masses)' },
+    { name: 'passions',     values: [0, 1, 2, 3, 5, 7, 9, 11, 13, 16, 18],      grad: 'url(#grad-passions)' },
+    { name: 'cantatas',     values: [0, 3, 8, 16, 25, 36, 48, 58, 68, 76, 82],  grad: 'url(#grad-cantatas)' },
+  ]
+};
+
+// Compute stacked values
+const stackedData = [];
+for (let yi = 0; yi < bergData.years.length; yi++) {
+  let cumulative = 0;
+  const point = { year: bergData.years[yi], layers: [] };
+  for (let ci = 0; ci < bergData.categories.length; ci++) {
+    const val = bergData.categories[ci].values[yi];
+    point.layers.push({ y0: cumulative, y1: cumulative + val });
+    cumulative += val;
+  }
+  stackedData.push(point);
+}
+
+const bergPadLeft = 80, bergPadRight = 40, bergPadTop = 40, bergPadBot = 70;
+const bergW = 1000, bergH = 500;
+const bergMaxY = 172;
+
+function yearToX(year) {
+  return bergPadLeft + ((year - 1970) / (2000 - 1970)) * (bergW - bergPadLeft - bergPadRight);
+}
+function valToY(val) {
+  return bergH - bergPadBot - (val / bergMaxY) * (bergH - bergPadTop - bergPadBot);
+}
+
+function buildAreaPath(layerIdx, progress) {
+  const pts = stackedData.map((d, i) => {
+    const x = yearToX(d.year);
+    const animatedY1 = d.layers[layerIdx].y1 * progress;
+    const animatedY0 = d.layers[layerIdx].y0 * progress;
+    return { x, y0: valToY(animatedY0), y1: valToY(animatedY1) };
+  });
+
+  let path = `M ${pts[0].x},${pts[0].y0}`;
+  // Top line (y1)
+  for (let i = 0; i < pts.length - 1; i++) {
+    const cpx = (pts[i].x + pts[i + 1].x) / 2;
+    path += ` C ${cpx},${pts[i].y1} ${cpx},${pts[i + 1].y1} ${pts[i + 1].x},${pts[i + 1].y1}`;
+  }
+  // Bottom line (y0) reverse
+  for (let i = pts.length - 1; i > 0; i--) {
+    const cpx = (pts[i].x + pts[i - 1].x) / 2;
+    path += ` C ${cpx},${pts[i].y0} ${cpx},${pts[i - 1].y0} ${pts[i - 1].x},${pts[i - 1].y0}`;
+  }
+  path += ' Z';
+  return path;
+}
+
+const bergLayersGroup = document.getElementById('berg-layers');
+// Create path elements
+const bergPaths = bergData.categories.map((cat, i) => {
+  const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+  path.setAttribute('fill', cat.grad);
+  path.setAttribute('stroke', 'none');
+  bergLayersGroup.appendChild(path);
+  return path;
+});
+
+let bergLastProgress = -1;
+
+function updateBerg() {
+  const section = document.getElementById('der-berg');
+  const progress = getSectionProgress(section);
+  const eased = Math.pow(progress, 0.8);
+
+  if (Math.abs(eased - bergLastProgress) < 0.002) return;
+  bergLastProgress = eased;
+
+  bergPaths.forEach((path, i) => {
+    path.setAttribute('d', buildAreaPath(i, eased));
+  });
+
+  const annotation = document.getElementById('berg-annotation');
+  annotation.classList.toggle('visible', eased > 0.85);
+}
+
+// ================================================
+// SECTION 2: DER VERGLEICH — Bar race
+// ================================================
+let vergleichAnimated = false;
+
+function updateVergleich() {
+  const section = document.getElementById('der-vergleich');
+  const progress = getSectionProgress(section);
+
+  if (progress > 0.3 && !vergleichAnimated) {
+    vergleichAnimated = true;
+    document.querySelectorAll('.bar-fill').forEach((bar, i) => {
+      setTimeout(() => bar.classList.add('animated'), i * 200);
+    });
+    setTimeout(() => {
+      document.getElementById('vergleich-annotation').classList.add('visible');
+    }, 800);
+  }
+}
+
+// ================================================
+// SECTION 3: DAS NETZWERK — Force-directed graph
+// ================================================
+const networkNodes = [
+  { id: 'rilling', label: 'Helmuth Rilling', type: 'center', r: 38, desc: 'Dirigent, Pädagoge, Visionär (1933--2026)' },
+  // Ensembles
+  { id: 'gaechinger', label: 'Gächinger Kantorei', type: 'ensemble', r: 22, desc: 'Gegründet 1954, sein Lebensensemble' },
+  { id: 'bachcollegium', label: 'Bach-Collegium Stuttgart', type: 'ensemble', r: 22, desc: 'Gegründet 1965, Orchester der Gesamteinspielung' },
+  { id: 'bachakademie', label: 'Internationale Bachakademie', type: 'institution', r: 24, desc: 'Gegründet 1981 in Stuttgart' },
+  { id: 'oregon', label: 'Oregon Bach Festival', type: 'institution', r: 20, desc: 'Künstlerischer Leiter 1970--2013' },
+  { id: 'israel', label: 'Israel Philharmonic', type: 'ensemble', r: 18, desc: 'Regelmäßiger Gastdirigent' },
+  { id: 'nhk', label: 'NHK Symphony', type: 'ensemble', r: 18, desc: 'Gastdirigent in Tokyo' },
+  // Students
+  { id: 'student1', label: 'Hans-Christoph Rademann', type: 'student', r: 14, desc: 'Leiter der Gaechinger Cantorey' },
+  { id: 'student2', label: 'Frieder Bernius', type: 'student', r: 14, desc: 'Gründer des Kammerchor Stuttgart' },
+  { id: 'student3', label: 'Marcus Creed', type: 'student', r: 14, desc: 'Ehem. Leiter des RIAS Kammerchors' },
+  { id: 'student4', label: 'Helmuth Müller-Brühl', type: 'student', r: 13, desc: 'Kölner Kammerorchester' },
+  { id: 'student5', label: 'Robin Gritton', type: 'student', r: 13, desc: 'Chorleiter in Cambridge' },
+  { id: 'student6', label: 'Andrew Megill', type: 'student', r: 13, desc: 'Montréal Symphony Chorus' },
+  { id: 'student7', label: 'Simon Halsey', type: 'student', r: 14, desc: 'City of Birmingham Symphony Chorus' },
+  { id: 'student8', label: 'Nicol Matt', type: 'student', r: 13, desc: 'Europäischer Kammerchor' },
+  { id: 'student9', label: 'Brett Karlin', type: 'student', r: 12, desc: 'Oregon Repertory Singers' },
+  { id: 'student10', label: 'Patrick Dupré Quigley', type: 'student', r: 12, desc: 'Seraphic Fire' },
+  { id: 'student11', label: 'Matthew Halls', type: 'student', r: 13, desc: 'Oregon Bach Festival (Nachfolger)' },
+];
+
+const networkLinks = [
+  { source: 'rilling', target: 'gaechinger' },
+  { source: 'rilling', target: 'bachcollegium' },
+  { source: 'rilling', target: 'bachakademie' },
+  { source: 'rilling', target: 'oregon' },
+  { source: 'rilling', target: 'israel' },
+  { source: 'rilling', target: 'nhk' },
+  { source: 'rilling', target: 'student1' },
+  { source: 'rilling', target: 'student2' },
+  { source: 'rilling', target: 'student3' },
+  { source: 'rilling', target: 'student4' },
+  { source: 'rilling', target: 'student5' },
+  { source: 'rilling', target: 'student6' },
+  { source: 'rilling', target: 'student7' },
+  { source: 'rilling', target: 'student8' },
+  { source: 'rilling', target: 'student9' },
+  { source: 'rilling', target: 'student10' },
+  { source: 'rilling', target: 'student11' },
+  { source: 'bachakademie', target: 'gaechinger' },
+  { source: 'bachakademie', target: 'bachcollegium' },
+  { source: 'bachakademie', target: 'oregon' },
+];
+
+// Position nodes using simple force simulation
+const cx = 450, cy = 350;
+function initNetworkPositions() {
+  networkNodes.forEach((n, i) => {
+    if (n.id === 'rilling') {
+      n.x = cx; n.y = cy;
+    } else {
+      const angle = (i - 1) / (networkNodes.length - 1) * Math.PI * 2;
+      const dist = n.type === 'student' ? 260 : 160;
+      n.x = cx + Math.cos(angle) * dist;
+      n.y = cy + Math.sin(angle) * dist;
+    }
+    n.vx = 0; n.vy = 0;
+  });
+}
+
+initNetworkPositions();
+
+// Simple force simulation
+function simulateForces(iterations) {
+  const nodeMap = {};
+  networkNodes.forEach(n => nodeMap[n.id] = n);
+
+  for (let iter = 0; iter < iterations; iter++) {
+    // Repulsion between all nodes
+    for (let i = 0; i < networkNodes.length; i++) {
+      for (let j = i + 1; j < networkNodes.length; j++) {
+        const a = networkNodes[i], b = networkNodes[j];
+        let dx = b.x - a.x, dy = b.y - a.y;
+        let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+        const minDist = (a.r + b.r) * 2.2;
+        if (dist < minDist) {
+          const force = (minDist - dist) * 0.3;
+          const fx = (dx / dist) * force, fy = (dy / dist) * force;
+          if (a.id !== 'rilling') { a.x -= fx; a.y -= fy; }
+          if (b.id !== 'rilling') { b.x += fx; b.y += fy; }
+        }
+      }
+    }
+
+    // Attraction along links
+    networkLinks.forEach(link => {
+      const a = nodeMap[link.source], b = nodeMap[link.target];
+      let dx = b.x - a.x, dy = b.y - a.y;
+      let dist = Math.sqrt(dx * dx + dy * dy) || 1;
+      const targetDist = a.id === 'rilling' || b.id === 'rilling' ?
+        (b.type === 'student' || a.type === 'student' ? 230 : 155) : 120;
+      const force = (dist - targetDist) * 0.02;
+      const fx = (dx / dist) * force, fy = (dy / dist) * force;
+      if (a.id !== 'rilling') { a.x += fx; a.y += fy; }
+      if (b.id !== 'rilling') { b.x -= fx; b.y -= fy; }
+    });
+
+    // Bounds
+    networkNodes.forEach(n => {
+      if (n.id !== 'rilling') {
+        n.x = clamp(n.x, n.r + 10, 890 - n.r);
+        n.y = clamp(n.y, n.r + 10, 690 - n.r);
+      }
+    });
+  }
+}
+
+simulateForces(300);
+
+function renderNetwork() {
+  const nodeMap = {};
+  networkNodes.forEach(n => nodeMap[n.id] = n);
+
+  const linksGroup = document.getElementById('netzwerk-links');
+  const nodesGroup = document.getElementById('netzwerk-nodes');
+  linksGroup.innerHTML = '';
+  nodesGroup.innerHTML = '';
+
+  // Draw links
+  networkLinks.forEach(link => {
+    const a = nodeMap[link.source], b = nodeMap[link.target];
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    line.setAttribute('x1', a.x);
+    line.setAttribute('y1', a.y);
+    line.setAttribute('x2', b.x);
+    line.setAttribute('y2', b.y);
+    line.setAttribute('stroke', 'rgba(201,168,76,0.15)');
+    line.setAttribute('stroke-width', '1.5');
+    linksGroup.appendChild(line);
+  });
+
+  // Draw nodes
+  networkNodes.forEach(n => {
+    const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    g.setAttribute('class', 'netzwerk-node');
+    g.setAttribute('data-id', n.id);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('cx', n.x);
+    circle.setAttribute('cy', n.y);
+    circle.setAttribute('r', n.r);
+
+    let fill;
+    if (n.type === 'center') fill = '#C9A84C';
+    else if (n.type === 'ensemble') fill = '#6B9080';
+    else if (n.type === 'institution') fill = '#8B7EC8';
+    else fill = '#7BA0B8';
+
+    circle.setAttribute('fill', fill);
+    circle.setAttribute('stroke', n.type === 'center' ? '#ddbf6a' : 'rgba(245,240,232,0.2)');
+    circle.setAttribute('stroke-width', n.type === 'center' ? '3' : '1.5');
+    g.appendChild(circle);
+
+    // Label
+    const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    text.setAttribute('x', n.x);
+    text.setAttribute('y', n.y + n.r + 14);
+    text.setAttribute('text-anchor', 'middle');
+    text.setAttribute('fill', 'rgba(245,240,232,0.7)');
+    text.setAttribute('font-family', 'Cormorant Garamond, serif');
+    text.setAttribute('font-size', n.type === 'center' ? '14' : '10');
+
+    // Split long labels
+    const words = n.label.split(' ');
+    if (words.length > 2 && n.type !== 'center') {
+      const mid = Math.ceil(words.length / 2);
+      const line1 = words.slice(0, mid).join(' ');
+      const line2 = words.slice(mid).join(' ');
+      const tspan1 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspan1.setAttribute('x', n.x);
+      tspan1.setAttribute('dy', '0');
+      tspan1.textContent = line1;
+      const tspan2 = document.createElementNS('http://www.w3.org/2000/svg', 'tspan');
+      tspan2.setAttribute('x', n.x);
+      tspan2.setAttribute('dy', '12');
+      tspan2.textContent = line2;
+      text.appendChild(tspan1);
+      text.appendChild(tspan2);
+    } else {
+      text.textContent = n.label;
+    }
+    g.appendChild(text);
+
+    // Hover events
+    g.addEventListener('mouseenter', (e) => {
+      const tooltip = document.getElementById('netzwerk-tooltip');
+      tooltip.querySelector('.tooltip-title').textContent = n.label;
+      tooltip.querySelector('.tooltip-desc').textContent = n.desc;
+      tooltip.classList.add('visible');
+      circle.setAttribute('stroke-width', '3');
+      circle.setAttribute('stroke', '#C9A84C');
+    });
+    g.addEventListener('mousemove', (e) => {
+      const tooltip = document.getElementById('netzwerk-tooltip');
+      tooltip.style.left = (e.clientX + 15) + 'px';
+      tooltip.style.top = (e.clientY - 10) + 'px';
+    });
+    g.addEventListener('mouseleave', () => {
+      const tooltip = document.getElementById('netzwerk-tooltip');
+      tooltip.classList.remove('visible');
+      circle.setAttribute('stroke-width', n.type === 'center' ? '3' : '1.5');
+      circle.setAttribute('stroke', n.type === 'center' ? '#ddbf6a' : 'rgba(245,240,232,0.2)');
+    });
+
+    nodesGroup.appendChild(g);
+  });
+}
+
+renderNetwork();
+
+// Gentle floating animation for network
+let networkTime = 0;
+function animateNetwork() {
+  networkTime += 0.005;
+  const nodesGroup = document.getElementById('netzwerk-nodes');
+  const linksGroup = document.getElementById('netzwerk-links');
+  const nodeMap = {};
+  networkNodes.forEach(n => nodeMap[n.id] = n);
+
+  networkNodes.forEach((n, i) => {
+    if (n.id === 'rilling') return;
+    const offsetX = Math.sin(networkTime + i * 0.7) * 3;
+    const offsetY = Math.cos(networkTime + i * 1.1) * 3;
+    n.dx = offsetX; n.dy = offsetY;
+  });
+
+  // Update circles and texts
+  const gElements = nodesGroup.querySelectorAll('.netzwerk-node');
+  gElements.forEach(g => {
+    const id = g.dataset.id;
+    const n = nodeMap[id];
+    if (!n || n.id === 'rilling') return;
+    const circle = g.querySelector('circle');
+    const text = g.querySelector('text');
+    circle.setAttribute('cx', n.x + (n.dx || 0));
+    circle.setAttribute('cy', n.y + (n.dy || 0));
+    text.setAttribute('x', n.x + (n.dx || 0));
+    text.setAttribute('y', n.y + n.r + 14 + (n.dy || 0));
+    const tspans = text.querySelectorAll('tspan');
+    tspans.forEach(ts => ts.setAttribute('x', n.x + (n.dx || 0)));
+  });
+
+  // Update links
+  const lines = linksGroup.querySelectorAll('line');
+  let lineIdx = 0;
+  networkLinks.forEach(link => {
+    const a = nodeMap[link.source], b = nodeMap[link.target];
+    if (lineIdx < lines.length) {
+      lines[lineIdx].setAttribute('x1', a.x + (a.dx || 0));
+      lines[lineIdx].setAttribute('y1', a.y + (a.dy || 0));
+      lines[lineIdx].setAttribute('x2', b.x + (b.dx || 0));
+      lines[lineIdx].setAttribute('y2', b.y + (b.dy || 0));
+      lineIdx++;
+    }
+  });
+
+  requestAnimationFrame(animateNetwork);
+}
+animateNetwork();
+
+// ================================================
+// SECTION 4: DIE PREISE — Timeline
+// ================================================
+const awards = [
+  { year: 1994, name: 'UNESCO-Musikpreis', detail: 'Für Verdienste um Musikerziehung weltweit', icon: 'globe' },
+  { year: 1995, name: 'Theodor-Heuss-Preis', detail: 'Für vorbildliches demokratisches Engagement', icon: 'star' },
+  { year: 2001, name: 'Grammy Award', detail: 'Best Choral Performance', icon: 'music' },
+  { year: 2004, name: 'Bach-Medaille Leipzig', detail: 'Höchste Auszeichnung der Bach-Stadt', icon: 'medal' },
+  { year: 2008, name: 'Sanford Medal (Yale)', detail: 'Yale School of Music Distinguished Service', icon: 'shield' },
+  { year: 2011, name: 'Herbert-von-Karajan-Preis', detail: 'Für ein Lebenswerk der Musikvermittlung', icon: 'trophy' },
+  { year: 2013, name: 'ECHO Klassik', detail: 'Lebenswerk / Lifetime Achievement', icon: 'award' },
+];
+
+function getAwardIcon(type) {
+  switch(type) {
+    case 'globe': return '<circle cx="12" cy="12" r="8" fill="none" stroke="#1A1410" stroke-width="1.5"/><ellipse cx="12" cy="12" rx="4" ry="8" fill="none" stroke="#1A1410" stroke-width="1"/><line x1="4" y1="12" x2="20" y2="12" stroke="#1A1410" stroke-width="1"/>';
+    case 'star': return '<polygon points="12,3 14.5,9 21,9.5 16,14 17.5,21 12,17.5 6.5,21 8,14 3,9.5 9.5,9" fill="#1A1410" stroke="none"/>';
+    case 'music': return '<circle cx="8" cy="17" r="3" fill="#1A1410"/><circle cx="18" cy="15" r="3" fill="#1A1410"/><line x1="11" y1="17" x2="11" y2="5" stroke="#1A1410" stroke-width="2"/><line x1="21" y1="15" x2="21" y2="3" stroke="#1A1410" stroke-width="2"/><line x1="11" y1="5" x2="21" y2="3" stroke="#1A1410" stroke-width="2"/>';
+    case 'medal': return '<circle cx="12" cy="14" r="6" fill="none" stroke="#1A1410" stroke-width="1.5"/><line x1="8" y1="3" x2="10" y2="9" stroke="#1A1410" stroke-width="1.5"/><line x1="16" y1="3" x2="14" y2="9" stroke="#1A1410" stroke-width="1.5"/><line x1="8" y1="3" x2="16" y2="3" stroke="#1A1410" stroke-width="1.5"/>';
+    case 'shield': return '<path d="M12,2 L20,6 L20,13 C20,18 12,22 12,22 C12,22 4,18 4,13 L4,6 Z" fill="none" stroke="#1A1410" stroke-width="1.5"/>';
+    case 'trophy': return '<path d="M7,4 L17,4 L16,12 C16,14 14,16 12,16 C10,16 8,14 8,12 Z" fill="none" stroke="#1A1410" stroke-width="1.5"/><line x1="12" y1="16" x2="12" y2="20" stroke="#1A1410" stroke-width="1.5"/><line x1="8" y1="20" x2="16" y2="20" stroke="#1A1410" stroke-width="1.5"/><path d="M7,4 C4,4 3,7 5,9 L8,8" fill="none" stroke="#1A1410" stroke-width="1"/><path d="M17,4 C20,4 21,7 19,9 L16,8" fill="none" stroke="#1A1410" stroke-width="1"/>';
+    case 'award': return '<circle cx="12" cy="9" r="5" fill="none" stroke="#1A1410" stroke-width="1.5"/><polyline points="9,14 8,22 12,19 16,22 15,14" fill="none" stroke="#1A1410" stroke-width="1.5"/>';
+    default: return '<circle cx="12" cy="12" r="5" fill="#1A1410"/>';
+  }
+}
+
+const timelineDotsContainer = document.getElementById('timeline-dots');
+awards.forEach((award, i) => {
+  const dot = document.createElement('div');
+  dot.className = 'timeline-dot';
+  dot.style.transitionDelay = (i * 0.2) + 's';
+  dot.innerHTML = `
+    <div class="timeline-detail">${award.detail}</div>
+    <div class="timeline-medal">
+      <svg viewBox="0 0 24 24">${getAwardIcon(award.icon)}</svg>
+    </div>
+    <div class="timeline-year">${award.year}</div>
+    <div class="timeline-name">${award.name}</div>
+  `;
+  timelineDotsContainer.appendChild(dot);
+});
+
+let preiseAnimated = false;
+
+function updatePreise() {
+  const section = document.getElementById('die-preise');
+  const progress = getSectionProgress(section);
+
+  if (progress > 0.3 && !preiseAnimated) {
+    preiseAnimated = true;
+    document.getElementById('timeline-fill').style.width = '100%';
+    document.querySelectorAll('.timeline-dot').forEach((dot, i) => {
+      setTimeout(() => dot.classList.add('visible'), i * 250);
+    });
+  }
+}
+
+// ================================================
+// SECTION 5: DAS ERBE — Ripple effect
+// ================================================
+const erbeCanvas = document.getElementById('erbe-canvas');
+const erbeCtx = erbeCanvas.getContext('2d');
+
+const students = [
+  // Ring 1 - direct students
+  { name: 'Hans-Christoph Rademann', ring: 1, angle: 0 },
+  { name: 'Frieder Bernius', ring: 1, angle: 0.4 },
+  { name: 'Marcus Creed', ring: 1, angle: 0.8 },
+  { name: 'Simon Halsey', ring: 1, angle: 1.2 },
+  { name: 'Helmuth Müller-Brühl', ring: 1, angle: 1.6 },
+  { name: 'Nicol Matt', ring: 1, angle: 2.0 },
+  { name: 'Andrew Megill', ring: 1, angle: 2.4 },
+  { name: 'Robin Gritton', ring: 1, angle: 2.8 },
+  { name: 'Matthew Halls', ring: 1, angle: 3.2 },
+  { name: 'Patrick D. Quigley', ring: 1, angle: 3.7 },
+  { name: 'Brett Karlin', ring: 1, angle: 4.2 },
+  { name: 'Jörg Breiding', ring: 1, angle: 4.7 },
+  { name: 'Risto Joost', ring: 1, angle: 5.2 },
+  { name: 'José Antonio Montaño', ring: 1, angle: 5.7 },
+  // Ring 2 - next generation
+  { name: 'Neue Generation', ring: 2, angle: 0.3 },
+  { name: 'Weltweite Bachakademien', ring: 2, angle: 1.1 },
+  { name: 'Oregon Bach Festival Alumni', ring: 2, angle: 1.9 },
+  { name: 'Stuttgarter Tradition', ring: 2, angle: 2.7 },
+  { name: 'Internationale Chorleiter', ring: 2, angle: 3.5 },
+  { name: 'Musikpädagogen', ring: 2, angle: 4.3 },
+  { name: 'Kirchenmusiker', ring: 2, angle: 5.1 },
+  // Ring 3 - legacy
+  { name: 'Hunderte Musikstudierende', ring: 3, angle: 0.8 },
+  { name: 'Tausende Konzertbesucher', ring: 3, angle: 2.0 },
+  { name: 'Millionen Hörer weltweit', ring: 3, angle: 3.4 },
+  { name: 'Unzählige Bach-Liebhaber', ring: 3, angle: 4.8 },
+];
+
+let ripples = [];
+let erbeActive = false;
+let dropStartTime = 0;
+
+function resizeErbeCanvas() {
+  const section = document.getElementById('das-erbe');
+  erbeCanvas.width = section.offsetWidth;
+  erbeCanvas.height = section.offsetHeight;
+}
+resizeErbeCanvas();
+window.addEventListener('resize', resizeErbeCanvas);
+
+function spawnRipple() {
+  const now = performance.now();
+  ripples.push({ born: now, maxRadius: Math.max(erbeCanvas.width, erbeCanvas.height) * 0.6 });
+}
+
+function drawErbe(timestamp) {
+  if (!erbeActive) { requestAnimationFrame(drawErbe); return; }
+
+  erbeCtx.clearRect(0, 0, erbeCanvas.width, erbeCanvas.height);
+
+  const cx = erbeCanvas.width / 2;
+  const cy = erbeCanvas.height / 2;
+  const elapsed = (timestamp - dropStartTime) / 1000;
+
+  // Draw expanding rings for generations
+  const ringRadii = [0, 0, 0];
+  const maxR = Math.min(erbeCanvas.width, erbeCanvas.height) * 0.4;
+  const ringTargets = [maxR * 0.35, maxR * 0.65, maxR * 0.95];
+
+  for (let r = 0; r < 3; r++) {
+    const delay = r * 0.8;
+    const t = clamp((elapsed - delay) / 2.5, 0, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    ringRadii[r] = ringTargets[r] * eased;
+
+    if (t > 0) {
+      erbeCtx.beginPath();
+      erbeCtx.arc(cx, cy, ringRadii[r], 0, Math.PI * 2);
+      erbeCtx.strokeStyle = `rgba(201, 168, 76, ${0.15 * (1 - r * 0.03)})`;
+      erbeCtx.lineWidth = 1.5;
+      erbeCtx.stroke();
+    }
+  }
+
+  // Central drop
+  const dropSize = clamp(elapsed * 3, 0, 8);
+  const dropPulse = 1 + Math.sin(timestamp / 500) * 0.15;
+  erbeCtx.beginPath();
+  erbeCtx.arc(cx, cy, dropSize * dropPulse, 0, Math.PI * 2);
+  erbeCtx.fillStyle = '#C9A84C';
+  erbeCtx.fill();
+
+  // Ripple waves
+  const waveCount = Math.min(Math.floor(elapsed / 1.2), 6);
+  for (let w = 0; w < waveCount; w++) {
+    const waveAge = elapsed - w * 1.2;
+    const waveR = waveAge * maxR * 0.22;
+    const waveAlpha = clamp(0.3 - waveAge * 0.04, 0, 0.3);
+    if (waveAlpha > 0 && waveR > 0) {
+      erbeCtx.beginPath();
+      erbeCtx.arc(cx, cy, waveR, 0, Math.PI * 2);
+      erbeCtx.strokeStyle = `rgba(201, 168, 76, ${waveAlpha})`;
+      erbeCtx.lineWidth = 1;
+      erbeCtx.stroke();
+    }
+  }
+
+  // Student names along rings
+  students.forEach((s, i) => {
+    const delay = s.ring * 0.8;
+    const t = clamp((elapsed - delay - 0.5) / 2, 0, 1);
+    if (t <= 0) return;
+
+    const radius = ringRadii[s.ring - 1];
+    if (radius < 10) return;
+
+    const wobble = Math.sin(timestamp / 2000 + i) * 0.03;
+    const angle = s.angle + wobble;
+    const x = cx + Math.cos(angle) * radius;
+    const y = cy + Math.sin(angle) * radius;
+
+    const alpha = t * 0.75;
+    erbeCtx.save();
+    erbeCtx.translate(x, y);
+
+    const fontSize = s.ring === 1 ? 13 : s.ring === 2 ? 11 : 10;
+    erbeCtx.font = `${s.ring === 1 ? '500' : '300'} ${fontSize}px "Cormorant Garamond", serif`;
+    erbeCtx.fillStyle = s.ring === 1 ? `rgba(245, 240, 232, ${alpha})` :
+                        s.ring === 2 ? `rgba(201, 168, 76, ${alpha * 0.7})` :
+                                       `rgba(245, 240, 232, ${alpha * 0.5})`;
+    erbeCtx.textAlign = 'center';
+    erbeCtx.textBaseline = 'middle';
+
+    // Slight rotation to follow ring
+    let textAngle = angle + Math.PI / 2;
+    if (angle > Math.PI / 2 && angle < Math.PI * 1.5) {
+      textAngle += Math.PI;
+    }
+    erbeCtx.rotate(textAngle);
+    erbeCtx.fillText(s.name, 0, 0);
+    erbeCtx.restore();
+  });
+
+  requestAnimationFrame(drawErbe);
+}
+
+requestAnimationFrame(drawErbe);
+
+let erbeStarted = false;
+
+function updateErbe() {
+  const section = document.getElementById('das-erbe');
+  const progress = getSectionProgress(section);
+
+  if (progress > 0.3 && !erbeStarted) {
+    erbeStarted = true;
+    erbeActive = true;
+    dropStartTime = performance.now();
+    document.getElementById('erbe-quote').classList.add('visible');
+  }
+}
+
+// ================================================
+// SCROLL HANDLER
+// ================================================
+function onScroll() {
+  updateNavDots();
+  updateBerg();
+  updateVergleich();
+  updatePreise();
+  updateErbe();
+}
+
+window.addEventListener('scroll', onScroll, { passive: true });
+window.addEventListener('resize', () => {
+  onScroll();
+});
+
+// Initial call
+onScroll();
+
+// Also run on load to handle initial state
+window.addEventListener('load', () => {
+  onScroll();
+  // Trigger berg to show at least initial state
+  updateBerg();
+});
+</script>
+
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>

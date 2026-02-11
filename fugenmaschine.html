@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fugenmaschine — Klangkathedrale</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root {
+    --color-gold: #C9A84C;
+    --color-ink: #1A1410;
+    --color-ivory: #F5F0E8;
+    --color-rose: #D4725C;
+    --color-sage: #6B9080;
+    --color-amethyst: #8B7EC8;
+    --font-display: 'Bodoni Moda', serif;
+    --font-body: 'Cormorant Garamond', serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--color-ink);
+    overflow: hidden;
+    font-family: var(--font-body);
+    color: var(--color-ivory);
+    cursor: crosshair;
+  }
+
+  canvas { display: block; }
+
+  /* Back link */
+  .back-link {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    font-family: var(--font-body);
+    font-size: 14px;
+    color: var(--color-ivory);
+    opacity: 0.5;
+    text-decoration: none;
+    transition: opacity 0.3s;
+    letter-spacing: 0.5px;
+  }
+  .back-link:hover { opacity: 1; }
+
+  /* Title overlay */
+  .title-overlay {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    text-align: center;
+    pointer-events: none;
+    opacity: 0.6;
+    transition: opacity 0.5s;
+  }
+  .title-overlay h1 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 18px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-bottom: 2px;
+  }
+  .title-overlay .subtitle {
+    font-family: var(--font-body);
+    font-style: italic;
+    font-size: 12px;
+    color: var(--color-ivory);
+    opacity: 0.7;
+    letter-spacing: 1px;
+  }
+
+  /* Voice indicators */
+  .voice-indicators {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100;
+    display: flex;
+    gap: 24px;
+    opacity: 0.6;
+    transition: opacity 0.5s;
+  }
+  .voice-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 0.5px;
+    opacity: 0.3;
+    transition: opacity 0.8s ease;
+  }
+  .voice-indicator.active { opacity: 1; }
+  .voice-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* Fixed buttons */
+  .controls-bar {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    gap: 8px;
+  }
+
+  .ctrl-btn {
+    background: rgba(26, 20, 16, 0.7);
+    border: 1px solid rgba(201, 168, 76, 0.25);
+    color: var(--color-ivory);
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 6px 14px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    letter-spacing: 0.5px;
+  }
+  .ctrl-btn:hover {
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+  }
+
+  /* Sidebar */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    right: -320px;
+    width: 320px;
+    height: 100vh;
+    background: rgba(26, 20, 16, 0.92);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-left: 1px solid rgba(201, 168, 76, 0.15);
+    z-index: 200;
+    padding: 60px 28px 28px;
+    transition: right 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    overflow-y: auto;
+  }
+  .sidebar.open { right: 0; }
+
+  .sidebar-close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: none;
+    border: none;
+    color: var(--color-ivory);
+    font-size: 20px;
+    cursor: pointer;
+    opacity: 0.5;
+    transition: opacity 0.3s;
+    font-family: var(--font-body);
+  }
+  .sidebar-close:hover { opacity: 1; }
+
+  .sidebar h2 {
+    font-family: var(--font-display);
+    font-weight: 400;
+    font-size: 16px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--color-gold);
+    margin-bottom: 28px;
+  }
+
+  .control-group {
+    margin-bottom: 22px;
+  }
+  .control-group label {
+    display: block;
+    font-family: var(--font-body);
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--color-ivory);
+    opacity: 0.6;
+    margin-bottom: 8px;
+  }
+  .control-group .value-display {
+    float: right;
+    color: var(--color-gold);
+    opacity: 0.8;
+    text-transform: none;
+    letter-spacing: 0;
+  }
+
+  /* Sliders */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 2px;
+    background: rgba(245, 240, 232, 0.15);
+    border-radius: 1px;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    cursor: pointer;
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 6px rgba(201, 168, 76, 0.4);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    background: var(--color-gold);
+    cursor: pointer;
+    border: 2px solid var(--color-ink);
+    box-shadow: 0 0 6px rgba(201, 168, 76, 0.4);
+  }
+
+  /* Style buttons */
+  .style-buttons {
+    display: flex;
+    gap: 6px;
+  }
+  .style-btn {
+    flex: 1;
+    background: rgba(245, 240, 232, 0.05);
+    border: 1px solid rgba(245, 240, 232, 0.15);
+    color: var(--color-ivory);
+    font-family: var(--font-body);
+    font-size: 12px;
+    padding: 7px 4px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s;
+    letter-spacing: 0.3px;
+  }
+  .style-btn:hover {
+    border-color: rgba(201, 168, 76, 0.4);
+  }
+  .style-btn.active {
+    background: rgba(201, 168, 76, 0.15);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+  }
+
+  /* Toggle switches */
+  .toggle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+  }
+  .toggle-label {
+    font-family: var(--font-body);
+    font-size: 13px;
+    letter-spacing: 0.5px;
+    color: var(--color-ivory);
+    opacity: 0.8;
+  }
+  .toggle-switch {
+    position: relative;
+    width: 40px;
+    height: 20px;
+    cursor: pointer;
+  }
+  .toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  .toggle-track {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(245, 240, 232, 0.1);
+    border-radius: 10px;
+    transition: background 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-track {
+    background: rgba(201, 168, 76, 0.4);
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-ivory);
+    top: 2px;
+    left: 2px;
+    transition: transform 0.3s;
+  }
+  .toggle-switch input:checked + .toggle-track::after {
+    transform: translateX(20px);
+    background: var(--color-gold);
+  }
+
+  /* Action buttons in sidebar */
+  .action-btn {
+    width: 100%;
+    background: rgba(245, 240, 232, 0.05);
+    border: 1px solid rgba(201, 168, 76, 0.2);
+    color: var(--color-ivory);
+    font-family: var(--font-body);
+    font-size: 13px;
+    padding: 10px;
+    cursor: pointer;
+    border-radius: 2px;
+    transition: all 0.3s;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+  .action-btn:hover {
+    background: rgba(201, 168, 76, 0.1);
+    border-color: var(--color-gold);
+    color: var(--color-gold);
+  }
+
+  .divider {
+    border: none;
+    border-top: 1px solid rgba(245, 240, 232, 0.08);
+    margin: 20px 0;
+  }
+
+  .seed-display {
+    font-family: 'Courier New', monospace;
+    font-size: 11px;
+    color: var(--color-gold);
+    opacity: 0.6;
+    text-align: center;
+    margin-top: 16px;
+    letter-spacing: 1px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Back link -->
+<a href="klangkathedrale.html" class="back-link">&larr; Klangkathedrale</a>
+
+<!-- Title -->
+<div class="title-overlay">
+  <h1>Fugenmaschine</h1>
+  <div class="subtitle">after BWV 578 &middot; Fuga in G minor</div>
+</div>
+
+<!-- Voice indicators -->
+<div class="voice-indicators">
+  <div class="voice-indicator" id="vi-soprano">
+    <div class="voice-dot" style="background: #C9A84C;"></div>
+    <span>Soprano</span>
+  </div>
+  <div class="voice-indicator" id="vi-alto">
+    <div class="voice-dot" style="background: #D4725C;"></div>
+    <span>Alto</span>
+  </div>
+  <div class="voice-indicator" id="vi-tenor">
+    <div class="voice-dot" style="background: #6B9080;"></div>
+    <span>Tenor</span>
+  </div>
+  <div class="voice-indicator" id="vi-bass">
+    <div class="voice-dot" style="background: #8B7EC8;"></div>
+    <span>Bass</span>
+  </div>
+</div>
+
+<!-- Control buttons -->
+<div class="controls-bar">
+  <button class="ctrl-btn" id="btn-screenshot" title="Save screenshot">Capture</button>
+  <button class="ctrl-btn" id="btn-fullscreen" title="Toggle fullscreen">Fullscreen</button>
+  <button class="ctrl-btn" id="btn-sidebar" title="Open controls">Controls</button>
+</div>
+
+<!-- Sidebar -->
+<div class="sidebar" id="sidebar">
+  <button class="sidebar-close" id="sidebar-close">&times;</button>
+  <h2>Parameters</h2>
+
+  <div class="control-group">
+    <label>Tempo <span class="value-display" id="tempo-val">90 BPM</span></label>
+    <input type="range" id="slider-tempo" min="60" max="180" value="90">
+  </div>
+
+  <div class="control-group">
+    <label>Density <span class="value-display" id="density-val">Medium</span></label>
+    <input type="range" id="slider-density" min="1" max="10" value="5">
+  </div>
+
+  <div class="control-group">
+    <label>Style</label>
+    <div class="style-buttons">
+      <button class="style-btn" data-style="geometric">Geometric</button>
+      <button class="style-btn active" data-style="organic">Organic</button>
+      <button class="style-btn" data-style="calligraphic">Calligraphic</button>
+    </div>
+  </div>
+
+  <hr class="divider">
+
+  <div class="toggle-row">
+    <span class="toggle-label">Stretto</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle-stretto">
+      <div class="toggle-track"></div>
+    </label>
+  </div>
+
+  <div class="toggle-row">
+    <span class="toggle-label">Inversion</span>
+    <label class="toggle-switch">
+      <input type="checkbox" id="toggle-inversion">
+      <div class="toggle-track"></div>
+    </label>
+  </div>
+
+  <hr class="divider">
+
+  <button class="action-btn" id="btn-randomize">Randomize Seed</button>
+
+  <div class="seed-display" id="seed-display">seed: 0</div>
+</div>
+
+<script>
+// =============================================
+// FUGENMASCHINE — Generative Bach Fugue Visualizer
+// Part of Klangkathedrale (Memorial for Helmuth Rilling)
+// =============================================
+
+// --- Design Tokens ---
+const GOLD    = [201, 168, 76];
+const ROSE    = [212, 114, 92];
+const SAGE    = [107, 144, 128];
+const AMETHYST= [139, 126, 200];
+const INK     = [26, 20, 16];
+const IVORY   = [245, 240, 232];
+
+// --- Seed from URL ---
+function getSeedFromURL() {
+  const params = new URLSearchParams(window.location.search);
+  const s = params.get('seed');
+  return s !== null ? parseInt(s, 10) : Math.floor(Math.random() * 100000);
+}
+
+let currentSeed = getSeedFromURL();
+
+// --- Seeded RNG (mulberry32) ---
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  }
+}
+
+let seededRandom;
+
+// --- BWV 578 Fugue Subject (loosely) ---
+// Intervals in semitones relative to tonic, representing the "Little Fugue" subject
+// G4 - D5 - C5 - Bb4 - A4 - Bb4 - C5 - A4 - G4 - F#4 - G4 - A4 - Bb4 - D5 - G4
+const FUGUE_SUBJECT_PITCHES = [
+  67, 74, 72, 70, 69, 70, 72, 69, 67, 66, 67, 69, 70, 74, 67
+];
+// Durations (in 16th notes): gives rhythmic shape
+const FUGUE_SUBJECT_DURATIONS = [
+  4, 4, 2, 2, 2, 2, 4, 2, 2, 2, 2, 2, 2, 4, 8
+];
+
+// Counter-subject (a complementary line)
+const COUNTER_SUBJECT_PITCHES = [
+  72, 70, 69, 67, 65, 64, 65, 67, 69, 70, 72, 74, 72, 70, 69
+];
+const COUNTER_SUBJECT_DURATIONS = [
+  2, 2, 2, 4, 2, 2, 4, 2, 2, 2, 2, 4, 2, 2, 4
+];
+
+// Normalize pitches to 0-1 range
+function normalizePitches(pitches) {
+  const mn = Math.min(...pitches);
+  const mx = Math.max(...pitches);
+  const range = mx - mn || 1;
+  return pitches.map(p => (p - mn) / range);
+}
+
+const subjectNorm = normalizePitches(FUGUE_SUBJECT_PITCHES);
+const counterNorm = normalizePitches(COUNTER_SUBJECT_PITCHES);
+
+// --- State ---
+let params = {
+  tempo: 90,
+  density: 5,
+  style: 'organic',
+  stretto: false,
+  inversion: false
+};
+
+let voices = [];
+let grainTexture;
+let globalBeat = 0;
+let lastBeatTime = 0;
+
+// --- p5.js Sketch ---
+new p5(function(p) {
+
+  const VOICE_CONFIG = [
+    { name: 'Soprano', color: GOLD,     entryBar: 0,  yBase: 0.18, id: 'vi-soprano' },
+    { name: 'Alto',    color: ROSE,     entryBar: 4,  yBase: 0.38, id: 'vi-alto' },
+    { name: 'Tenor',   color: SAGE,     entryBar: 8,  yBase: 0.58, id: 'vi-tenor' },
+    { name: 'Bass',    color: AMETHYST, entryBar: 12, yBase: 0.78, id: 'vi-bass' }
+  ];
+
+  class Particle {
+    constructor(x, y, col, type, voice, seed) {
+      this.x = x;
+      this.y = y;
+      this.origY = y;
+      this.col = col;
+      this.type = type; // 'subject', 'counter', 'free'
+      this.voice = voice;
+      this.vx = 0;
+      this.vy = 0;
+      this.age = 0;
+      this.maxAge = 200 + seededRandom() * 300;
+      this.size = type === 'subject' ? 3 + seededRandom() * 3 :
+                  type === 'counter' ? 2 + seededRandom() * 2 :
+                  1.5 + seededRandom() * 2;
+      this.noiseOff = seededRandom() * 10000;
+      this.brightness = type === 'subject' ? 1.0 :
+                        type === 'counter' ? 0.65 : 0.4;
+      this.trail = [];
+      this.maxTrail = type === 'subject' ? 12 : type === 'counter' ? 8 : 5;
+    }
+
+    update(beat, w, h) {
+      this.age++;
+      const life = 1 - (this.age / this.maxAge);
+      if (life <= 0) return false;
+
+      const speed = p.map(params.tempo, 60, 180, 0.5, 2.0);
+      const t = this.age * 0.01 * speed;
+
+      if (params.style === 'geometric') {
+        // Geometric: angular, grid-snapped movement
+        const angle = Math.floor(p.noise(this.noiseOff + t, beat * 0.01) * 8) * (Math.PI / 4);
+        this.vx += Math.cos(angle) * 0.3;
+        this.vy += Math.sin(angle) * 0.15;
+      } else if (params.style === 'calligraphic') {
+        // Calligraphic: sweeping curves with varying thickness
+        const angle = p.noise(this.noiseOff + t * 0.7, beat * 0.005) * p.TWO_PI * 2;
+        this.vx += Math.cos(angle) * 0.5;
+        this.vy += Math.sin(angle) * 0.2;
+        this.size = (this.type === 'subject' ? 2 : 1.5) + Math.abs(Math.sin(t * 3)) * 4;
+      } else {
+        // Organic: flowing, natural Perlin noise movement
+        const angle = p.noise(this.noiseOff + t, this.y * 0.003) * p.TWO_PI * 2;
+        this.vx += Math.cos(angle) * 0.25;
+        this.vy += Math.sin(angle) * 0.12;
+      }
+
+      // Gravity back toward voice baseline
+      const targetY = this.origY;
+      this.vy += (targetY - this.y) * 0.002;
+
+      // Rightward drift
+      this.vx += 0.15 * speed;
+
+      // Damping
+      this.vx *= 0.96;
+      this.vy *= 0.95;
+
+      // Inversion: flip Y movement
+      if (params.inversion) {
+        this.vy *= -0.5;
+        const centerY = h * 0.5;
+        this.vy += (centerY + (centerY - this.origY) - this.y) * 0.003;
+      }
+
+      this.x += this.vx;
+      this.y += this.vy;
+
+      // Trail
+      if (this.type !== 'free' || this.age % 2 === 0) {
+        this.trail.push({ x: this.x, y: this.y });
+        if (this.trail.length > this.maxTrail) this.trail.shift();
+      }
+
+      // Wrap x
+      if (this.x > w + 50) this.x = -50;
+      if (this.x < -60) this.x = w + 40;
+
+      // Constrain y
+      this.y = p.constrain(this.y, 20, h - 20);
+
+      return life > 0;
+    }
+
+    draw(life) {
+      const a = life * this.brightness * 255;
+      const [r, g, b] = this.col;
+
+      // Draw trail
+      if (this.trail.length > 1 && params.style !== 'geometric') {
+        p.noFill();
+        for (let i = 1; i < this.trail.length; i++) {
+          const ta = (i / this.trail.length) * a * 0.3;
+          p.stroke(r, g, b, ta);
+          p.strokeWeight(this.size * 0.5 * (i / this.trail.length));
+          p.line(this.trail[i-1].x, this.trail[i-1].y, this.trail[i].x, this.trail[i].y);
+        }
+      }
+
+      // Draw particle
+      p.noStroke();
+      if (params.style === 'geometric') {
+        p.fill(r, g, b, a * 0.9);
+        p.rectMode(p.CENTER);
+        const s = this.size * 1.2;
+        p.push();
+        p.translate(this.x, this.y);
+        p.rotate(this.vx * 0.5);
+        p.rect(0, 0, s * 2, s, 1);
+        p.pop();
+      } else if (params.style === 'calligraphic') {
+        p.fill(r, g, b, a * 0.85);
+        p.push();
+        p.translate(this.x, this.y);
+        const angle = p.atan2(this.vy, this.vx);
+        p.rotate(angle);
+        p.ellipse(0, 0, this.size * 3, this.size * 0.8);
+        p.pop();
+      } else {
+        // Organic glow
+        p.fill(r, g, b, a * 0.15);
+        p.ellipse(this.x, this.y, this.size * 5, this.size * 5);
+        p.fill(r, g, b, a * 0.7);
+        p.ellipse(this.x, this.y, this.size * 1.5, this.size * 1.5);
+        p.fill(r, g, b, a);
+        p.ellipse(this.x, this.y, this.size, this.size);
+      }
+    }
+  }
+
+  class Voice {
+    constructor(config, index) {
+      this.name = config.name;
+      this.color = config.color;
+      this.entryBar = config.entryBar;
+      this.yBase = config.yBase;
+      this.elementId = config.id;
+      this.index = index;
+      this.particles = [];
+      this.active = false;
+      this.subjectPhase = 0;
+      this.state = 'waiting'; // 'waiting', 'subject', 'counter', 'free'
+      this.stateTimer = 0;
+      this.subjectLength = subjectNorm.length;
+      this.noteIndex = 0;
+      this.noteTimer = 0;
+    }
+
+    update(beat, w, h) {
+      const barLength = 16; // 16th notes per bar
+      const entryBeat = this.entryBar * barLength;
+
+      // Stretto: halve entry delays
+      const effectiveEntry = params.stretto ? entryBeat * 0.5 : entryBeat;
+
+      if (beat < effectiveEntry) return;
+
+      if (!this.active) {
+        this.active = true;
+        const el = document.getElementById(this.elementId);
+        if (el) el.classList.add('active');
+      }
+
+      // State machine: cycle through subject -> counter -> free -> subject ...
+      this.stateTimer++;
+      const cycleDuration = this.subjectLength * 6;
+      const pos = this.stateTimer % (cycleDuration * 3);
+      if (pos < cycleDuration) {
+        this.state = 'subject';
+      } else if (pos < cycleDuration * 2) {
+        this.state = 'counter';
+      } else {
+        this.state = 'free';
+      }
+
+      // Emit particles based on current melodic data
+      const spawnRate = p.map(params.density, 1, 10, 0.3, 2.5);
+      const spawnCount = Math.floor(spawnRate + (seededRandom() < (spawnRate % 1) ? 1 : 0));
+
+      for (let i = 0; i < spawnCount; i++) {
+        this.emitParticle(beat, w, h);
+      }
+
+      // Update existing particles
+      for (let j = this.particles.length - 1; j >= 0; j--) {
+        const alive = this.particles[j].update(beat, w, h);
+        if (!alive) {
+          this.particles.splice(j, 1);
+        }
+      }
+    }
+
+    emitParticle(beat, w, h) {
+      const maxParticles = p.map(params.density, 1, 10, 80, 600);
+      if (this.particles.length >= maxParticles) return;
+
+      let pitchNorm, noteData;
+      if (this.state === 'subject') {
+        const idx = this.noteIndex % subjectNorm.length;
+        pitchNorm = subjectNorm[idx];
+        noteData = subjectNorm;
+      } else if (this.state === 'counter') {
+        const idx = this.noteIndex % counterNorm.length;
+        pitchNorm = counterNorm[idx];
+        noteData = counterNorm;
+      } else {
+        pitchNorm = p.noise(beat * 0.01 + this.index * 100) ;
+        noteData = null;
+      }
+
+      // Advance note index with rhythm
+      this.noteTimer++;
+      const durs = this.state === 'subject' ? FUGUE_SUBJECT_DURATIONS :
+                   this.state === 'counter' ? COUNTER_SUBJECT_DURATIONS : null;
+      if (durs) {
+        const durIdx = this.noteIndex % durs.length;
+        const dur = durs[durIdx] * p.map(params.tempo, 60, 180, 3, 1);
+        if (this.noteTimer >= dur) {
+          this.noteTimer = 0;
+          this.noteIndex++;
+        }
+      } else {
+        if (this.noteTimer >= 4) {
+          this.noteTimer = 0;
+          this.noteIndex++;
+        }
+      }
+
+      // Y position from pitch
+      let yRange = h * 0.15;
+      let yCenter = h * this.yBase;
+
+      if (params.inversion) {
+        pitchNorm = 1.0 - pitchNorm;
+      }
+
+      const yPos = yCenter + (pitchNorm - 0.5) * yRange + (seededRandom() - 0.5) * 10;
+
+      // X position: spawn from left, spread across canvas
+      const xPos = (seededRandom() * 0.3) * w;
+
+      const particle = new Particle(
+        xPos, yPos, this.color, this.state, this.index, seededRandom
+      );
+      this.particles.push(particle);
+    }
+
+    draw() {
+      if (!this.active) return;
+      for (const particle of this.particles) {
+        const life = 1 - (particle.age / particle.maxAge);
+        particle.draw(life);
+      }
+    }
+  }
+
+  // --- Grain texture ---
+  function createGrain(w, h) {
+    grainTexture = p.createGraphics(w, h);
+    grainTexture.loadPixels();
+    for (let i = 0; i < grainTexture.pixels.length; i += 4) {
+      const v = seededRandom() * 25;
+      grainTexture.pixels[i]   = v;
+      grainTexture.pixels[i+1] = v;
+      grainTexture.pixels[i+2] = v;
+      grainTexture.pixels[i+3] = 12;
+    }
+    grainTexture.updatePixels();
+  }
+
+  // --- Interference patterns ---
+  function drawInterference() {
+    const activeVoices = voices.filter(v => v.active);
+    if (activeVoices.length < 2) return;
+
+    for (let i = 0; i < activeVoices.length; i++) {
+      for (let j = i + 1; j < activeVoices.length; j++) {
+        const v1 = activeVoices[i];
+        const v2 = activeVoices[j];
+
+        // Find nearby particle pairs
+        const sampleSize = Math.min(v1.particles.length, 30);
+        for (let k = 0; k < sampleSize; k++) {
+          const idx1 = Math.floor(seededRandom() * v1.particles.length);
+          const p1 = v1.particles[idx1];
+          if (!p1) continue;
+
+          for (let l = 0; l < Math.min(v2.particles.length, 15); l++) {
+            const idx2 = Math.floor(seededRandom() * v2.particles.length);
+            const p2 = v2.particles[idx2];
+            if (!p2) continue;
+
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 80 && dist > 5) {
+              const alpha = p.map(dist, 5, 80, 30, 2);
+              // Blend colors
+              const cr = (p1.col[0] + p2.col[0]) * 0.5;
+              const cg = (p1.col[1] + p2.col[1]) * 0.5;
+              const cb = (p1.col[2] + p2.col[2]) * 0.5;
+
+              p.stroke(cr, cg, cb, alpha);
+              p.strokeWeight(0.5);
+              p.line(p1.x, p1.y, p2.x, p2.y);
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // --- Staff lines (subtle) ---
+  function drawStaffLines(w, h) {
+    p.stroke(IVORY[0], IVORY[1], IVORY[2], 8);
+    p.strokeWeight(0.5);
+    for (const vc of VOICE_CONFIG) {
+      const y = h * vc.yBase;
+      p.line(0, y, w, y);
+      // Subtle zone indication
+      for (let offset = -2; offset <= 2; offset++) {
+        if (offset === 0) continue;
+        p.stroke(IVORY[0], IVORY[1], IVORY[2], 3);
+        p.line(0, y + offset * 12, w, y + offset * 12);
+      }
+    }
+  }
+
+  // --- Bar lines ---
+  function drawBarLines(beat, w, h) {
+    const barLength = 16;
+    const currentBar = Math.floor(beat / barLength);
+    const speed = p.map(params.tempo, 60, 180, 0.5, 2.0);
+    const barPixels = w / 6; // approximate bars visible
+
+    for (let b = 0; b < 20; b++) {
+      const barBeat = b * barLength;
+      const xOffset = ((beat - barBeat) * speed * 2) % (w + 100);
+      const x = w - xOffset;
+      if (x < -10 || x > w + 10) continue;
+      p.stroke(IVORY[0], IVORY[1], IVORY[2], 6);
+      p.strokeWeight(0.5);
+      p.line(x, h * 0.1, x, h * 0.9);
+    }
+  }
+
+  // --- SDG watermark ---
+  function drawSDG(w, h) {
+    p.push();
+    p.noStroke();
+    p.fill(GOLD[0], GOLD[1], GOLD[2], 40);
+    p.textFont('Bodoni Moda');
+    p.textSize(14);
+    p.textAlign(p.RIGHT, p.BOTTOM);
+    p.textStyle(p.ITALIC);
+    p.text('S. D. G.', w - 24, h - 20);
+    p.pop();
+  }
+
+  // ========== p5 SETUP ==========
+  p.setup = function() {
+    p.createCanvas(p.windowWidth, p.windowHeight);
+    p.frameRate(60);
+    p.colorMode(p.RGB, 255);
+
+    seededRandom = mulberry32(currentSeed);
+    document.getElementById('seed-display').textContent = 'seed: ' + currentSeed;
+
+    voices = VOICE_CONFIG.map((cfg, i) => new Voice(cfg, i));
+    createGrain(p.width, p.height);
+    lastBeatTime = p.millis();
+  };
+
+  // ========== p5 DRAW ==========
+  p.draw = function() {
+    const w = p.width;
+    const h = p.height;
+
+    // Background with subtle fade (creates trailing effect)
+    p.noStroke();
+    p.fill(INK[0], INK[1], INK[2], params.style === 'calligraphic' ? 25 : 18);
+    p.rect(0, 0, w, h);
+
+    // Advance beat based on tempo
+    const now = p.millis();
+    const msPerSixteenth = (60000 / params.tempo) / 4;
+    if (now - lastBeatTime >= msPerSixteenth) {
+      globalBeat++;
+      lastBeatTime = now;
+    }
+
+    // Draw subtle structural elements
+    drawStaffLines(w, h);
+    drawBarLines(globalBeat, w, h);
+
+    // Update and draw voices
+    for (const voice of voices) {
+      voice.update(globalBeat, w, h);
+    }
+
+    // Draw interference first (behind particles)
+    drawInterference();
+
+    // Draw particles
+    for (const voice of voices) {
+      voice.draw();
+    }
+
+    // Grain overlay
+    if (grainTexture) {
+      p.push();
+      p.blendMode(p.ADD);
+      p.image(grainTexture, 0, 0);
+      p.pop();
+    }
+
+    // SDG watermark
+    drawSDG(w, h);
+  };
+
+  // ========== RESIZE ==========
+  p.windowResized = function() {
+    p.resizeCanvas(p.windowWidth, p.windowHeight);
+    createGrain(p.width, p.height);
+  };
+
+  // ========== SCREENSHOT ==========
+  window.takeScreenshot = function() {
+    p.saveCanvas('fugenmaschine_' + currentSeed, 'png');
+  };
+
+  // ========== RESET WITH NEW SEED ==========
+  window.resetWithSeed = function(newSeed) {
+    currentSeed = newSeed;
+    seededRandom = mulberry32(currentSeed);
+    globalBeat = 0;
+    lastBeatTime = p.millis();
+    voices = VOICE_CONFIG.map((cfg, i) => new Voice(cfg, i));
+
+    // Reset voice indicators
+    document.querySelectorAll('.voice-indicator').forEach(el => el.classList.remove('active'));
+    document.getElementById('seed-display').textContent = 'seed: ' + currentSeed;
+
+    // Update URL without reload
+    const url = new URL(window.location);
+    url.searchParams.set('seed', currentSeed);
+    window.history.replaceState({}, '', url);
+
+    // Clear canvas
+    p.background(INK[0], INK[1], INK[2]);
+    createGrain(p.width, p.height);
+  };
+
+}, document.body);
+
+// =============================================
+// UI CONTROLS
+// =============================================
+
+// Sidebar toggle
+document.getElementById('btn-sidebar').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+document.getElementById('sidebar-close').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+});
+
+// Tempo slider
+const tempoSlider = document.getElementById('slider-tempo');
+tempoSlider.addEventListener('input', function() {
+  params.tempo = parseInt(this.value);
+  document.getElementById('tempo-val').textContent = this.value + ' BPM';
+});
+
+// Density slider
+const densitySlider = document.getElementById('slider-density');
+densitySlider.addEventListener('input', function() {
+  params.density = parseInt(this.value);
+  const labels = ['', 'Sparse', 'Sparse', 'Light', 'Light', 'Medium', 'Medium', 'Rich', 'Rich', 'Lush', 'Lush'];
+  document.getElementById('density-val').textContent = labels[this.value] || 'Medium';
+});
+
+// Style buttons
+document.querySelectorAll('.style-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    document.querySelectorAll('.style-btn').forEach(b => b.classList.remove('active'));
+    this.classList.add('active');
+    params.style = this.dataset.style;
+  });
+});
+
+// Stretto toggle
+document.getElementById('toggle-stretto').addEventListener('change', function() {
+  params.stretto = this.checked;
+});
+
+// Inversion toggle
+document.getElementById('toggle-inversion').addEventListener('change', function() {
+  params.inversion = this.checked;
+});
+
+// Randomize seed
+document.getElementById('btn-randomize').addEventListener('click', () => {
+  const newSeed = Math.floor(Math.random() * 100000);
+  window.resetWithSeed(newSeed);
+});
+
+// Screenshot
+document.getElementById('btn-screenshot').addEventListener('click', () => {
+  window.takeScreenshot();
+});
+
+// Fullscreen
+document.getElementById('btn-fullscreen').addEventListener('click', () => {
+  if (!document.fullscreenElement) {
+    document.documentElement.requestFullscreen().catch(() => {});
+  } else {
+    document.exitFullscreen().catch(() => {});
+  }
+});
+
+// Close sidebar when clicking canvas (outside sidebar)
+document.addEventListener('click', (e) => {
+  const sidebar = document.getElementById('sidebar');
+  const sidebarBtn = document.getElementById('btn-sidebar');
+  if (sidebar.classList.contains('open') &&
+      !sidebar.contains(e.target) &&
+      !sidebarBtn.contains(e.target)) {
+    sidebar.classList.remove('open');
+  }
+});
+
+// Keyboard shortcuts
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.getElementById('sidebar').classList.remove('open');
+  }
+  if (e.key === 's' && !e.ctrlKey && !e.metaKey) {
+    window.takeScreenshot();
+  }
+  if (e.key === 'f') {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  }
+  if (e.key === 'r') {
+    const newSeed = Math.floor(Math.random() * 100000);
+    window.resetWithSeed(newSeed);
+  }
+});
+</script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js');</script>
+</body>
+</html>
